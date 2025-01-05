@@ -1,0 +1,1 @@
+rsync -av --exclude='recipe.tmpl' --delete vendor/gojo/src/* ./

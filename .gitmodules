@@ -1,0 +1,9 @@
+[submodule "vendor/gojo"]
+	path = vendor/gojo
+	url = https://github.com/thatstoasty/gojo.git
+[submodule "vendor/libc"]
+	path = vendor/libc
+	url = https://github.com/mojothon/libc.git
+[submodule "vendor/small-time"]
+	path = vendor/small-time
+	url = https://github.com/thatstoasty/small-time.git
