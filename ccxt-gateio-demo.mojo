@@ -1,8 +1,9 @@
 from sys._build import is_debug_build
 from collections import Dict
 from os import getenv
-from testing import assert_equal
+from testing import assert_equal, assert_true
 from memory import UnsafePointer, stack_allocation
+from mojoenv import load_mojo_env
 from monoio_connect import *
 from ccxt.base.types import Any, OrderType, OrderSide, Num, Order, Ticker
 from ccxt.foundation.bybit import Bybit
@@ -261,16 +262,15 @@ fn test_sign() raises:
 fn main() raises:
     var logger = init_logger(LogLevel.Debug, "", "")
 
-    # var api_key = "10d23703c09150b1bf4c5bb7f0f1dd2e"
-    # var api_secret = "996c14c32700f3ce63d0f5530793766a7b8bda8cdfaf5d71071915235f3d3f50"
+    var env_vars = load_mojo_env(".env")
+    var api_key = env_vars["GATEIO_API_KEY"]
+    var api_secret = env_vars["GATEIO_API_SECRET"]
+    var testnet = parse_bool(env_vars["GATEIO_TESTNET"])
 
-    var api_key = "54f938b79e12aa343242ba1d940196c5"
-    var api_secret = "3a98ab4e74b5a02acd5156184bf0e5ace7df76f5bafaa02ff3aedc4c22452bfe"
-    var testnet = True
     # test_http_client_post()
 
     # test_sign()
-    # test_rest(api_key, api_secret, testnet)
-    test_ws(api_key, api_secret, testnet)
+    test_rest(api_key, api_secret, testnet)
+    # test_ws(api_key, api_secret, testnet)
 
     time.sleep(1000000.0)

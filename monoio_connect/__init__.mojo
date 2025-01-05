@@ -13,4 +13,5 @@ from .internal.log import *
 from .internal import *
 from .nanoid import *
 from .timeutil import *
+from .util import *
 from .websocket import *
