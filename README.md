@@ -3,6 +3,12 @@ Furnace is a high-performance quantitative trading library that provides feature
 
 ## Installation
 
+Before using furnace, you need to:
+
+1. Compile https://github.com/furnace-dev/sonic-mojo and copy `libsonic.so` to the current directory.
+
+2. Compile https://github.com/furnace-dev/furnace-connect and copy `libfurnace_connect.so` to the current directory.
+
 ```bash
 magic install
 magic shell
