@@ -1,7 +1,11 @@
-fn parse_bool(val: String) -> Bool:
-    """Parse a string as a boolean value.
-
-    The string is considered `True` if it is equal to "True" or "true" (case
-    insensitive). Otherwise, it is considered `False`.
+fn parse_bool(value: String) -> Bool:
+    """Parse a string value into a boolean.
+    
+    Args:
+        value: String value to parse, e.g. "True", "true", "1"
+        
+    Returns:
+        Bool: True if value is "True", "true", "1", False otherwise
     """
-    return val.lower() == "true"
+    var lower_value = value.lower()
+    return lower_value == "true" or lower_value == "1"
