@@ -12,6 +12,7 @@ from .internal.idgen import *
 from .internal.log import *
 from .internal import *
 from .nanoid import *
+from .thread import start_thread, ThreadTaskFn, TaskFn
 from .timeutil import *
 from .util import *
 from .websocket import *

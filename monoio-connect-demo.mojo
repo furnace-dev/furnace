@@ -419,6 +419,7 @@ struct WebSocketWrapper:
         print("ws_send_text ret: " + str(ret))
 
     fn run(mut self: Self) -> None:
+        var rt = create_monoio_runtime()
         print("start")
         var on_open = self.get_on_open()
         print("get_on_open")
@@ -447,7 +448,7 @@ struct WebSocketWrapper:
         print("set_on_timer")
 
         print("run")
-        self._ws[].run()
+        self._ws[].run(rt)
         print("done")
 
 
@@ -477,6 +478,27 @@ fn tscns_test() raises:
     assert_true(ns > 1735996711599105344)
 
 
+fn thread_run1(context: UnsafePointer[UInt8]) -> UInt8:
+    print("thread_run")
+    context.free()
+    return 0
+
+
+fn thread_test1() raises:
+    var arg = UnsafePointer[UInt8]()
+    var tid = start_thread(thread_run1, arg)
+    print("tid: " + str(tid))
+
+
+fn task() raises -> None:
+    print("task")
+
+
+fn thread_test2() raises:
+    var tid = start_thread(task)
+    print("tid: " + str(tid))
+
+
 fn main() raises:
     tscns_init(INIT_CALIBRATE_NANOS, CALIBRATE_INTERVAL_NANOS)
     tscns_calibrate()
@@ -495,6 +517,8 @@ fn main() raises:
     # http_raw_test()
     # http_test()
     # http_callback_test()
-    log_test()
+    # log_test()
     # tscns_test()
-    # time.sleep(1000.0)
+    # thread_test1()
+    thread_test2()
+    time.sleep(1000.0)

@@ -258,7 +258,7 @@ struct Gate(ProExchangeable):
     fn set_on_my_trade(mut self: Self, on_my_trade: OnMyTrade) raises -> None:
         self._on_my_trade = on_my_trade
 
-    fn connect(mut self: Self) raises -> None:
+    fn connect(mut self: Self, rt: MonoioRuntimePtr) raises -> None:
         """
         Connect to the Gate.io API.
         """
@@ -286,7 +286,7 @@ struct Gate(ProExchangeable):
         self._ws[].set_on_close(on_close^)
         self._ws[].set_on_timer(on_timer^)
 
-        self._ws[0].run()
+        self._ws[0].run(rt)
 
     fn get_on_open(mut self) -> WebSocketOpenCallback:
         var self_ptr = UnsafePointer.address_of(self)

@@ -54,8 +54,6 @@ fn test_rest(api_key: String, api_secret: String, testnet: Bool) raises -> None:
     config["api_secret"] = api_secret
     config["testnet"] = testnet
 
-    # config["proxy"] = String("http://10.0.1.56:1080")
-    # var bybit = Bybit(config)
     var trading_context = TradingContext(
         exchange_id="gate", account_id="1", trader_id="1"
     )
@@ -67,9 +65,7 @@ fn test_rest(api_key: String, api_secret: String, testnet: Bool) raises -> None:
     # var markets = gate.fetch_markets(params)
     # for market in markets:
     #     print(str(market))
-    # https://api.gateio.ws/api/v4/spot/currencies
-    # https://fx-api-testnet.gateio.ws/api/v4/spot/currencies
-    # https://fx-api-testnet.gateio.ws/api/v4/futures/currencies
+
     # var currencies = gate.fetch_currencies(params)
     # for currency in currencies:
     #     print(str(currency[].value()))
@@ -151,10 +147,11 @@ fn on_ticker(trading_context: TradingContext, ticker: Ticker) -> None:
 
 
 fn thread_run(arg: UnsafePointer[UInt8]) -> UInt8:
+    var rt = create_monoio_runtime()
     var gate_pro = arg.bitcast[GatePro]()
     print("start connect")
     try:
-        gate_pro[].connect()
+        gate_pro[].connect(rt)
     except err:
         print(str(err))
     print("connect done")
@@ -162,10 +159,11 @@ fn thread_run(arg: UnsafePointer[UInt8]) -> UInt8:
 
 
 fn thread_run_wrap[T: AnyType](arg: UnsafePointer[UInt8]) -> UInt8:
+    var rt = create_monoio_runtime()
     var gate_pro = arg.bitcast[GatePro]()
     print("start connect")
     try:
-        gate_pro[].connect()
+        gate_pro[].connect(rt)
     except err:
         print(str(err))
     print("connect done")
@@ -174,6 +172,7 @@ fn thread_run_wrap[T: AnyType](arg: UnsafePointer[UInt8]) -> UInt8:
 
 # ws
 fn test_ws(api_key: String, api_secret: String, testnet: Bool) raises -> None:
+    var rt = create_monoio_runtime()
     var config_pro = Dict[String, Any]()
 
     config_pro["api_key"] = api_key
@@ -203,7 +202,7 @@ fn test_ws(api_key: String, api_secret: String, testnet: Bool) raises -> None:
     # var params2 = Dict[String, Any]()
     # gate_pro.subscribe_order("BTC_USDT", params2)  # Subscribe to BTC/USDT order
 
-    gate_pro.connect()
+    gate_pro.connect(rt)
 
     # var tid: UInt64 = 0
     # var gate_pro_ptr: UnsafePointer[GatePro] = UnsafePointer[GatePro].address_of(gate_pro)

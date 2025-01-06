@@ -25,7 +25,8 @@ mojo test
 
 ```bash
 # Debug mode
-mojo run -D DEBUG_MODE ccxt-gateio-demo.mojo
+RUST_BACKTRACE=1 mojo run -D DEBUG_MODE ccxt-gateio-demo.mojo
+RUST_BACKTRACE=1 mojo run -D DEBUG_MODE gateio-main.mojo
 
 # Release mode
 mojo run ccxt-gateio-demo.mojo

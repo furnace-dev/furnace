@@ -393,20 +393,37 @@ struct Account:
 
 
 @value
-struct Trade:
+struct Trade(Stringable):
     var info: Dict[String, Any]
-    var amount: Num
+    var amount: Fixed
     var datetime: Str
-    var id: Str
+    var id: String
     var order: Str
-    var price: Num
+    var price: Fixed
     var timestamp: Int
     var type: Str
-    var side: Str
-    var symbol: Str
+    var side: String
+    var symbol: String
     var takerOrMaker: Str
-    var cost: Num
+    var cost: Fixed
     var fee: Fee
+
+    fn __str__(self) -> String:
+        return String.write(
+            "Trade(id=",
+            self.id,
+            ", symbol=",
+            str(self.symbol),
+            ", side=",
+            str(self.side),
+            ", amount=",
+            str(self.amount),
+            ", price=",
+            str(self.price),
+            ", cost=",
+            str(self.cost),
+            ")",
+        )
 
 
 @value

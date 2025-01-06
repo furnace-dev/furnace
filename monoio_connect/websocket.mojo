@@ -215,9 +215,8 @@ struct WebSocket:
     fn _set_ws(mut self: Self, ws: UnsafePointer[c_void]) -> None:
         self._ws = ws
 
-    fn run(mut self: Self) -> None:
+    fn run(mut self: Self, rt: MonoioRuntimePtr) -> None:
         print("WebSocket.run")
-        var rt = create_monoio_runtime()
         var ret = connect_ws(
             rt,
             self._id,
@@ -233,7 +232,6 @@ struct WebSocket:
             _ws_on_timer,
         )
         print("connect_ws ret: " + str(ret))
-        _ = rt
 
     fn send(self: Self, text: String) -> Int:
         if self._ws == UnsafePointer[c_void]():

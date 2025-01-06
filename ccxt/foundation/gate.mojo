@@ -1,7 +1,7 @@
 import time
 from collections.optional import _NoneType
 from memory import stack_allocation
-from monoio_connect import logd, logi
+from monoio_connect import logd, logi, logw
 from monoio_connect.fixed import Fixed
 from ccxt.base.types import *
 from ccxt.base.exchange import Exchange
@@ -95,6 +95,7 @@ struct Gate(Exchangeable):
     var _trading_context: TradingContext
     var _host: String
     var _debug: Bool
+    var _testnet: Bool
 
     fn __init__(
         out self,
@@ -103,10 +104,10 @@ struct Gate(Exchangeable):
         rt: MonoioRuntimePtr = MonoioRuntimePtr(),
         debug: Bool = False,
     ) raises:
-        var testnet = False if "testnet" not in config else config[
-            "testnet"
-        ].bool()
-        var base_url = "https://api.gateio.ws" if not testnet else "https://fx-api-testnet.gateio.ws"
+        self._testnet = (
+            False if "testnet" not in config else config["testnet"].bool()
+        )
+        var base_url = "https://api.gateio.ws" if not self._testnet else "https://fx-api-testnet.gateio.ws"
         self._debug = debug
         self._host = String(base_url).replace("https://", "")
         if debug:
@@ -151,6 +152,7 @@ struct Gate(Exchangeable):
         self._api_secret = other._api_secret
         self._on_order = other._on_order
         self._trading_context = other._trading_context
+        self._testnet = other._testnet
 
     fn set_on_order(mut self: Self, on_order: OnOrder) raises -> None:
         self._on_order = on_order
@@ -188,7 +190,7 @@ struct Gate(Exchangeable):
         var full_path = path_
         if query != "":
             full_path += "?" + query
-        logd("path: " + path_)
+        # logd("path: " + path_)
         var headers = Headers()
 
         headers["Accept"] = "application/json"
@@ -660,20 +662,14 @@ struct Gate(Exchangeable):
         :param dict [params]: extra parameters specific to the exchange API endpoint
         :returns dict: an associative dictionary of currencies
         """
-        # sandbox/testnet only supports future markets
-        # var apiBackup = self.safe_value(self.urls, 'apiBackup')
-        # if apiBackup is not None:
-        #     return None
-        # if self.check_required_credentials(False):
-        #     self.load_unified_status()
-        # response = self.publicSpotGetCurrencies(params)
+        if self._testnet:
+            logw("fetch_currencies not supported on testnet")
+            return List[Currency]()
+
         var text = self._request(self._api.spot_get_currencies, params, "", "")
         logd("text: " + text)
         if len(text) == 0:
             return List[Currency]()
-        # 保存到文件
-        # with open("data/currencies.json", "w") as f:
-        #     f.write(text)
 
         # {
         #     "currency": "0DOG",
@@ -785,38 +781,14 @@ struct Gate(Exchangeable):
         :param dict [params]: extra parameters specific to the exchange API endpoint
         :returns dict: a `ticker structure <https://docs.ccxt.com/#/?id=ticker-structure>`
         """
-        # self.load_markets()
-        # market = self.market(symbol)
-        # request, query = self.prepare_request(market, None, params)
         var text: String
-        # if market['spot'] or market['margin']:
-        #    text = self.publicSpotGetTickers(self.extend(request, query))
-        # elif market['swap']:
         var params = Dict[String, Any]()
         params["settle"] = "usdt"
         var query = "contract=" + symbol
         text = self._request(
             self._api.futures_get_settle_tickers, params, query, ""
         )
-        logd(text)
-        # elif market['future']:
-        #    response = self.publicDeliveryGetSettleTickers(self.extend(request, query))
-        # elif market['option']:
-        #     marketId = market['id']
-        #     optionParts = marketId.split('-')
-        #     request['underlying'] = self.safe_string(optionParts, 0)
-        #     response = self.publicOptionsGetTickers(self.extend(request, query))
-        # else:
-        #     raise NotSupported(self.id + ' fetchTicker() not support self market type')
-        # ticker = None
-        # if market['option']:
-        #     for i in range(0, len(response)):
-        #         entry = response[i]
-        #         if entry['name'] == market['id']:
-        #             ticker = entry
-        #             break
-        # else:
-        #     ticker = self.safe_value(response, 0)
+        # logd(text)
         # [{"last":"102969.5","low_24h":"94635","high_24h":"104597.4","volume_24h":"390181848","change_percentage":"7.45","funding_rate_indicative":"0.000178","index_price":"102796.9","volume_24h_base":"39016","volume_24h_quote":"4017682988","contract":"BTC_USDT","volume_24h_settle":"4017682988","funding_rate":"0.000178","mark_price":"102961.81","total_size":"196983402","highest_bid":"102984.6","highest_size":"110787","lowest_ask":"102984.7","lowest_size":"229255","quanto_multiplier":"0.0001"}]
         var doc = JsonObject(text)
         var arr = JsonValueArrayView(doc)
@@ -826,6 +798,7 @@ struct Gate(Exchangeable):
         _ = obj^
         _ = arr^
         _ = doc^
+        ticker.timestamp = int(now_ms())
         return ticker
 
     fn parse_ticker(self, obj_view: JsonValueRefObjectView) raises -> Ticker:
@@ -945,25 +918,23 @@ struct Gate(Exchangeable):
     fn fetch_tickers(
         self, symbols: Strings, mut params: Dict[String, Any]
     ) raises -> List[Ticker]:
-        var text: String
-        # if market['spot'] or market['margin']:
-        #    text = self.publicSpotGetTickers(self.extend(request, query))
-        # elif market['swap']:
         params["settle"] = "usdt"
-        text = self._request(
+        var text = self._request(
             self._api.futures_get_settle_tickers, params, "", ""
         )
-        logd(text)
+        # logd(text)
         var doc = JsonObject(text)
         var arr = JsonValueArrayView(doc)
         var n = arr.len()
         var result = List[Ticker](capacity=n)
+        var timestamp = int(now_ms())
         for i in range(0, n):
             var obj = arr.get(i)
             var obj_view = JsonValueRefObjectView(obj)
             var ticker = self.parse_ticker(obj_view)
             if symbols:
                 if ticker.symbol.value() in symbols.value():
+                    ticker.timestamp = timestamp
                     result.append(ticker)
             else:
                 result.append(ticker)
@@ -1135,315 +1106,21 @@ struct Gate(Exchangeable):
         :param boolean [params.unifiedAccount]: default False, set to True for fetching the unified account balance
         :returns dict: a `balance structure <https://docs.ccxt.com/#/?id=balance-structure>`
         """
-        # self.load_markets()
-        # self.load_unified_status()
-        # symbol = self.safe_string(params, 'symbol')
-        # params = self.omit(params, 'symbol')
-        # isUnifiedAccount = False
-        # isUnifiedAccount, params = self.handle_option_and_params(params, 'fetchBalance', 'unifiedAccount')
-        # type, query = self.handle_market_type_and_params('fetchBalance', None, params)
-        # request, requestParams = self.prepare_request(None, type, query)
-        # marginMode, requestQuery = self.get_margin_mode(False, requestParams)
-        # if symbol is not None:
-        #     market = self.market(symbol)
-        #     request['currency_pair'] = market['id']
-        # response = None
-        # if isUnifiedAccount:
-        # var text = self._request(self._api.unified_get_accounts, params)
         params["settle"] = "usdt"
         var text = self._request(
             self._api.futures_get_settle_accounts, params, "", ""
         )
-        logd(text)
-        # elif type == 'spot':
-        #     if marginMode == 'spot':
-        #         response = self.privateSpotGetAccounts(self.extend(request, requestQuery))
-        #     elif marginMode == 'margin':
-        #         response = self.privateMarginGetAccounts(self.extend(request, requestQuery))
-        #     elif marginMode == 'cross_margin':
-        #         response = self.privateMarginGetCrossAccounts(self.extend(request, requestQuery))
-        #     else:
-        #         raise NotSupported(self.id + ' fetchBalance() not support self marginMode')
-        # elif type == 'funding':
-        #     response = self.privateMarginGetFundingAccounts(self.extend(request, requestQuery))
-        # elif type == 'swap':
-        #     response = self.privateFuturesGetSettleAccounts(self.extend(request, requestQuery))
-        # elif type == 'future':
-        #     response = self.privateDeliveryGetSettleAccounts(self.extend(request, requestQuery))
-        # elif type == 'option':
-        #     response = self.privateOptionsGetAccounts(self.extend(request, requestQuery))
-        # else:
-        #     raise NotSupported(self.id + ' fetchBalance() not support self market type')
-        # contract = ((type == 'swap') or (type == 'future') or (type == 'option'))
-        # if contract:
-        #     response = [response]
-        #
-        # Spot / margin funding
-        #
-        #     [
-        #         {
-        #             "currency": "DBC",
-        #             "available": "0",
-        #             "locked": "0"
-        #             "lent": "0",  # margin funding only
-        #             "total_lent": "0"  # margin funding only
-        #         },
-        #         ...
-        #     ]
-        #
-        #  Margin
-        #
-        #    [
-        #        {
-        #            "currency_pair": "DOGE_USDT",
-        #            "locked": False,
-        #            "risk": "9999.99",
-        #            "base": {
-        #                "currency": "DOGE",
-        #                "available": "0",
-        #                "locked": "0",
-        #                "borrowed": "0",
-        #                "interest": "0"
-        #            },
-        #            "quote": {
-        #                "currency": "USDT",
-        #                "available": "0.73402",
-        #                "locked": "0",
-        #                "borrowed": "0",
-        #                "interest": "0"
-        #            }
-        #        },
-        #        ...
-        #    ]
-        #
-        # Cross margin
-        #
-        #    {
-        #        "user_id": 10406147,
-        #        "locked": False,
-        #        "balances": {
-        #            "USDT": {
-        #                "available": "1",
-        #                "freeze": "0",
-        #                "borrowed": "0",
-        #                "interest": "0"
-        #            }
-        #        },
-        #        "total": "1",
-        #        "borrowed": "0",
-        #        "interest": "0",
-        #        "risk": "9999.99"
-        #    }
-        #
-        #  Perpetual Swap
-        #
-        #    {
-        #        "order_margin": "0",
-        #        "point": "0",
-        #        "bonus": "0",
-        #        "history": {
-        #            "dnw": "2.1321",
-        #            "pnl": "11.5351",
-        #            "refr": "0",
-        #            "point_fee": "0",
-        #            "fund": "-0.32340576684",
-        #            "bonus_dnw": "0",
-        #            "point_refr": "0",
-        #            "bonus_offset": "0",
-        #            "fee": "-0.20132775",
-        #            "point_dnw": "0",
-        #        },
-        #        "unrealised_pnl": "13.315100000006",
-        #        "total": "12.51345151332",
-        #        "available": "0",
-        #        "in_dual_mode": False,
-        #        "currency": "USDT",
-        #        "position_margin": "12.51345151332",
-        #        "user": "6333333",
-        #    }
-        #
-        # Delivery Future
-        #
-        #    {
-        #        "order_margin": "0",
-        #        "point": "0",
-        #        "history": {
-        #            "dnw": "1",
-        #            "pnl": "0",
-        #            "refr": "0",
-        #            "point_fee": "0",
-        #            "point_dnw": "0",
-        #            "settle": "0",
-        #            "settle_fee": "0",
-        #            "point_refr": "0",
-        #            "fee": "0",
-        #        },
-        #        "unrealised_pnl": "0",
-        #        "total": "1",
-        #        "available": "1",
-        #        "currency": "USDT",
-        #        "position_margin": "0",
-        #        "user": "6333333",
-        #    }
-        #
-        # option
-        #
-        #     {
-        #         "order_margin": "0",
-        #         "bid_order_margin": "0",
-        #         "init_margin": "0",
-        #         "history": {
-        #             "dnw": "32",
-        #             "set": "0",
-        #             "point_fee": "0",
-        #             "point_dnw": "0",
-        #             "prem": "0",
-        #             "point_refr": "0",
-        #             "insur": "0",
-        #             "fee": "0",
-        #             "refr": "0"
-        #         },
-        #         "total": "32",
-        #         "available": "32",
-        #         "liq_triggered": False,
-        #         "maint_margin": "0",
-        #         "ask_order_margin": "0",
-        #         "point": "0",
-        #         "position_notional_limit": "2000000",
-        #         "unrealised_pnl": "0",
-        #         "equity": "32",
-        #         "user": 5691076,
-        #         "currency": "USDT",
-        #         "short_enabled": False,
-        #         "orders_limit": 10
-        #     }
-        #
-        # unified
-        #
-        #     {
-        #         "user_id": 10001,
-        #         "locked": False,
-        #         "balances": {
-        #             "ETH": {
-        #                 "available": "0",
-        #                 "freeze": "0",
-        #                 "borrowed": "0.075393666654",
-        #                 "negative_liab": "0",
-        #                 "futures_pos_liab": "0",
-        #                 "equity": "1016.1",
-        #                 "total_freeze": "0",
-        #                 "total_liab": "0"
-        #             },
-        #             "POINT": {
-        #                 "available": "9999999999.017023138734",
-        #                 "freeze": "0",
-        #                 "borrowed": "0",
-        #                 "negative_liab": "0",
-        #                 "futures_pos_liab": "0",
-        #                 "equity": "12016.1",
-        #                 "total_freeze": "0",
-        #                 "total_liab": "0"
-        #             },
-        #             "USDT": {
-        #                 "available": "0.00000062023",
-        #                 "freeze": "0",
-        #                 "borrowed": "0",
-        #                 "negative_liab": "0",
-        #                 "futures_pos_liab": "0",
-        #                 "equity": "16.1",
-        #                 "total_freeze": "0",
-        #                 "total_liab": "0"
-        #             }
-        #         },
-        #         "total": "230.94621713",
-        #         "borrowed": "161.66395521",
-        #         "total_initial_margin": "1025.0524665088",
-        #         "total_margin_balance": "3382495.944473949183",
-        #         "total_maintenance_margin": "205.01049330176",
-        #         "total_initial_margin_rate": "3299.827135672679",
-        #         "total_maintenance_margin_rate": "16499.135678363399",
-        #         "total_available_margin": "3381470.892007440383",
-        #         "unified_account_total": "3381470.892007440383",
-        #         "unified_account_total_liab": "0",
-        #         "unified_account_total_equity": "100016.1",
-        #         "leverage": "2"
-        #     }
-        #
-        # isolated = marginMode == 'margin'
-        # data = response
-        # if 'balances' in data:  # True for cross_margin and unified
-        #     flatBalances = []
-        #     balances = self.safe_value(data, 'balances', [])
-        #     # inject currency and create an artificial balance object
-        #     # so it can follow the existent flow
-        #     keys = list(balances.keys())
-        #     for i in range(0, len(keys)):
-        #         currencyId = keys[i]
-        #         content = balances[currencyId]
-        #         content['currency'] = currencyId
-        #         flatBalances.append(content)
-        #     data = flatBalances
-        # for i in range(0, len(data)):
-        #     entry = data[i]
-        #     if isolated:
-        #         marketId = self.safe_string(entry, 'currency_pair')
-        #         symbolInner = self.safe_symbol(marketId, None, '_', 'margin')
-        #         base = self.safe_value(entry, 'base', {})
-        #         quote = self.safe_value(entry, 'quote', {})
-        #         baseCode = self.safe_currency_code(self.safe_string(base, 'currency'))
-        #         quoteCode = self.safe_currency_code(self.safe_string(quote, 'currency'))
-        #         subResult: dict = {}
-        #         subResult[baseCode] = self.parse_balance_helper(base)
-        #         subResult[quoteCode] = self.parse_balance_helper(quote)
-        #         result[symbolInner] = self.safe_balance(subResult)
-        #     else:
-        #         code = self.safe_currency_code(self.safe_string(entry, 'currency'))
-        #         result[code] = self.parse_balance_helper(entry)
-        # returnResult = result if isolated else self.safe_balance(result)
-        # return returnResult
-
-        # {"order_margin":"307.857342","point":"0","bonus":"0","history":{"dnw":"3000","pnl":"0","refr":"0","point_fee":"0","fund":"4.823794069","bonus_dnw":"0","point_refr":"0","bonus_offset":"0","fee":"-0.001","point_dnw":"0","cross_settle":"0"},"unrealised_pnl":"19.601","total":"3004.822794069","available":"2696.711702069","enable_credit":false,"in_dual_mode":false,"currency":"USDT","position_margin":"0.25375","user":16792411,"update_time":1733702400,"update_id":145,"position_initial_margin":"0","maintenance_margin":"0","margin_mode":0,"enable_evolved_classic":false,"cross_initial_margin":"0","cross_maintenance_margin":"0","cross_order_margin":"0","cross_unrealised_pnl":"0","cross_available":"2696.711702069","isolated_position_margin":"0","enable_new_dual_mode":false}
-        # {
-        #     "order_margin": "307.857342",
-        #     "point": "0",
-        #     "bonus": "0",
-        #     "history": {
-        #         "dnw": "3000",
-        #         "pnl": "0",
-        #         "refr": "0",
-        #         "point_fee": "0",
-        #         "fund": "4.823794069",
-        #         "bonus_dnw": "0",
-        #         "point_refr": "0",
-        #         "bonus_offset": "0",
-        #         "fee": "-0.001",
-        #         "point_dnw": "0",
-        #         "cross_settle": "0"
-        #     },
-        #     "unrealised_pnl": "19.601",
-        #     "total": "3004.822794069",
-        #     "available": "2696.711702069",
-        #     "enable_credit": false,
-        #     "in_dual_mode": false,
-        #     "currency": "USDT",
-        #     "position_margin": "0.25375",
-        #     "user": 16792411,
-        #     "update_time": 1733702400,
-        #     "update_id": 145,
-        #     "position_initial_margin": "0",
-        #     "maintenance_margin": "0",
-        #     "margin_mode": 0,
-        #     "enable_evolved_classic": false,
-        #     "cross_initial_margin": "0",
-        #     "cross_maintenance_margin": "0",
-        #     "cross_order_margin": "0",
-        #     "cross_unrealised_pnl": "0",
-        #     "cross_available": "2696.711702069",
-        #     "isolated_position_margin": "0",
-        #     "enable_new_dual_mode": false
-        # }
-
-        var result = Balance(free=Fixed.zero, used=Fixed.zero, total=Fixed.zero)
+        # {"order_margin":"0.97185","point":"0","bonus":"0","history":{"dnw":"1000","pnl":"-9.39257","refr":"0","point_fee":"0","fund":"0.8214787682","bonus_dnw":"0","point_refr":"0","bonus_offset":"0","fee":"-1.2116409725","point_dnw":"0","cross_settle":"0"},"unrealised_pnl":"72.462424","total":"990.2172677957","available":"954.330842371984","enable_credit":false,"in_dual_mode":true,"currency":"USDT","position_margin":"0","user":541811,"update_time":1736150400,"update_id":416,"position_initial_margin":"0","maintenance_margin":"6.3514389255","margin_mode":0,"enable_evolved_classic":true,"cross_initial_margin":"0","cross_maintenance_margin":"0","cross_order_margin":"0","cross_unrealised_pnl":"0","cross_available":"954.330842371984","isolated_position_margin":"34.914575423716","enable_new_dual_mode":true,"margin_mode_name":"classic"}
+        # logd(text)
+        var doc = JsonObject(text)
+        var unrealised_pnl = Fixed(doc.get_str("unrealised_pnl"))
+        var total = Fixed(doc.get_str("total"))
+        var available = Fixed(doc.get_str("available"))
+        var result = Balance(
+            free=available,
+            used=unrealised_pnl,
+            total=total,
+        )
         return result
 
     fn create_order(
