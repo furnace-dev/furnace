@@ -12,9 +12,9 @@ struct Bybit(Exchangeable):
     var _client: UnsafePointer[HttpClient]
     var _api: ImplicitAPI
 
-    fn __init__(out self, config: Dict[String, Any]) raises:
+    fn __init__(out self, config: Dict[String, Any]):
         var base_url = "https://api.bybit.com"
-        var proxy = str(config["proxy"]) if 'proxy' in config else String()
+        # var proxy = str(config["proxy"]) if 'proxy' in config else String()
         var options = HttpClientOptions(base_url)
         # self.default_type = config["defaultType"][
         #     String

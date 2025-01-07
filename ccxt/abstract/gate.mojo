@@ -270,7 +270,7 @@ struct ImplicitAPI:
     var rebate_get_agency_transaction_history: Entry
     var rebate_get_agency_commission_history: Entry
 
-    fn __init__(out self) raises:
+    fn __init__(out self):
         self.wallet_get_currency_chains = Entry(
             "currency_chains", '["public", "wallet"]', "GET", '{"cost": 1}'
         )

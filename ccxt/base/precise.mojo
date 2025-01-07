@@ -277,7 +277,7 @@ struct Precise:
 
     @staticmethod
     fn string_or(string1: String, string2: String) raises -> Self:
-        return str(Precise(string1).orn(Precise(string2)))
+        return Self(str(Precise(string1).orn(Precise(string2))))
 
     @staticmethod
     fn string_equals(string1: String, string2: String) raises -> Bool:
@@ -289,11 +289,11 @@ struct Precise:
 
     @staticmethod
     fn string_min(string1: String, string2: String) raises -> Self:
-        return str(Precise(string1).min(Precise(string2)))
+        return Self(str(Precise(string1).min(Precise(string2))))
 
     @staticmethod
     fn string_max(string1: String, string2: String) raises -> Self:
-        return str(Precise(string1).max(Precise(string2)))
+        return Self(str(Precise(string1).max(Precise(string2))))
 
     @staticmethod
     fn string_gt(string1: String, string2: String) raises -> Bool:

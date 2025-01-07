@@ -292,7 +292,7 @@ struct ImplicitAPI:
     var v5_account_set_collateral_switch_batch: Entry
     var v5_account_demo_apply_money: Entry
 
-    fn __init__(out self) raises:
+    fn __init__(out self):
         self.spot_v3_public_symbols = Entry(
             "spot/v3/public/symbols", "public", "GET", '{"cost": 1}'
         )

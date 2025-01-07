@@ -96,7 +96,7 @@ struct ImplicitAPI:
     var private_delete_order_all: Entry
     var private_delete_user_unstakingrequests: Entry
 
-    fn __init__(out self) raises:
+    fn __init__(out self):
         self.public_get_announcement_urgent = Entry(
             "announcement/urgent", "public", "GET", '{"cost": 5}'
         )

@@ -51,8 +51,8 @@ struct HttpClient:
         client_builder_default_headers(self._builder, self._headers)
         # client_builder_disable_connection_pool(self._builder)
         client_builder_max_idle_connections(self._builder, 10)
-        client_builder_idle_connection_timeout(self._builder, 10)
-        client_builder_set_read_timeout(self._builder, 10)
+        client_builder_idle_connection_timeout(self._builder, 30)
+        client_builder_set_read_timeout(self._builder, 30)
         # client_builder_initial_max_streams(self._builder, 100)
         # client_builder_max_concurrent_streams(self._builder, 100)
         client_builder_enable_https(self._builder)
@@ -93,13 +93,33 @@ struct HttpClient:
                 item[].key.unsafe_cstr_ptr(),
                 item[].value.unsafe_cstr_ptr(),
             )
+        # retry 3 times
+        for i in range(3):
+            var ret = self.request_internal[max_body_size](req)
+            if ret.status_code != 0:
+                destroy_http_request(req)
+                return ret
+            logi(
+                "request failed, status_code: "
+                + str(ret.status_code)
+                + ", retrying "
+                + str(i)
+                + "/3"
+            )
+        destroy_http_request(req)
+        logw("request failed")
+        return HttpResponse(0, "")
+
+    @always_inline
+    fn request_internal[
+        max_body_size: Int = 1024 * 1000
+    ](self, req: HttpRequestPtr,) -> HttpResponse:
         var resp = http_client_request(self._rt, self._client, req)
         var status_code = int(http_response_status_code(resp))
         var buf = stack_allocation[max_body_size, Int8]()
         var body = http_response_body(resp, buf, max_body_size)
         var ret = HttpResponse(status_code, String(StringRef(buf, body)))
         destroy_http_response(resp)
-        destroy_http_request(req)
         return ret
 
     @always_inline

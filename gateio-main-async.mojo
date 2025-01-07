@@ -1,8 +1,10 @@
+from os import abort
 from collections import Dict
 from os import getenv
 from time import perf_counter_ns
 from testing import assert_equal, assert_true
 from memory import UnsafePointer, stack_allocation
+from sys.ffi import _Global
 from mojoenv import load_mojo_env
 from monoio_connect import *
 from ccxt.base.types import Any, OrderType, OrderSide, Num, Order, Ticker
@@ -12,6 +14,50 @@ from ccxt.pro.gate import Gate as GatePro
 from ccxt.base.pro_exchangeable import TradingContext
 from monoio_connect.pthread import *
 from monoio_connect import *
+
+alias GATE_CLIENT = _Global[
+    "GATE_CLIENT",
+    Gate,
+    _init_gate,
+]
+
+
+fn _init_gate() -> Gate:
+    var env_vars = load_mojo_env(".env")
+    var api_key = env_vars.get("GATEIO_API_KEY").value()
+    var api_secret = env_vars.get("GATEIO_API_SECRET").value()
+    var testnet = parse_bool(env_vars.get("GATEIO_TESTNET").value())
+
+    var config = Dict[String, Any]()
+
+    config["api_key"] = api_key
+    config["api_secret"] = api_secret
+    config["testnet"] = testnet
+
+    var trading_context = TradingContext(
+        exchange_id="gate", account_id="1", trader_id="1"
+    )
+    var rt = create_monoio_runtime()
+    return Gate(config, trading_context, rt, debug=False)
+
+
+fn gate_client_ptr() -> UnsafePointer[Gate]:
+    return GATE_CLIENT.get_or_create_ptr()
+
+
+alias _CHANNEL = _Global[
+    "_CHANNEL",
+    ChannelPtr,
+    _init_channel,
+]
+
+
+fn _init_channel() -> ChannelPtr:
+    return create_channel(2, 1024)
+
+
+fn channel_ptr() -> UnsafePointer[ChannelPtr]:
+    return _CHANNEL.get_or_create_ptr()
 
 
 fn on_order(trading_context: TradingContext, order: Order) -> None:
@@ -124,9 +170,25 @@ fn run() raises:
     # logi("sleep")
 
 
+fn gate_client_backend() raises -> None:
+    logd("gate_client_backend run")
+    # 设置cpu
+    bind_to_cpu_set(0)
+    # 初始化客户端
+    gate_client_ptr()[].submit_order(
+        "BTC_USDT",
+        OrderType.Limit,
+        OrderSide.Buy,
+        Fixed(1.0),
+        Fixed(93000),
+        Dict[String, Any](),
+    )
+
+
 fn main() raises:
     var logger = init_logger(LogLevel.Debug, "", "")
-    run()
+    # run()
+    time.sleep(1000000.0)
     destroy_logger(logger)
 
     # test_rest(api_key, api_secret, testnet)

@@ -132,36 +132,22 @@ struct BitMEX(Exchangeable):
 
     fn __init__(
         out self, config: Dict[String, Any], trading_context: TradingContext
-    ) raises:
+    ):
         logd("BitMEX init")
-        var testnet = False if "testnet" not in config else config[
-            "testnet"
-        ].bool()
+        var testnet = config.get("testnet", False).bool()
         logd("testnet: " + str(testnet))
         var base_url = "https://www.bitmex.com" if not testnet else "https://testnet.bitmex.com"
         logd("base_url: " + str(base_url))
-        var proxy = str(config["proxy"]) if "proxy" in config else String()
-        logd("proxy: " + proxy)
         var options = HttpClientOptions(base_url)
-        # self.default_type = config["defaultType"][
-        #     String
-        # ] if "defaultType" in config else String("future")
         self._default_type = String("future")
-        # self._client = PhotonHttpClient(options)
         self._client = UnsafePointer[HttpClient].alloc(1)
-        # self._client.init_pointee_move(PhotonHttpClient(options))
         __get_address_as_uninit_lvalue(self._client.address) = HttpClient(
             options
         )
-        # self._client = PhotonHttpClientCurl(options)
         self._api = ImplicitAPI()
         self._base = Exchange(config)
-        self._api_key = (
-            str(config["api_key"]) if "api_key" in config else String()
-        )
-        self._api_secret = (
-            str(config["api_secret"]) if "api_secret" in config else String()
-        )
+        self._api_key = str(config.get("api_key", String()))
+        self._api_secret = str(config.get("api_secret", String()))
         self._on_order = empty_on_order
         self._trading_context = trading_context
         logd("BitMEX init end")

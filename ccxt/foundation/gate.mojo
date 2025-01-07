@@ -103,22 +103,14 @@ struct Gate(Exchangeable):
         trading_context: TradingContext,
         rt: MonoioRuntimePtr = MonoioRuntimePtr(),
         debug: Bool = False,
-    ) raises:
-        self._testnet = (
-            False if "testnet" not in config else config["testnet"].bool()
-        )
+    ):
+        self._testnet = config.get("testnet", False).bool()
         var base_url = "https://api.gateio.ws" if not self._testnet else "https://fx-api-testnet.gateio.ws"
         self._debug = debug
         self._host = String(base_url).replace("https://", "")
         if debug:
             base_url = "https://httpbin.org"
-        # var proxy = str(config["proxy"]) if "proxy" in config else String()
-        # var options = HttpClientOptions(base_url, proxy=proxy)
-        # self.default_type = config["defaultType"][
-        #     String
-        # ] if "defaultType" in config else String("future")
         self._default_type = String("future")
-        # self._client = PhotonHttpClient(options)
         self._client = UnsafePointer[HttpClient].alloc(1)
         var options = HttpClientOptions(base_url)
         # self._client.init_pointee_move(PhotonHttpClient(options))
@@ -127,12 +119,8 @@ struct Gate(Exchangeable):
         )
         self._api = ImplicitAPI()
         self._base = Exchange(config)
-        self._api_key = (
-            str(config["api_key"]) if "api_key" in config else String()
-        )
-        self._api_secret = (
-            str(config["api_secret"]) if "api_secret" in config else String()
-        )
+        self._api_key = str(config.get("api_key", String()))
+        self._api_secret = str(config.get("api_secret", String()))
         self._on_order = empty_on_order
         self._trading_context = trading_context
 
@@ -655,12 +643,12 @@ struct Gate(Exchangeable):
         self, mut params: Dict[String, Any]
     ) raises -> List[Currency]:
         """
-        fetches all available currencies on an exchange
+        Fetches all available currencies on an exchange.
 
         https://www.gate.io/docs/developers/apiv4/en/#list-all-currencies-details
 
         :param dict [params]: extra parameters specific to the exchange API endpoint
-        :returns dict: an associative dictionary of currencies
+        :returns dict: an associative dictionary of currencies.
         """
         if self._testnet:
             logw("fetch_currencies not supported on testnet")
@@ -770,7 +758,7 @@ struct Gate(Exchangeable):
 
     fn fetch_ticker(self, symbol: String) raises -> Ticker:
         """
-        fetches a price ticker, a statistical calculation with the information calculated over the past 24 hours for a specific market
+        Fetches a price ticker, a statistical calculation with the information calculated over the past 24 hours for a specific market.
 
         https://www.gate.io/docs/developers/apiv4/en/#get-details-of-a-specifc-order
         https://www.gate.io/docs/developers/apiv4/en/#list-futures-tickers
@@ -779,7 +767,7 @@ struct Gate(Exchangeable):
 
         :param str symbol: unified symbol of the market to fetch the ticker for
         :param dict [params]: extra parameters specific to the exchange API endpoint
-        :returns dict: a `ticker structure <https://docs.ccxt.com/#/?id=ticker-structure>`
+        :returns dict: a `ticker structure <https://docs.ccxt.com/#/?id=ticker-structure>`.
         """
         var text: String
         var params = Dict[String, Any]()
@@ -950,7 +938,7 @@ struct Gate(Exchangeable):
         mut params: Dict[String, Any],
     ) raises -> OrderBook:
         """
-        fetches information on open orders with bid(buy) and ask(sell) prices, volumes and other data
+        Fetches information on open orders with bid(buy) and ask(sell) prices, volumes and other data.
 
         https://www.gate.io/docs/developers/apiv4/en/#retrieve-order-book
         https://www.gate.io/docs/developers/apiv4/en/#futures-order-book
@@ -960,7 +948,7 @@ struct Gate(Exchangeable):
         :param str symbol: unified symbol of the market to fetch the order book for
         :param int [limit]: the maximum amount of order book entries to return
         :param dict [params]: extra parameters specific to the exchange API endpoint
-        :returns dict: A dictionary of `order book structures <https://docs.ccxt.com/#/?id=order-book-structure>` indexed by market symbols
+        :returns dict: A dictionary of `order book structures <https://docs.ccxt.com/#/?id=order-book-structure>` indexed by market symbols.
         """
         var query = Dict[String, Any]()
         query["contract"] = symbol
@@ -1104,7 +1092,7 @@ struct Gate(Exchangeable):
         :param str [params.marginMode]: 'cross' or 'isolated' - marginMode for margin trading if not provided self.options['defaultMarginMode'] is used
         :param str [params.symbol]: margin only - unified ccxt symbol
         :param boolean [params.unifiedAccount]: default False, set to True for fetching the unified account balance
-        :returns dict: a `balance structure <https://docs.ccxt.com/#/?id=balance-structure>`
+        :returns dict: a `balance structure <https://docs.ccxt.com/#/?id=balance-structure>`.
         """
         params["settle"] = "usdt"
         var text = self._request(
