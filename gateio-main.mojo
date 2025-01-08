@@ -4,14 +4,10 @@ from time import perf_counter_ns
 from testing import assert_equal, assert_true
 from memory import UnsafePointer, stack_allocation
 from mojoenv import load_mojo_env
+from ccxt.base.types import *
 from monoio_connect import *
-from ccxt.base.types import Any, OrderType, OrderSide, Num, Order, Ticker
-from ccxt.foundation.bybit import Bybit
-from ccxt.foundation.gate import Gate
-from ccxt.pro.gate import Gate as GatePro
 from ccxt.base.pro_exchangeable import TradingContext
-from monoio_connect.pthread import *
-from monoio_connect import *
+from ccxt.foundation.gate import Gate
 
 
 fn on_order(trading_context: TradingContext, order: Order) -> None:
