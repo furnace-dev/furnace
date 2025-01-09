@@ -3,6 +3,7 @@ from .internal.httpclient import *
 from .internal.monoio import *
 from .internal.fastwebsockets import *
 from .internal.tscns import *
+from .channel import Channel
 from .crypto import *
 from .fixed import *
 from .headermap import *

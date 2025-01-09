@@ -175,19 +175,24 @@ fn gate_client_backend() raises -> None:
     # 设置cpu
     bind_to_cpu_set(0)
     # 初始化客户端
-    gate_client_ptr()[].submit_order(
+    var params = Dict[String, Any]()
+    var ok = gate_client_ptr()[].submit_order(
         "BTC_USDT",
         OrderType.Limit,
         OrderSide.Buy,
         Fixed(1.0),
         Fixed(93000),
-        Dict[String, Any](),
+        params,
     )
+    logd("ok: " + str(ok))
 
 
 fn main() raises:
     var logger = init_logger(LogLevel.Debug, "", "")
+    # 发送消息
+    # channel_ptr()[].send("hello")
     # run()
+    logd("OK")
     time.sleep(1000000.0)
     destroy_logger(logger)
 
