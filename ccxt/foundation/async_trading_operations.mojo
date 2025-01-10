@@ -53,10 +53,12 @@ fn _cancel_order_internal[
     var req = request[].data[SubmitCancelOrderData]
     var symbol = req.symbol
     var order_id = req.order_id
-    exchange[].cancel_order(symbol, order_id)
+    var params = Dict[String, Any]()
+    var ok = exchange[].cancel_order(symbol, order_id, params)
+    # TODO: trigger callback
 
 
-@allways_inline
+@always_inline
 fn _cancel_order(request: UnsafePointer[AsyncTradingRequest]) raises:
     var exchange_id = request[].exchange_id
     if exchange_id == ExchangeId.Gateio:
