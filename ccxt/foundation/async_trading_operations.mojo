@@ -79,7 +79,7 @@ fn _cancel_order(request: UnsafePointer[AsyncTradingRequest]):
 
 fn _async_trading_backend() raises -> None:
     """
-    The entry point of the asynchronous trading thread
+    The entry point of the asynchronous trading thread.
     """
 
     # set cpu affinity
@@ -106,7 +106,7 @@ fn _async_trading_backend() raises -> None:
 
 fn run_async_trading_thread() raises:
     """
-    Start the asynchronous trading thread
+    Start the asynchronous trading thread.
     """
     var tid = start_thread(_async_trading_backend)
     logd("tid: " + str(tid))
