@@ -1378,17 +1378,62 @@ alias Currency = Optional[CurrencyInterface]
 
 
 @value
+struct ExchangeId(Intable, Stringable):
+    """ExchangeId, the id of the exchange."""
+
+    var _value: UInt8
+
+    alias Gateio = ExchangeId(0)
+    alias Binance = ExchangeId(1)
+    alias Kucoin = ExchangeId(2)
+    alias Bybit = ExchangeId(3)
+    alias OKX = ExchangeId(4)
+    alias Huobi = ExchangeId(5)
+    alias Bitmex = ExchangeId(6)
+    alias Deribit = ExchangeId(7)
+
+    fn __eq__(self, other: ExchangeId) -> Bool:
+        return self._value == other._value
+
+    fn __init__(out self, value: UInt8):
+        self._value = value
+
+    fn __int__(self) -> Int:
+        return int(self._value)
+
+    fn __str__(self) -> String:
+        if self == ExchangeId.Gateio:
+            return "Gateio"
+        elif self == ExchangeId.Binance:
+            return "Binance"
+        elif self == ExchangeId.Kucoin:
+            return "Kucoin"
+        elif self == ExchangeId.Bybit:
+            return "Bybit"
+        elif self == ExchangeId.OKX:
+            return "OKX"
+        elif self == ExchangeId.Huobi:
+            return "Huobi"
+        elif self == ExchangeId.Bitmex:
+            return "Bitmex"
+        elif self == ExchangeId.Deribit:
+            return "Deribit"
+        else:
+            return "Unknown"
+
+
+@value
 struct TradingContext(Stringable):
     """
     交易上下文.
     """
 
-    var exchange_id: String
+    var exchange_id: ExchangeId
     var account_id: String
     var trader_id: String
 
     fn __init__(
-        out self, exchange_id: String, account_id: String, trader_id: String
+        out self, exchange_id: ExchangeId, account_id: String, trader_id: String
     ):
         self.exchange_id = exchange_id
         self.account_id = account_id
@@ -1397,7 +1442,7 @@ struct TradingContext(Stringable):
     fn __str__(self) -> String:
         return (
             "TradingContext(exchange_id="
-            + self.exchange_id
+            + str(self.exchange_id)
             + ", account_id="
             + self.account_id
             + ", trader_id="

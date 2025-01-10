@@ -26,62 +26,11 @@ from monoio_connect import (
     http_response_body,
 )
 from monoio_connect import HttpResponseCallback, Headers
+from ._common_utils import *
 
 
 fn empty_on_order(trading_context: TradingContext, order: Order) -> None:
     pass
-
-
-# fn submit_order_task_entry(arg: c_void_ptr) raises -> c_void_ptr:
-#     logi("submit_order_task_entry: " + str(arg))
-
-#     var request = TaskEntryArg[SubmitOrderRequest[Gate]](arg)
-
-#     logd("symbol: " + request.data()[].symbol)
-#     logd("type: " + str(request.data()[].type))
-#     logd("side: " + str(request.data()[].side))
-#     logd("amount: " + str(request.data()[].amount))
-#     logd("price: " + str(request.data()[].price))
-
-#     var ptr = request.data()
-
-#     # var exchange = ptr[].exchange
-
-#     logd("submit_order create_order start")
-#     var order = ptr[].exchange[].create_order(
-#         ptr[].symbol,
-#         ptr[].type,
-#         ptr[].side,
-#         ptr[].amount,
-#         ptr[].price,
-#         ptr[].params,
-#     )
-#     logd("submit_order create_order end")
-#     # logd("order: " + str(order))
-#     ptr[].exchange[].on_order(order)
-#     logd("submit_order on_order end")
-
-#     _ = order^
-#     _ = request^
-
-#     return c_void_ptr()
-
-
-# fn cancel_order_task_entry(arg: c_void_ptr) raises -> c_void_ptr:
-#     logi("cancel_order_task_entry: " + str(arg))
-
-#     var request = TaskEntryArg[CancelOrderRequest[Gate]](arg)
-
-#     var ptr = request.data()
-
-#     var exchange = ptr[].exchange
-
-#     var order = exchange[].cancel_order_internal(
-#         ptr[].id, ptr[].symbol, ptr[].params
-#     )
-#     exchange[].on_order(order)
-
-#     return c_void_ptr()
 
 
 struct Gate(Exchangeable):
@@ -141,6 +90,9 @@ struct Gate(Exchangeable):
         self._on_order = other._on_order
         self._trading_context = other._trading_context
         self._testnet = other._testnet
+        
+    fn id(self) -> ExchangeId:
+        return ExchangeId.Gateio
 
     fn set_on_order(mut self: Self, on_order: OnOrder) raises -> None:
         self._on_order = on_order
@@ -1338,90 +1290,30 @@ struct Gate(Exchangeable):
         price: Fixed,
         mut params: Dict[String, Any],
     ) raises -> Bool:
-        # https://httpbin.org/#/HTTP_Methods/post_post
-        # curl -X POST "https://httpbin.org/post" -H "accept: application/json"
-        logd("submit_order start")
-        var data = JsonObject()
-        data.insert_str("contract", symbol)
-        data.insert_i64("size", amount.to_int())
-        # data.insert_str("size", amount.to_string())
-        # if iceberg >= 0:
-        #     data.insert_i64("iceberg", iceberg)
-        if type == OrderType.Market:
-            data.insert_str("price", "0")
-        else:
-            # price_to_precision
-            data.insert_str("price", price.to_string())
-
-        if "reduce_only" in params:
-            data.insert_bool("reduce_only", params["reduce_only"].bool())
-        if "tif" in params:
-            data.insert_str("tif", params["tif"].string())
-        if "text" in params:
-            data.insert_str("text", params["text"].string())
-        if "auto_size" in params:
-            data.insert_str("auto_size", params["auto_size"].string())
-        # if close:
-        #     data.insert_bool("close", close)
-        # if reduce_only:
-        #     data.insert_bool("reduce_only", reduce_only)
-        # if len(tif):
-        #     data.insert_str("tif", tif)
-        data.insert_str("tif", "gtc")
-        # if len(text) > 0:
-        #     data.insert_str("text", text)
-        # if len(auto_size) > 0:
-        #     data.insert_str("auto_size", auto_size)
-        var payload = data.to_string()
-
-        logd(payload)
-
-        params["settle"] = "usdt"
-
-        # var text = self._request(
-        #     self._api.futures_post_settle_orders, params, payload=payload
-        # )
-        var entry = UnsafePointer.address_of(
-            self._api.futures_post_settle_orders
+        var request = AsyncTradingRequest(
+            type=0,
+            data=SubmitOrderData(
+                symbol=symbol,
+                order_type=type,
+                order_side=side,
+                amount=amount,
+                price=price,
+            ),
+            exchange=UnsafePointer.address_of(self),
         )
-        self._request_with_callback(
-            entry[].method,
-            entry[].path,
-            params,
-            "",
-            payload,
-            entry[].api,
-            request_callback,
-        )
-
-        # self._request_with_callback(Method.METHOD_POST, "/post", params, "", payload, ApiType.Private, request_callback)
-
-        # var text = '{"refu":0,"tkfr":"0.0005","mkfr":"0.0002","contract":"BTC_USDT","id":58828270139457759,"price":"93000","tif":"gtc","iceberg":0,"text":"api","user":16792411,"is_reduce_only":false,"is_close":false,"is_liq":false,"fill_price":"0","create_time":1733801848.473,"update_time":1733801848.473,"status":"open","left":1,"refr":"0","size":1,"biz_info":"ch:daniugege","amend_text":"-","stp_act":"-","stp_id":0,"update_id":1,"pnl":"0","pnl_margin":"0"}'
-        # logd(text)
-        # var resp = self._request(
-        #     entry[].method,
-        #     entry[].path,
-        #     params,
-        #     query="",
-        #     payload=payload,
-        #     api=entry[].api,
-        #     # callback=request_callback,
-        # )
-        # logd("resp: " + resp)
-        return True
+        var ok = async_trading_channel_ptr()[].send(request)
+        return ok == 0
 
     fn submit_cancel_order(
         self, id: String, symbol: String, mut params: Dict[String, Any]
     ) raises -> Bool:
-        # var request = UnsafePointer[CancelOrderRequest[Gate]].alloc(1)
-        # __get_address_as_uninit_lvalue(request.address) = CancelOrderRequest[
-        #     Gate
-        # ](id, symbol, params, UnsafePointer.address_of(self))
-        # var arg = request.bitcast[UInt8]()
-        # seq_photon_thread_create_and_migrate_to_work_pool(
-        #     cancel_order_task_entry, arg
-        # )
-        return True
+        var request = AsyncTradingRequest(
+            type=1,
+            data=SubmitCancelOrderData(symbol=symbol, order_id=id),
+            exchange=UnsafePointer.address_of(self),
+        )
+        var ok = async_trading_channel_ptr()[].send(request)
+        return ok == 0
 
     fn on_order(self, order: Order) -> None:
         logd("on_order start")

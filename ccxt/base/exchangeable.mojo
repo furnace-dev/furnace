@@ -6,9 +6,10 @@ from ccxt.base.types import *
 # 定义 Exchangeable 接口
 trait Exchangeable:
     # 公共方法
-    fn load_markets(
-        self, mut params: Dict[String, Any]
-    ) raises -> List[Market]:
+    fn id(self) -> ExchangeId:
+        ...
+
+    fn load_markets(self, mut params: Dict[String, Any]) raises -> List[Market]:
         ...
 
     fn fetch_markets(
@@ -133,6 +134,9 @@ trait Exchangeable:
     fn submit_cancel_order(
         self, id: String, symbol: String, mut params: Dict[String, Any]
     ) raises -> Bool:
+        ...
+
+    fn on_order(self, order: Order) -> None:
         ...
 
 

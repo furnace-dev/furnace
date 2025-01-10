@@ -7,14 +7,14 @@ from memory import UnsafePointer, stack_allocation
 from monoio_connect import *
 from ccxt.base.types import Any, OrderType, OrderSide, Num, Order, Ticker
 from ccxt.foundation.bitmex import BitMEX
-from ccxt.base.pro_exchangeable import TradingContext
+from ccxt.base.pro_exchangeable import TradingContext, ExchangeId
 
 
 fn on_order(trading_context: TradingContext, order: Order) -> None:
     logd("on_order start")
     # logd("trading_context: " + str(trading_context))
     # logd("order: " + str(order))
-    logd("exchange_id: " + trading_context.exchange_id)
+    logd("exchange_id: " + str(trading_context.exchange_id))
     logd("account_id: " + trading_context.account_id)
     logd("trader_id: " + trading_context.trader_id)
     logd("=============")
@@ -35,7 +35,7 @@ fn test_rest(api_key: String, api_secret: String) raises -> None:
     config["testnet"] = True
 
     var trading_context = TradingContext(
-        exchange_id="bitmex", account_id="1", trader_id="1"
+        exchange_id=ExchangeId.Bitmex, account_id="1", trader_id="1"
     )
     var bm = BitMEX(config, trading_context)
     var params = Dict[String, Any]()
@@ -132,7 +132,7 @@ fn test_ws(api_key: String, api_secret: String) raises -> None:
     # config_pro["settle"] = "usdt"
 
     # var trading_context = TradingContext(
-    #     exchange_id="gate", account_id="1", trader_id="1"
+    #     exchange_id=ExchangeId.Gateio, account_id="1", trader_id="1"
     # )
     # var gate_pro = GatePro(config_pro, trading_context)
     # gate_pro.set_on_ticker(on_ticker)

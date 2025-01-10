@@ -55,7 +55,7 @@ fn test_rest(api_key: String, api_secret: String, testnet: Bool) raises -> None:
     config["testnet"] = testnet
 
     var trading_context = TradingContext(
-        exchange_id="gate", account_id="1", trader_id="1"
+        exchange_id=ExchangeId.Gateio, account_id="1", trader_id="1"
     )
     var gate = Gate(config, trading_context, rt, debug=False)
     var params = Dict[String, Any]()
@@ -181,7 +181,7 @@ fn test_ws(api_key: String, api_secret: String, testnet: Bool) raises -> None:
     config_pro["settle"] = "usdt"
 
     var trading_context = TradingContext(
-        exchange_id="gate", account_id="1", trader_id="1"
+        exchange_id=ExchangeId.Gateio, account_id="1", trader_id="1"
     )
     var gate_pro = GatePro(config_pro, trading_context)
     gate_pro.set_on_ticker(on_ticker)
@@ -240,7 +240,7 @@ fn test_sign() raises:
     var ts = 1735736524
     var sign = "8c759c5cb2ae052e0868a120c759279e14a8fff5bba26ac4e1c9f202e124fe83baee060309d3144da9be96057ddf9451995725b3a8c04d3afa4876ec8a540ce9"
     var trading_context = TradingContext(
-        exchange_id="gate", account_id="1", trader_id="1"
+        exchange_id=ExchangeId.Gateio, account_id="1", trader_id="1"
     )
     var config = Dict[String, Any]()
 

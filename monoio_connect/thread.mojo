@@ -15,7 +15,6 @@ fn __do_task(context: UnsafePointer[UInt8]) -> UInt8:
     except err:
         loge("Task failed: " + str(err))
     task.free()
-    context.free()
     return 0
 
 

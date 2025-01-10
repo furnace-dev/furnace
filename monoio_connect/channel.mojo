@@ -2,7 +2,7 @@ from collections import Optional
 from .internal.channel import *
 
 
-struct Channel:
+struct Channel(Movable):
     """
     A channel is a communication mechanism that allows data to be sent across different threads in a single process.
     """
@@ -13,8 +13,15 @@ struct Channel:
         """Initializes a new Channel with a specified capacity."""
         self._ptr = create_channel(2, capacity)
 
+    fn __moveinit__(out self, owned other: Self):
+        """Moves ownership of the Channel from another Channel object."""
+        self._ptr = other._ptr
+        other._ptr = ChannelPtr()
+
     fn __del__(owned self):
         """Destroys the Channel."""
+        if not self._ptr:
+            return
         destroy_channel(self._ptr)
 
     @always_inline

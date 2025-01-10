@@ -5,66 +5,26 @@ from time import perf_counter_ns
 from testing import assert_equal, assert_true
 from memory import UnsafePointer, stack_allocation
 from sys.ffi import _Global
+from utils import Variant
 from mojoenv import load_mojo_env
 from monoio_connect import *
 from ccxt.base.types import Any, OrderType, OrderSide, Num, Order, Ticker
 from ccxt.foundation.bybit import Bybit
 from ccxt.foundation.gate import Gate
 from ccxt.pro.gate import Gate as GatePro
-from ccxt.base.pro_exchangeable import TradingContext
+from ccxt.base.pro_exchangeable import TradingContext, ExchangeId
 from monoio_connect.pthread import *
 from monoio_connect import *
-
-alias GATE_CLIENT = _Global[
-    "GATE_CLIENT",
-    Gate,
-    _init_gate,
-]
-
-
-fn _init_gate() -> Gate:
-    var env_vars = load_mojo_env(".env")
-    var api_key = env_vars.get("GATEIO_API_KEY").value()
-    var api_secret = env_vars.get("GATEIO_API_SECRET").value()
-    var testnet = parse_bool(env_vars.get("GATEIO_TESTNET").value())
-
-    var config = Dict[String, Any]()
-
-    config["api_key"] = api_key
-    config["api_secret"] = api_secret
-    config["testnet"] = testnet
-
-    var trading_context = TradingContext(
-        exchange_id="gate", account_id="1", trader_id="1"
-    )
-    var rt = create_monoio_runtime()
-    return Gate(config, trading_context, rt, debug=False)
-
-
-fn gate_client_ptr() -> UnsafePointer[Gate]:
-    return GATE_CLIENT.get_or_create_ptr()
-
-
-alias _CHANNEL = _Global[
-    "_CHANNEL",
-    ChannelPtr,
-    _init_channel,
-]
-
-
-fn _init_channel() -> ChannelPtr:
-    return create_channel(2, 1024)
-
-
-fn channel_ptr() -> UnsafePointer[ChannelPtr]:
-    return _CHANNEL.get_or_create_ptr()
+from ccxt.foundation.async_trading_operations import (
+    run_async_trading_thread,
+)
 
 
 fn on_order(trading_context: TradingContext, order: Order) -> None:
     logd("on_order start")
-    # logd("trading_context: " + str(trading_context))
-    # logd("order: " + str(order))
-    logd("exchange_id: " + trading_context.exchange_id)
+    logd("trading_context: " + str(trading_context))
+    logd("order: " + str(order))
+    logd("exchange_id: " + str(trading_context.exchange_id))
     logd("account_id: " + trading_context.account_id)
     logd("trader_id: " + trading_context.trader_id)
     logd("=============")
@@ -98,7 +58,7 @@ fn run() raises:
     config["testnet"] = testnet
 
     var trading_context = TradingContext(
-        exchange_id="gate", account_id="1", trader_id="1"
+        exchange_id=ExchangeId.Gateio, account_id="1", trader_id="1"
     )
     var gate = Gate(config, trading_context, rt, debug=False)
     var params = Dict[String, Any]()
@@ -116,8 +76,8 @@ fn run() raises:
     #     logd(str(c[].value()))
 
     # 获取ticker
-    # var ticker = gate.fetch_ticker("BTC_USDT")
-    # logd(str(ticker))
+    var ticker = gate.fetch_ticker("BTC_USDT")
+    logd(str(ticker))
 
     # 获取tickers
     # var symbols = List[String](capacity=2)
@@ -142,41 +102,7 @@ fn run() raises:
     # var balance = gate.fetch_balance(params)
     # logd(str(balance))
 
-    # while True:
-    #     try:
-    #         var start = perf_counter_ns()
-    #         var ticker = gate.fetch_ticker("BTC_USDT")
-    #         var end = perf_counter_ns()
-    #         # logd(String.write("fetch_ticker Time: ", (end - start) / 1000000, "ms"))
-    #         # logd(str(ticker))
-    #     except e:
-    #         logd(str(e))
-
-    #     # 休息
-    #     monoio_sleep_ms(rt, 200)
-
-    # try:
-    #     _ = gate.submit_order(
-    #         "BTC_USDT",
-    #         OrderType.Limit,
-    #         OrderSide.Buy,
-    #         Fixed(1.0),
-    #         Fixed(93000),
-    #         params,
-    #     )
-    # except e:
-    #     logd("submit_order error: " + str(e))
-
-    # logi("sleep")
-
-
-fn gate_client_backend() raises -> None:
-    logd("gate_client_backend run")
-    # 设置cpu
-    bind_to_cpu_set(0)
-    # 初始化客户端
-    var params = Dict[String, Any]()
-    var ok = gate_client_ptr()[].submit_order(
+    var ok = gate.submit_order(
         "BTC_USDT",
         OrderType.Limit,
         OrderSide.Buy,
@@ -184,14 +110,22 @@ fn gate_client_backend() raises -> None:
         Fixed(93000),
         params,
     )
-    logd("ok: " + str(ok))
+    logi("ok: " + str(ok))
+
+    logi("sleep")
+
+    sleep(rt, 1000)
+
+    _ = gate^
 
 
 fn main() raises:
     var logger = init_logger(LogLevel.Debug, "", "")
-    # 发送消息
-    # channel_ptr()[].send("hello")
-    # run()
+
+    run_async_trading_thread()
+
+    run()
+
     logd("OK")
     time.sleep(1000000.0)
     destroy_logger(logger)

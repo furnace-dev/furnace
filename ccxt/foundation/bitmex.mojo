@@ -68,58 +68,6 @@ fn empty_on_order(trading_context: TradingContext, order: Order) -> None:
     pass
 
 
-# fn submit_order_task_entry(arg: c_void_ptr) raises -> c_void_ptr:
-#     logi("submit_order_task_entry: " + str(arg))
-
-#     var request = TaskEntryArg[SubmitOrderRequest[BitMEX]](arg)
-
-#     logd("symbol: " + request.data()[].symbol)
-#     logd("type: " + str(request.data()[].type))
-#     logd("side: " + str(request.data()[].side))
-#     logd("amount: " + str(request.data()[].amount))
-#     logd("price: " + str(request.data()[].price))
-
-#     var ptr = request.data()
-
-#     # var exchange = ptr[].exchange
-
-#     logd("submit_order create_order start")
-#     var order = ptr[].exchange[].create_order(
-#         ptr[].symbol,
-#         ptr[].type,
-#         ptr[].side,
-#         ptr[].amount,
-#         ptr[].price,
-#         ptr[].params,
-#     )
-#     logd("submit_order create_order end")
-#     # logd("order: " + str(order))
-#     ptr[].exchange[].on_order(order)
-#     logd("submit_order on_order end")
-
-#     _ = order^
-#     _ = request^
-
-#     return c_void_ptr()
-
-
-# fn cancel_order_task_entry(arg: c_void_ptr) raises -> c_void_ptr:
-#     logi("cancel_order_task_entry: " + str(arg))
-
-#     var request = TaskEntryArg[CancelOrderRequest[BitMEX]](arg)
-
-#     var ptr = request.data()
-
-#     var exchange = ptr[].exchange
-
-#     var order = exchange[].cancel_order_internal(
-#         ptr[].id, ptr[].symbol, ptr[].params
-#     )
-#     exchange[].on_order(order)
-
-#     return c_void_ptr()
-
-
 struct BitMEX(Exchangeable):
     var _default_type: String
     var _client: UnsafePointer[HttpClient]
@@ -166,6 +114,9 @@ struct BitMEX(Exchangeable):
         self._api_secret = other._api_secret
         self._on_order = other._on_order
         self._trading_context = other._trading_context
+
+    fn id(self) -> ExchangeId:
+        return ExchangeId.Bitmex
 
     fn set_on_order(mut self: Self, on_order: OnOrder) raises -> None:
         self._on_order = on_order

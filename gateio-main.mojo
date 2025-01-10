@@ -6,7 +6,7 @@ from memory import UnsafePointer, stack_allocation
 from mojoenv import load_mojo_env
 from ccxt.base.types import *
 from monoio_connect import *
-from ccxt.base.pro_exchangeable import TradingContext
+from ccxt.base.pro_exchangeable import TradingContext, ExchangeId
 from ccxt.foundation.gate import Gate
 
 
@@ -14,7 +14,7 @@ fn on_order(trading_context: TradingContext, order: Order) -> None:
     logd("on_order start")
     # logd("trading_context: " + str(trading_context))
     # logd("order: " + str(order))
-    logd("exchange_id: " + trading_context.exchange_id)
+    logd("exchange_id: " + str(trading_context.exchange_id))
     logd("account_id: " + trading_context.account_id)
     logd("trader_id: " + trading_context.trader_id)
     logd("=============")
@@ -48,7 +48,7 @@ fn run() raises:
     config["testnet"] = testnet
 
     var trading_context = TradingContext(
-        exchange_id="gate", account_id="1", trader_id="1"
+        exchange_id=ExchangeId.Gateio, account_id="1", trader_id="1"
     )
     var gate = Gate(config, trading_context, rt, debug=False)
     var params = Dict[String, Any]()
@@ -137,7 +137,7 @@ fn run_async() raises:
     config["testnet"] = testnet
 
     var trading_context = TradingContext(
-        exchange_id="gate", account_id="1", trader_id="1"
+        exchange_id=ExchangeId.Gateio, account_id="1", trader_id="1"
     )
     var gate = Gate(config, trading_context, rt, debug=False)
     var params = Dict[String, Any]()

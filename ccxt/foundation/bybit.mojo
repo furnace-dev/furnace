@@ -21,7 +21,9 @@ struct Bybit(Exchangeable):
         # ] if "defaultType" in config else String("future")
         self.default_type = String("future")
         self._client = UnsafePointer[HttpClient].alloc(1)
-        __get_address_as_uninit_lvalue(self._client.address) = HttpClient(options)
+        __get_address_as_uninit_lvalue(self._client.address) = HttpClient(
+            options
+        )
         self._api = ImplicitAPI()
 
     fn __del__(owned self):
@@ -32,7 +34,10 @@ struct Bybit(Exchangeable):
         self._client = other._client
         # self.options = other.options
         self._api = other._api^
-    
+
+    fn id(self) -> ExchangeId:
+        return ExchangeId.Bybit
+
     @always_inline
     fn _request(self, entry: Entry) raises -> String:
         logi("entry: " + entry.path)
@@ -44,9 +49,7 @@ struct Bybit(Exchangeable):
         return response.text
 
     # 公共方法
-    fn load_markets(
-        self, mut params: Dict[String, Any]
-    ) raises -> List[Market]:
+    fn load_markets(self, mut params: Dict[String, Any]) raises -> List[Market]:
         raise Error("NotImplemented")
 
     fn fetch_markets(
@@ -165,7 +168,7 @@ struct Bybit(Exchangeable):
         mut params: Dict[String, Any],
     ) raises -> List[Trade]:
         raise Error("NotImplemented")
-    
+
     fn submit_order(
         self,
         symbol: String,
@@ -181,3 +184,9 @@ struct Bybit(Exchangeable):
         self, id: String, symbol: String, mut params: Dict[String, Any]
     ) raises -> Bool:
         return True
+
+    fn on_order(self, order: Order) -> None:
+        pass
+
+    fn keep_alive(self) -> None:
+        pass
