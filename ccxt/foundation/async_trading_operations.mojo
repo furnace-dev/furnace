@@ -33,16 +33,19 @@ fn _create_order_internal[
 
 
 @always_inline
-fn _create_order(request: UnsafePointer[AsyncTradingRequest]) raises:
-    var exchange_id = request[].exchange_id
-    if exchange_id == ExchangeId.Gateio:
-        _create_order_internal[Gate](request)
-    elif exchange_id == ExchangeId.Bybit:
-        _create_order_internal[Bybit](request)
-    elif exchange_id == ExchangeId.Bitmex:
-        _create_order_internal[BitMEX](request)
-    else:
-        logw("unknown exchange_id: " + str(exchange_id))
+fn _create_order(request: UnsafePointer[AsyncTradingRequest]):
+    try:
+        var exchange_id = request[].exchange_id
+        if exchange_id == ExchangeId.Gateio:
+            _create_order_internal[Gate](request)
+        elif exchange_id == ExchangeId.Bybit:
+            _create_order_internal[Bybit](request)
+        elif exchange_id == ExchangeId.Bitmex:
+            _create_order_internal[BitMEX](request)
+        else:
+            logw("unknown exchange_id: " + str(exchange_id))
+    except e:
+        loge("create_order error: " + str(e))
 
 
 @always_inline
@@ -59,16 +62,19 @@ fn _cancel_order_internal[
 
 
 @always_inline
-fn _cancel_order(request: UnsafePointer[AsyncTradingRequest]) raises:
-    var exchange_id = request[].exchange_id
-    if exchange_id == ExchangeId.Gateio:
-        _cancel_order_internal[Gate](request)
-    elif exchange_id == ExchangeId.Bybit:
-        _cancel_order_internal[Bybit](request)
-    elif exchange_id == ExchangeId.Bitmex:
-        _cancel_order_internal[BitMEX](request)
-    else:
-        logw("unknown exchange_id: " + str(exchange_id))
+fn _cancel_order(request: UnsafePointer[AsyncTradingRequest]):
+    try:
+        var exchange_id = request[].exchange_id
+        if exchange_id == ExchangeId.Gateio:
+            _cancel_order_internal[Gate](request)
+        elif exchange_id == ExchangeId.Bybit:
+            _cancel_order_internal[Bybit](request)
+        elif exchange_id == ExchangeId.Bitmex:
+            _cancel_order_internal[BitMEX](request)
+        else:
+            logw("unknown exchange_id: " + str(exchange_id))
+    except e:
+        loge("cancel_order error: " + str(e))
 
 
 fn _async_trading_backend() raises -> None:

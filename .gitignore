@@ -10,3 +10,4 @@ __pycache__
 *.dylib
 gateio-main
 ccxt-gateio-demo
+gateio-main-async
