@@ -36,11 +36,11 @@ fn _create_order_internal[
 fn _create_order(request: UnsafePointer[AsyncTradingRequest]):
     try:
         var exchange_id = request[].exchange_id
-        if exchange_id == ExchangeId.Gateio:
+        if exchange_id == ExchangeId.gateio:
             _create_order_internal[Gate](request)
-        elif exchange_id == ExchangeId.Bybit:
+        elif exchange_id == ExchangeId.binance:
             _create_order_internal[Bybit](request)
-        elif exchange_id == ExchangeId.Bitmex:
+        elif exchange_id == ExchangeId.kucoin:
             _create_order_internal[BitMEX](request)
         else:
             logw("unknown exchange_id: " + str(exchange_id))
@@ -65,11 +65,11 @@ fn _cancel_order_internal[
 fn _cancel_order(request: UnsafePointer[AsyncTradingRequest]):
     try:
         var exchange_id = request[].exchange_id
-        if exchange_id == ExchangeId.Gateio:
+        if exchange_id == ExchangeId.gateio:
             _cancel_order_internal[Gate](request)
-        elif exchange_id == ExchangeId.Bybit:
+        elif exchange_id == ExchangeId.binance:
             _cancel_order_internal[Bybit](request)
-        elif exchange_id == ExchangeId.Bitmex:
+        elif exchange_id == ExchangeId.kucoin:
             _cancel_order_internal[BitMEX](request)
         else:
             logw("unknown exchange_id: " + str(exchange_id))

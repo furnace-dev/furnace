@@ -1,19 +1,29 @@
+from os import abort
 from collections import Dict
 from os import getenv
 from time import perf_counter_ns
 from testing import assert_equal, assert_true
 from memory import UnsafePointer, stack_allocation
+from sys.ffi import _Global
+from utils import Variant
 from mojoenv import load_mojo_env
-from ccxt.base.types import *
 from monoio_connect import *
-from ccxt.base.pro_exchangeable import TradingContext, ExchangeId
+from ccxt.base.types import Any, OrderType, OrderSide, Num, Order, Ticker
+from ccxt.foundation.bybit import Bybit
 from ccxt.foundation.gate import Gate
+from ccxt.pro.gate import Gate as GatePro
+from ccxt.base.pro_exchangeable import TradingContext, ExchangeId
+from monoio_connect.pthread import *
+from monoio_connect import *
+from ccxt.foundation.async_trading_operations import (
+    run_async_trading_thread,
+)
 
 
 fn on_order(trading_context: TradingContext, order: Order) -> None:
     logd("on_order start")
-    # logd("trading_context: " + str(trading_context))
-    # logd("order: " + str(order))
+    logd("trading_context: " + str(trading_context))
+    logd("order: " + str(order))
     logd("exchange_id: " + str(trading_context.exchange_id))
     logd("account_id: " + trading_context.account_id)
     logd("trader_id: " + trading_context.trader_id)
@@ -66,8 +76,8 @@ fn run() raises:
     #     logd(str(c[].value()))
 
     # 获取ticker
-    # var ticker = gate.fetch_ticker("BTC_USDT")
-    # logd(str(ticker))
+    var ticker = gate.fetch_ticker("BTC_USDT")
+    logd(str(ticker))
 
     # 获取tickers
     # var symbols = List[String](capacity=2)
@@ -92,82 +102,32 @@ fn run() raises:
     # var balance = gate.fetch_balance(params)
     # logd(str(balance))
 
-    logd("start")
-
-    while True:
-        try:
-            var start = perf_counter_ns()
-            var ticker = gate.fetch_ticker("BTC_USDT")
-            var end = perf_counter_ns()
-            # logd(String.write("fetch_ticker Time: ", (end - start) / 1000000, "ms"))
-            # logd(str(ticker))
-        except e:
-            logd(str(e))
-
-        # 休息
-        monoio_sleep_ms(rt, 200)
-
-    # logi("sleep")
-
-
-fn gate_backend() raises -> None:
-    logd("gate_backend run")
-    bind_to_cpu_set(0)
-    var rt = create_monoio_runtime()
-
-
-fn run_thread() raises:
-    var tid = start_thread(gate_backend)
-    logd("tid: " + str(tid))
-
-
-fn run_async() raises:
-    bind_to_cpu_set(0)
-    var rt = create_monoio_runtime()
-
-    var env_vars = load_mojo_env(".env")
-    var api_key = env_vars["GATEIO_API_KEY"]
-    var api_secret = env_vars["GATEIO_API_SECRET"]
-    var testnet = parse_bool(env_vars["GATEIO_TESTNET"])
-
-    var config = Dict[String, Any]()
-
-    config["api_key"] = api_key
-    config["api_secret"] = api_secret
-    config["testnet"] = testnet
-
-    var trading_context = TradingContext(
-        exchange_id=ExchangeId.gateio, account_id="1", trader_id="1"
+    var ok = gate.submit_order(
+        "BTC_USDT",
+        OrderType.Limit,
+        OrderSide.Buy,
+        Fixed(1.0),
+        Fixed(93000),
+        params,
     )
-    var gate = Gate(config, trading_context, rt, debug=False)
-    var params = Dict[String, Any]()
+    logi("ok: " + str(ok))
 
-    gate.set_on_order(on_order)
+    logi("sleep")
 
-    # 异步下单
-    try:
-        var ok = gate.submit_order(
-            "BTC_USDT",
-            OrderType.Limit,
-            OrderSide.Buy,
-            Fixed(1.0),
-            Fixed(93000),
-            params,
-        )
-        logd("ok: " + str(ok))
-    except e:
-        logd("submit_order error: " + str(e))
+    sleep(rt, 1000)
 
-    monoio_sleep_ms(rt, 1000 * 60 * 5)
-
-    _ = gate ^
+    _ = gate^
 
 
 fn main() raises:
     var logger = init_logger(LogLevel.Debug, "", "")
-    # run()
-    # run_async()
-    run_thread()
+
+    run_async_trading_thread()
+
+    run()
+
+    logd("OK")
+    time.sleep(1000000.0)
     destroy_logger(logger)
 
     # test_rest(api_key, api_secret, testnet)

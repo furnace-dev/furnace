@@ -1383,14 +1383,14 @@ struct ExchangeId(Intable, Stringable):
 
     var _value: UInt8
 
-    alias Gateio = ExchangeId(0)
-    alias Binance = ExchangeId(1)
-    alias Kucoin = ExchangeId(2)
-    alias Bybit = ExchangeId(3)
-    alias OKX = ExchangeId(4)
-    alias Huobi = ExchangeId(5)
-    alias Bitmex = ExchangeId(6)
-    alias Deribit = ExchangeId(7)
+    alias gateio = ExchangeId(0)
+    alias binance = ExchangeId(1)
+    alias kucoin = ExchangeId(2)
+    alias bybit = ExchangeId(3)
+    alias okx = ExchangeId(4)
+    alias huobi = ExchangeId(5)
+    alias bitmex = ExchangeId(6)
+    alias deribit = ExchangeId(7)
 
     fn __eq__(self, other: ExchangeId) -> Bool:
         return self._value == other._value
@@ -1402,24 +1402,24 @@ struct ExchangeId(Intable, Stringable):
         return int(self._value)
 
     fn __str__(self) -> String:
-        if self == ExchangeId.Gateio:
-            return "Gateio"
-        elif self == ExchangeId.Binance:
-            return "Binance"
-        elif self == ExchangeId.Kucoin:
-            return "Kucoin"
-        elif self == ExchangeId.Bybit:
-            return "Bybit"
-        elif self == ExchangeId.OKX:
-            return "OKX"
-        elif self == ExchangeId.Huobi:
-            return "Huobi"
-        elif self == ExchangeId.Bitmex:
-            return "Bitmex"
-        elif self == ExchangeId.Deribit:
-            return "Deribit"
+        if self == ExchangeId.gateio:
+            return "gateio"
+        elif self == ExchangeId.binance:
+            return "binance"
+        elif self == ExchangeId.kucoin:
+            return "kucoin"
+        elif self == ExchangeId.bybit:
+            return "bybit"
+        elif self == ExchangeId.okx:
+            return "okx"
+        elif self == ExchangeId.huobi:
+            return "huobi"
+        elif self == ExchangeId.bitmex:
+            return "bitmex"
+        elif self == ExchangeId.deribit:
+            return "deribit"
         else:
-            return "Unknown"
+            return "unknown"
 
 
 @value

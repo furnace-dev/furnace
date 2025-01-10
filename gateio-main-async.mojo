@@ -14,7 +14,6 @@ from ccxt.foundation.gate import Gate
 from ccxt.pro.gate import Gate as GatePro
 from ccxt.base.pro_exchangeable import TradingContext, ExchangeId
 from monoio_connect.pthread import *
-from monoio_connect import *
 from ccxt.foundation.async_trading_operations import (
     run_async_trading_thread,
 )
@@ -58,7 +57,7 @@ fn run() raises:
     config["testnet"] = testnet
 
     var trading_context = TradingContext(
-        exchange_id=ExchangeId.Gateio, account_id="1", trader_id="1"
+        exchange_id=ExchangeId.gateio, account_id="1", trader_id="1"
     )
     var gate = Gate(config, trading_context, rt, debug=False)
     var params = Dict[String, Any]()

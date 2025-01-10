@@ -116,7 +116,7 @@ struct BitMEX(Exchangeable):
         self._trading_context = other._trading_context
 
     fn id(self) -> ExchangeId:
-        return ExchangeId.Bitmex
+        return ExchangeId.bitmex
 
     fn set_on_order(mut self: Self, on_order: OnOrder) raises -> None:
         self._on_order = on_order

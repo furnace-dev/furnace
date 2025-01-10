@@ -36,7 +36,7 @@ struct Bybit(Exchangeable):
         self._api = other._api^
 
     fn id(self) -> ExchangeId:
-        return ExchangeId.Bybit
+        return ExchangeId.bybit
 
     @always_inline
     fn _request(self, entry: Entry) raises -> String:

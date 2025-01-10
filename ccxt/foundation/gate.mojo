@@ -92,7 +92,7 @@ struct Gate(Exchangeable):
         self._testnet = other._testnet
         
     fn id(self) -> ExchangeId:
-        return ExchangeId.Gateio
+        return ExchangeId.gateio
 
     fn set_on_order(mut self: Self, on_order: OnOrder) raises -> None:
         self._on_order = on_order

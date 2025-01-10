@@ -35,7 +35,7 @@ fn test_rest(api_key: String, api_secret: String) raises -> None:
     config["testnet"] = True
 
     var trading_context = TradingContext(
-        exchange_id=ExchangeId.Bitmex, account_id="1", trader_id="1"
+        exchange_id=ExchangeId.bitmex, account_id="1", trader_id="1"
     )
     var bm = BitMEX(config, trading_context)
     var params = Dict[String, Any]()
@@ -132,7 +132,7 @@ fn test_ws(api_key: String, api_secret: String) raises -> None:
     # config_pro["settle"] = "usdt"
 
     # var trading_context = TradingContext(
-    #     exchange_id=ExchangeId.Gateio, account_id="1", trader_id="1"
+    #     exchange_id=ExchangeId.gateio, account_id="1", trader_id="1"
     # )
     # var gate_pro = GatePro(config_pro, trading_context)
     # gate_pro.set_on_ticker(on_ticker)
