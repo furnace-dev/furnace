@@ -84,7 +84,7 @@ fn _async_trading_backend() raises -> None:
     while True:
         var request = async_trading_channel_ptr()[].recv[AsyncTradingRequest]()
         if not request:
-            sleep(rt, 1000)
+            sleep_ns(rt, 1)
             continue
         # logt("Received request")
         var request_ = request.value()
