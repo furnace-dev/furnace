@@ -9,7 +9,7 @@ from ccxt.base.types import Any, OrderType, OrderSide, Num, Order, Ticker
 from ccxt.foundation.bybit import Bybit
 from ccxt.foundation.gate import Gate
 from ccxt.pro.gate import Gate as GatePro
-from ccxt.base.pro_exchangeable import TradingContext
+from ccxt.base.pro_exchangeable import TradingContext, ExchangeId
 from monoio_connect.pthread import *
 from monoio_connect import *
 
@@ -33,7 +33,7 @@ fn on_order(trading_context: TradingContext, order: Order) -> None:
     logd("on_order start")
     # logd("trading_context: " + str(trading_context))
     # logd("order: " + str(order))
-    logd("exchange_id: " + trading_context.exchange_id)
+    logd("exchange_id: " + str(trading_context.exchange_id))
     logd("account_id: " + trading_context.account_id)
     logd("trader_id: " + trading_context.trader_id)
     logd("=============")
