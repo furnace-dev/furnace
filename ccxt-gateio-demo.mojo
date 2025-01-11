@@ -57,7 +57,7 @@ fn test_rest(api_key: String, api_secret: String, testnet: Bool) raises -> None:
     var trading_context = TradingContext(
         exchange_id=ExchangeId.gateio, account_id="1", trader_id="1"
     )
-    var gate = Gate(config, trading_context, rt, debug=False)
+    var gate = Gate(config, trading_context, rt)
     var params = Dict[String, Any]()
 
     gate.set_on_order(on_order)

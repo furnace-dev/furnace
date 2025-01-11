@@ -43,7 +43,6 @@ struct Gate(Exchangeable):
     var _on_order: OnOrder
     var _trading_context: TradingContext
     var _host: String
-    var _debug: Bool
     var _testnet: Bool
 
     fn __init__(
@@ -51,14 +50,10 @@ struct Gate(Exchangeable):
         config: Dict[String, Any],
         trading_context: TradingContext,
         rt: MonoioRuntimePtr = MonoioRuntimePtr(),
-        debug: Bool = False,
     ):
         self._testnet = config.get("testnet", False).bool()
         var base_url = "https://api.gateio.ws" if not self._testnet else "https://fx-api-testnet.gateio.ws"
-        self._debug = debug
         self._host = String(base_url).replace("https://", "")
-        if debug:
-            base_url = "https://httpbin.org"
         self._default_type = String("future")
         self._client = UnsafePointer[HttpClient].alloc(1)
         var options = HttpClientOptions(base_url)
@@ -78,7 +73,6 @@ struct Gate(Exchangeable):
         self._client.free()
 
     fn __moveinit__(out self, owned other: Self):
-        self._debug = other._debug
         self._host = other._host
         self._default_type = other._default_type
         self._client = other._client
@@ -90,7 +84,7 @@ struct Gate(Exchangeable):
         self._on_order = other._on_order
         self._trading_context = other._trading_context
         self._testnet = other._testnet
-        
+
     fn id(self) -> ExchangeId:
         return ExchangeId.gateio
 

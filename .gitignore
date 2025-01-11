@@ -8,6 +8,11 @@ __pycache__
 .env
 *.so
 *.dylib
-gateio-main
+
+ccxt-bitmex-demo
 ccxt-gateio-demo
 gateio-main-async
+gateio-main
+gateio-ws
+memory_leak
+monoio-connect-demo

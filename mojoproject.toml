@@ -7,6 +7,7 @@ platforms = ["linux-64"]
 version = "0.1.0"
 
 [tasks]
+test = "mojo test"
 
 [dependencies]
 max = "*"
