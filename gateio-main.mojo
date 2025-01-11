@@ -105,7 +105,7 @@ fn run() raises:
             logd(str(e))
 
         # 休息
-        monoio_sleep_ms(rt, 200)
+        sleep_ms(rt, 200)
 
     # logi("sleep")
 
