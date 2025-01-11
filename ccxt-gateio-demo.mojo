@@ -204,23 +204,6 @@ fn test_ws(api_key: String, api_secret: String, testnet: Bool) raises -> None:
 
     gate_pro.connect(rt)
 
-    # var tid: UInt64 = 0
-    # var gate_pro_ptr: UnsafePointer[GatePro] = UnsafePointer[GatePro].address_of(gate_pro)
-    # # var arg = gate_pro_ptr.bitcast[UInt8]()
-    # var arg = UnsafePointer[UInt8]()
-    # arg = gate_pro_ptr.bitcast[UInt8]()
-    # # _ = pthread_create(tid, thread_run, arg)
-    # _ = pthread_create(tid, thread_run_wrap[UInt8], arg)
-    # print("tid: " + str(tid))
-
-    # var req_id = seq_nanoid()
-    # gate_pro.login("header", req_id)
-
-    # time.sleep(3.0)
-
-    # var params = Dict[String, Any]()
-    # gate_pro.subscribe_order("BTC_USDT", params)
-
     time.sleep(1000000.0)
 
     _ = gate_pro^

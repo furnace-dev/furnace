@@ -110,65 +110,7 @@ fn run() raises:
     # logi("sleep")
 
 
-fn gate_backend() raises -> None:
-    logd("gate_backend run")
-    bind_to_cpu_set(0)
-    var rt = create_monoio_runtime()
-
-
-fn run_thread() raises:
-    var tid = start_thread(gate_backend)
-    logd("tid: " + str(tid))
-
-
-fn run_async() raises:
-    bind_to_cpu_set(0)
-    var rt = create_monoio_runtime()
-
-    var env_vars = load_mojo_env(".env")
-    var api_key = env_vars["GATEIO_API_KEY"]
-    var api_secret = env_vars["GATEIO_API_SECRET"]
-    var testnet = parse_bool(env_vars["GATEIO_TESTNET"])
-
-    var config = Dict[String, Any]()
-
-    config["api_key"] = api_key
-    config["api_secret"] = api_secret
-    config["testnet"] = testnet
-
-    var trading_context = TradingContext(
-        exchange_id=ExchangeId.gateio, account_id="1", trader_id="1"
-    )
-    var gate = Gate(config, trading_context, rt, debug=False)
-    var params = Dict[String, Any]()
-
-    gate.set_on_order(on_order)
-
-    # 异步下单
-    try:
-        var ok = gate.submit_order(
-            "BTC_USDT",
-            OrderType.Limit,
-            OrderSide.Buy,
-            Fixed(1.0),
-            Fixed(93000),
-            params,
-        )
-        logd("ok: " + str(ok))
-    except e:
-        logd("submit_order error: " + str(e))
-
-    monoio_sleep_ms(rt, 1000 * 60 * 5)
-
-    _ = gate ^
-
-
 fn main() raises:
     var logger = init_logger(LogLevel.Debug, "", "")
-    # run()
-    # run_async()
-    run_thread()
+    run()
     destroy_logger(logger)
-
-    # test_rest(api_key, api_secret, testnet)
-    # time.sleep(1000000.0)
