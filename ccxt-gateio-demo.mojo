@@ -111,7 +111,7 @@ fn test_rest(api_key: String, api_secret: String, testnet: Bool) raises -> None:
     logd("create_order end")
 
     # try:
-    #     _ = gate.submit_order(
+    #     _ = gate.create_order_async(
     #         "BTC_USDT",
     #         OrderType.Limit,
     #         OrderSide.Buy,
@@ -120,7 +120,7 @@ fn test_rest(api_key: String, api_secret: String, testnet: Bool) raises -> None:
     #         params,
     #     )
     # except e:
-    #     logd("submit_order error: " + str(e))
+    #     logd("create_order_async error: " + str(e))
 
     # logd("cancel_order")
 

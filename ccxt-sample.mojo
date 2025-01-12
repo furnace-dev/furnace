@@ -22,10 +22,17 @@ fn test_binance_fetch_balance() raises -> None:
     var options = HttpClientOptions(base_url=base_url)
     var http = HttpClient(options)
     var headers = Headers()
-    var resp = http.request("/fapi/v3/account", Method.METHOD_GET, headers, "")
+    var path = String("/fapi/v3/account")
+    var data = ""
+    var ts_str = "recvWindow=5000&timestamp=" + str(now_ms())
+    var payload = data + "&" + ts_str if data != "" else ts_str
+    var signature = compute_hmac_sha256_hex(payload, api_secret)
+    headers["X-MBX-APIKEY"] = api_key
+    var p = payload + "&signature=" + signature
+    path += "?" + p
+    var resp = http.request(path, Method.METHOD_GET, headers, "")
     print(resp.status_code)
     print(resp.text)
-
 
 
 fn on_order(trading_context: TradingContext, order: Order) -> None:
@@ -117,7 +124,7 @@ fn test_binance() raises -> None:
     # logd("create_order end")
 
     # try:
-    #     _ = binance.submit_order(
+    #     _ = binance.create_order_async(
     #         "BTC_USDT",
     #         OrderType.Limit,
     #         OrderSide.Buy,
@@ -126,7 +133,7 @@ fn test_binance() raises -> None:
     #         params,
     #     )
     # except e:
-    #     logd("submit_order error: " + str(e))
+    #     logd("create_order_async error: " + str(e))
 
     # logd("cancel_order")
 
@@ -189,6 +196,7 @@ fn test_ws(api_key: String, api_secret: String, testnet: Bool) raises -> None:
 fn main() raises:
     var logger = init_logger(LogLevel.Debug, "", "")
 
+    # test_binance_fetch_balance()
     test_binance()
     # test_ws(api_key, api_secret, testnet)
 

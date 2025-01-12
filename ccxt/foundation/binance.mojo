@@ -39,7 +39,7 @@ struct Binance(Exchangeable):
         # Reference: https://developers.binance.com/docs/zh-CN/derivatives/usds-margined-futures/general-info
         self._testnet = config.get("testnet", False).bool()
         var base_url = "https://fapi.binance.com" if not self._testnet else "https://testnet.binancefuture.com"
-        logd("base_url: " + str(base_url))
+        # logd("base_url: " + str(base_url))
         self._host = String(base_url).replace("https://", "")
         self._default_type = String("future")
         self._client = UnsafePointer[HttpClient].alloc(1)
@@ -101,7 +101,7 @@ struct Binance(Exchangeable):
         payload: String,
         api: ApiType = ApiType.Public,
     ) raises -> String:
-        logd("entry: " + str(method) + " " + path)
+        # logd("entry: " + str(method) + " " + path)
         var full_path = path
         var headers = Headers()
 
@@ -111,10 +111,6 @@ struct Binance(Exchangeable):
         if api == ApiType.Private:
             var query_ = self._sign(headers, query)
             full_path += "?" + query_
-            logd("full_path: " + full_path)
-
-        # for item in headers.items():
-        #     logd(item[].key + " " + item[].value)
 
         var response = self._client[].request(
             full_path, method, headers, payload
@@ -141,11 +137,7 @@ struct Binance(Exchangeable):
         var ts_str = "recvWindow=5000&timestamp=" + str(now_ms())
         var payload = data + "&" + ts_str if data != "" else ts_str
         var signature = compute_hmac_sha256_hex(payload, self._api_secret)
-        headers["X-MBX-APIKEY"] = self._api_secret
-        logd("payload: " + payload)
-        logd("signature: " + signature)
-        logd("api_key: " + self._api_key)
-        logd("api_secret: " + self._api_secret)
+        headers["X-MBX-APIKEY"] = self._api_key
         return payload + "&signature=" + signature
 
     fn load_markets(self, mut params: Dict[String, Any]) raises -> List[Market]:
@@ -742,7 +734,7 @@ struct Binance(Exchangeable):
     ) raises -> List[Trade]:
         raise Error("NotImplemented")
 
-    fn fetch_balance(self, mut params: Dict[String, Any]) raises -> Balance:
+    fn fetch_balance(self, mut params: Dict[String, Any]) raises -> Balances:
         """Query for balance and get the amount of funds available for trading or funds locked in orders.
 
         https://developers.binance.com/docs/binance-spot-api-docs/rest-api#account-information-user_data                    # spot
@@ -770,22 +762,31 @@ struct Binance(Exchangeable):
         # {"code":-5000,"msg":"Path /fapi/v1/account, Method GET is invalid"}
         # {"code":-1021,"msg":"Timestamp for this request was 1000ms ahead of the server's time."}
         # {"code":-2015,"msg":"Invalid API-key, IP, or permissions for action"}
+        # {"totalInitialMargin":"0.00000000","totalMaintMargin":"0.00000000","totalWalletBalance":"15000.00000000","totalUnrealizedProfit":"0.00000000","totalMarginBalance":"15000.00000000","totalPositionInitialMargin":"0.00000000","totalOpenOrderInitialMargin":"0.00000000","totalCrossWalletBalance":"15000.00000000","totalCrossUnPnl":"0.00000000","availableBalance":"15000.00000000","maxWithdrawAmount":"15000.00000000","assets":[{"asset":"FDUSD","walletBalance":"0.00000000","unrealizedProfit":"0.00000000","marginBalance":"0.00000000","maintMargin":"0.00000000","initialMargin":"0.00000000","positionInitialMargin":"0.00000000","openOrderInitialMargin":"0.00000000","crossWalletBalance":"0.00000000","crossUnPnl":"0.00000000","availableBalance":"0.00000000","maxWithdrawAmount":"0.00000000","updateTime":0},{"asset":"BNB","walletBalance":"0.00000000","unrealizedProfit":"0.00000000","marginBalance":"0.00000000","maintMargin":"0.00000000","initialMargin":"0.00000000","positionInitialMargin":"0.00000000","openOrderInitialMargin":"0.00000000","crossWalletBalance":"0.00000000","crossUnPnl":"0.00000000","availableBalance":"0.00000000","maxWithdrawAmount":"0.00000000","updateTime":0},{"asset":"ETH","walletBalance":"0.00000000","unrealizedProfit":"0.00000000","marginBalance":"0.00000000","maintMargin":"0.00000000","initialMargin":"0.00000000","positionInitialMargin":"0.00000000","openOrderInitialMargin":"0.00000000","crossWalletBalance":"0.00000000","crossUnPnl":"0.00000000","availableBalance":"0.00000000","maxWithdrawAmount":"0.00000000","updateTime":0},{"asset":"BTC","walletBalance":"0.00000000","unrealizedProfit":"0.00000000","marginBalance":"0.00000000","maintMargin":"0.00000000","initialMargin":"0.00000000","positionInitialMargin":"0.00000000","openOrderInitialMargin":"0.00000000","crossWalletBalance":"0.00000000","crossUnPnl":"0.00000000","availableBalance":"0.00000000","maxWithdrawAmount":"0.00000000","updateTime":0},{"asset":"USDT","walletBalance":"15000.00000000","unrealizedProfit":"0.00000000","marginBalance":"15000.00000000","maintMargin":"0.00000000","initialMargin":"0.00000000","positionInitialMargin":"0.00000000","openOrderInitialMargin":"0.00000000","crossWalletBalance":"15000.00000000","crossUnPnl":"0.00000000","availableBalance":"15000.00000000","maxWithdrawAmount":"15000.00000000","updateTime":1736591270429},{"asset":"USDC","walletBalance":"0.00000000","unrealizedProfit":"0.00000000","marginBalance":"0.00000000","maintMargin":"0.00000000","initialMargin":"0.00000000","positionInitialMargin":"0.00000000","openOrderInitialMargin":"0.00000000","crossWalletBalance":"0.00000000","crossUnPnl":"0.00000000","availableBalance":"0.00000000","maxWithdrawAmount":"0.00000000","updateTime":0}],"positions":[]}
         var doc = JsonObject(text)
         var code = doc.get_i64("code")
         if code != 0:
             var msg = doc.get_str("msg")
             raise Error(msg)
-        # var unrealised_pnl = Fixed(doc.get_str("unrealised_pnl"))
-        # var total = Fixed(doc.get_str("total"))
-        # var available = Fixed(doc.get_str("available"))
-        var unrealised_pnl = Fixed("0")
-        var total = Fixed("0")
-        var available = Fixed("0")
-        var result = Balance(
-            free=available,
-            used=unrealised_pnl,
-            total=total,
-        )
+
+        var result = Balances()
+        result.timestamp = int(doc.get_i64("updateTime"))
+        var assets = doc.get_array_mut("assets")
+        for i in range(0, assets.len()):
+            var asset = assets.get(i)
+            var asset_view = JsonValueRefObjectView(asset)
+            var asset_name = asset_view.get_str("asset")
+            var walletBalance = Fixed(asset_view.get_str("walletBalance"))
+            var unrealizedProfit = Fixed(asset_view.get_str("unrealizedProfit"))
+            var marginBalance = Fixed(asset_view.get_str("marginBalance"))
+            result.data[asset_name] = Balance(
+                free=walletBalance,
+                used=unrealizedProfit,
+                total=marginBalance,
+            )
+            _ = asset^
+        _ = assets^
+        _ = doc^
         return result
 
     fn create_order(
@@ -847,18 +848,6 @@ struct Binance(Exchangeable):
         return result
 
     fn cancel_order(
-        self, id: String, symbol: Str, mut params: Dict[String, Any]
-    ) raises -> Bool:
-        try:
-            var order = self.cancel_order_internal(id, symbol, params)
-            if order.id == "":
-                return False
-            else:
-                return True
-        except e:
-            return False
-
-    fn cancel_order_internal(
         self, id: String, symbol: Str, mut params: Dict[String, Any]
     ) raises -> Order:
         var payload = String("")
@@ -989,7 +978,7 @@ struct Binance(Exchangeable):
     ) raises -> List[Trade]:
         raise Error("NotImplemented")
 
-    fn submit_order(
+    fn create_order_async(
         self,
         symbol: String,
         type: OrderType,
@@ -997,7 +986,7 @@ struct Binance(Exchangeable):
         amount: Fixed,
         price: Fixed,
         mut params: Dict[String, Any],
-    ) raises -> Bool:
+    ) raises -> None:
         var request = AsyncTradingRequest(
             type=0,
             data=SubmitOrderData(
@@ -1009,19 +998,17 @@ struct Binance(Exchangeable):
             ),
             exchange=UnsafePointer.address_of(self),
         )
-        var ok = async_trading_channel_ptr()[].send(request)
-        return ok == 0
+        _ = async_trading_channel_ptr()[].send(request)
 
-    fn submit_cancel_order(
+    fn cancel_order_async(
         self, id: String, symbol: String, mut params: Dict[String, Any]
-    ) raises -> Bool:
+    ) raises -> None:
         var request = AsyncTradingRequest(
             type=1,
             data=SubmitCancelOrderData(symbol=symbol, order_id=id),
             exchange=UnsafePointer.address_of(self),
         )
-        var ok = async_trading_channel_ptr()[].send(request)
-        return ok == 0
+        _ = async_trading_channel_ptr()[].send(request)
 
     fn on_order(self, order: Order) -> None:
         logd("on_order start")

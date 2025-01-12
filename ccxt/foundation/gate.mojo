@@ -1016,7 +1016,7 @@ struct Gate(Exchangeable):
         raise Error("NotImplemented")
 
     # 私有方法
-    fn fetch_balance(self, mut params: Dict[String, Any]) raises -> Balance:
+    fn fetch_balance(self, mut params: Dict[String, Any]) raises -> Balances:
         """
         :param dict [params]: exchange specific parameters
         :param str [params.type]: spot, margin, swap or future, if not provided self.options['defaultType'] is used
@@ -1036,7 +1036,9 @@ struct Gate(Exchangeable):
         var unrealised_pnl = Fixed(doc.get_str("unrealised_pnl"))
         var total = Fixed(doc.get_str("total"))
         var available = Fixed(doc.get_str("available"))
-        var result = Balance(
+        var result = Balances()
+        result.timestamp = int(doc.get_i64("update_time"))
+        result.data["USDT"] = Balance(
             free=available,
             used=unrealised_pnl,
             total=total,
@@ -1108,18 +1110,6 @@ struct Gate(Exchangeable):
         return result
 
     fn cancel_order(
-        self, id: String, symbol: Str, mut params: Dict[String, Any]
-    ) raises -> Bool:
-        try:
-            var order = self.cancel_order_internal(id, symbol, params)
-            if order.id == "":
-                return False
-            else:
-                return True
-        except e:
-            return False
-
-    fn cancel_order_internal(
         self, id: String, symbol: Str, mut params: Dict[String, Any]
     ) raises -> Order:
         var payload = String("")
@@ -1261,7 +1251,7 @@ struct Gate(Exchangeable):
     ) raises -> List[Trade]:
         raise Error("NotImplemented")
 
-    fn submit_order(
+    fn create_order_async(
         self,
         symbol: String,
         type: OrderType,
@@ -1269,7 +1259,7 @@ struct Gate(Exchangeable):
         amount: Fixed,
         price: Fixed,
         mut params: Dict[String, Any],
-    ) raises -> Bool:
+    ) raises -> None:
         var request = AsyncTradingRequest(
             type=0,
             data=SubmitOrderData(
@@ -1281,38 +1271,20 @@ struct Gate(Exchangeable):
             ),
             exchange=UnsafePointer.address_of(self),
         )
-        var ok = async_trading_channel_ptr()[].send(request)
-        return ok == 0
+        _ = async_trading_channel_ptr()[].send(request)
 
-    fn submit_cancel_order(
+    fn cancel_order_async(
         self, id: String, symbol: String, mut params: Dict[String, Any]
-    ) raises -> Bool:
+    ) raises -> None:
         var request = AsyncTradingRequest(
             type=1,
             data=SubmitCancelOrderData(symbol=symbol, order_id=id),
             exchange=UnsafePointer.address_of(self),
         )
-        var ok = async_trading_channel_ptr()[].send(request)
-        return ok == 0
+        _ = async_trading_channel_ptr()[].send(request)
 
     fn on_order(self, order: Order) -> None:
-        logd("on_order start")
         self._on_order(self._trading_context, order)
-        logd("on_order end")
 
     fn keep_alive(self) -> None:
         pass
-
-
-fn request_callback(
-    req_id: UInt64,
-    type_: UInt32,
-    source: UnsafePointer[c_void],
-    res: HttpResponsePtr,
-) -> None:
-    logd("request_callback req_id: " + str(req_id))
-    logd("request_callback status_code: " + str(http_response_status_code(res)))
-    alias buf_size = 1024 * 1000
-    var buf = stack_allocation[buf_size, Int8]()
-    var body = http_response_body(res, buf, buf_size)
-    logd("http_callback text: " + str(String(StringRef(buf, body))))

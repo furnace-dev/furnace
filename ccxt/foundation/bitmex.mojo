@@ -655,7 +655,7 @@ struct BitMEX(Exchangeable):
         raise Error("NotImplemented")
 
     # 私有方法
-    fn fetch_balance(self, mut params: Dict[String, Any]) raises -> Balance:
+    fn fetch_balance(self, mut params: Dict[String, Any]) raises -> Balances:
         # TODO: 需要实现
         # params["settle"] = "usdt"
         # var text = self._request(self._api.futures_get_settle_accounts, params)
@@ -721,19 +721,6 @@ struct BitMEX(Exchangeable):
         return result
 
     fn cancel_order(
-        self, id: String, symbol: Str, mut params: Dict[String, Any]
-    ) raises -> Bool:
-        # TODO: 需要实现
-        try:
-            var order = self.cancel_order_internal(id, symbol, params)
-            if order.id == "":
-                return False
-            else:
-                return True
-        except e:
-            return False
-
-    fn cancel_order_internal(
         self, id: String, symbol: Str, mut params: Dict[String, Any]
     ) raises -> Order:
         # TODO: 需要实现
@@ -873,7 +860,7 @@ struct BitMEX(Exchangeable):
     ) raises -> List[Trade]:
         raise Error("NotImplemented")
 
-    fn submit_order(
+    fn create_order_async(
         self,
         symbol: String,
         type: OrderType,
@@ -881,46 +868,13 @@ struct BitMEX(Exchangeable):
         amount: Fixed,
         price: Fixed,
         mut params: Dict[String, Any],
-    ) raises -> Bool:
-        logd("submit_order start")
-        var request = UnsafePointer[SubmitOrderRequest[BitMEX]].alloc(1)
-        __get_address_as_uninit_lvalue(request.address) = SubmitOrderRequest[
-            BitMEX
-        ](
-            symbol,
-            type,
-            side,
-            amount,
-            price,
-            params,
-            UnsafePointer.address_of(self),
-        )
-        logd("submit_order end")
-        var arg = request.bitcast[UInt8]()
-        logd(
-            "submit_order seq_photon_thread_create_and_migrate_to_work_pool"
-            " start"
-        )
-        # seq_photon_thread_create_and_migrate_to_work_pool(
-        #     submit_order_task_entry, arg
-        # )
-        # logd(
-        #     "submit_order seq_photon_thread_create_and_migrate_to_work_pool end"
-        # )
-        return True
+    ) raises -> None:
+        pass
 
-    fn submit_cancel_order(
+    fn cancel_order_async(
         self, id: String, symbol: String, mut params: Dict[String, Any]
-    ) raises -> Bool:
-        var request = UnsafePointer[CancelOrderRequest[BitMEX]].alloc(1)
-        __get_address_as_uninit_lvalue(request.address) = CancelOrderRequest[
-            BitMEX
-        ](id, symbol, params, UnsafePointer.address_of(self))
-        var arg = request.bitcast[UInt8]()
-        # seq_photon_thread_create_and_migrate_to_work_pool(
-        #     cancel_order_task_entry, arg
-        # )
-        return True
+    ) raises -> None:
+        pass
 
     fn on_order(self, order: Order) -> None:
         self._on_order(self._trading_context, order)

@@ -54,7 +54,7 @@ trait Exchangeable:
         ...
 
     # 私有方法
-    fn fetch_balance(self, mut params: Dict[String, Any]) raises -> Balance:
+    fn fetch_balance(self, mut params: Dict[String, Any]) raises -> Balances:
         ...
 
     fn create_order(
@@ -70,7 +70,7 @@ trait Exchangeable:
 
     fn cancel_order(
         self, id: String, symbol: Str, mut params: Dict[String, Any]
-    ) raises -> Bool:
+    ) raises -> Order:
         ...
 
     fn fetch_order(
@@ -120,7 +120,7 @@ trait Exchangeable:
     # fn withdraw(self: Self, currency: String, amount: Float64) -> Bool:
     #     ...
 
-    fn submit_order(
+    fn create_order_async(
         self,
         symbol: String,
         type: OrderType,
@@ -128,12 +128,12 @@ trait Exchangeable:
         amount: Fixed,
         price: Fixed,
         mut params: Dict[String, Any],
-    ) raises -> Bool:
+    ) raises -> None:
         ...
 
-    fn submit_cancel_order(
+    fn cancel_order_async(
         self, id: String, symbol: String, mut params: Dict[String, Any]
-    ) raises -> Bool:
+    ) raises -> None:
         ...
 
     fn on_order(self, order: Order) -> None:

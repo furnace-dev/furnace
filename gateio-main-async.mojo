@@ -98,7 +98,7 @@ fn run() raises:
     # var balance = gate.fetch_balance(params)
     # logd(str(balance))
 
-    var ok = gate.submit_order(
+    var ok = gate.create_order_async(
         "BTC_USDT",
         OrderType.Limit,
         OrderSide.Buy,

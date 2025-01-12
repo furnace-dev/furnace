@@ -16,7 +16,7 @@ fn test_fetch_markets() raises:
         trader_id="daniugege",
     )
     var gate = Gate(config, trading_context)
-    var text = open("data/contracts.json", "r").read()
+    var text = open("data/gateio_contracts.json", "r").read()
     assert_true(len(text) > 0)
     var doc = JsonObject(text)
     var arr = JsonValueArrayView(doc)

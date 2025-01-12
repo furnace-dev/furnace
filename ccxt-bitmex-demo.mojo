@@ -93,7 +93,7 @@ fn test_rest(api_key: String, api_secret: String) raises -> None:
     #     logd("create_order error: " + str(e))
     # logd("create_order end")
 
-    # _ = bm.submit_order(
+    # _ = bm.create_order_async(
     #     "BTC_USDT",
     #     OrderType.Limit,
     #     OrderSide.Buy,

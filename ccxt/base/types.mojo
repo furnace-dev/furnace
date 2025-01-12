@@ -649,10 +649,33 @@ struct FundingHistory:
 
 
 @value
-struct Balances:
+struct Balances(Stringable):
     var data: Dict[String, Balance]
-    var datetime: Str
+    var datetime: String
     var timestamp: Int
+
+    fn __init__(out self):
+        self.data = Dict[String, Balance]()
+        self.datetime = String("")
+        self.timestamp = 0
+
+    fn __str__(self) -> String:
+        var data = String("")
+        var n = len(self.data)
+        for k_v in self.data.items():
+            if n > 0:
+                data += ", "
+            data += String.write(k_v[].key, ": ", str(k_v[].value))
+            n -= 1
+        return String.write(
+            "Balances(datetime=",
+            self.datetime,
+            ", timestamp=",
+            str(self.timestamp),
+            ", data=",
+            data,
+            ")",
+        )
 
 
 @value

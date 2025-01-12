@@ -109,7 +109,7 @@ struct Bybit(Exchangeable):
         raise Error("NotImplemented")
 
     # 私有方法
-    fn fetch_balance(self, mut params: Dict[String, Any]) raises -> Balance:
+    fn fetch_balance(self, mut params: Dict[String, Any]) raises -> Balances:
         raise Error("NotImplemented")
 
     fn create_order(
@@ -125,7 +125,7 @@ struct Bybit(Exchangeable):
 
     fn cancel_order(
         self, id: String, symbol: Str, mut params: Dict[String, Any]
-    ) raises -> Bool:
+    ) raises -> Order:
         raise Error("NotImplemented")
 
     fn fetch_order(
@@ -169,7 +169,7 @@ struct Bybit(Exchangeable):
     ) raises -> List[Trade]:
         raise Error("NotImplemented")
 
-    fn submit_order(
+    fn create_order_async(
         self,
         symbol: String,
         type: OrderType,
@@ -177,13 +177,13 @@ struct Bybit(Exchangeable):
         amount: Fixed,
         price: Fixed,
         mut params: Dict[String, Any],
-    ) raises -> Bool:
-        return True
+    ) raises -> None:
+        pass
 
-    fn submit_cancel_order(
+    fn cancel_order_async(
         self, id: String, symbol: String, mut params: Dict[String, Any]
-    ) raises -> Bool:
-        return True
+    ) raises -> None:
+        pass
 
     fn on_order(self, order: Order) -> None:
         pass

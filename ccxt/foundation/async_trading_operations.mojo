@@ -57,8 +57,10 @@ fn _cancel_order_internal[
     var symbol = req.symbol
     var order_id = req.order_id
     var params = Dict[String, Any]()
-    var ok = exchange[].cancel_order(symbol, order_id, params)
-    # TODO: trigger callback
+    var order = exchange[].cancel_order(symbol, order_id, params)
+    logt("order: " + str(order))
+    # trigger callback
+    exchange[].on_order(order)
 
 
 @always_inline
