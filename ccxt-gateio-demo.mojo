@@ -10,8 +10,6 @@ from ccxt.foundation.bybit import Bybit
 from ccxt.foundation.gate import Gate
 from ccxt.pro.gate import Gate as GatePro
 from ccxt.base.pro_exchangeable import TradingContext, ExchangeId
-from monoio_connect.pthread import *
-from monoio_connect import *
 
 
 fn test_http_client_post() raises -> None:
@@ -134,7 +132,7 @@ fn test_rest(api_key: String, api_secret: String, testnet: Bool) raises -> None:
 
     logd("sleep")
 
-    monoio_sleep_ms(rt, 10 * 60 * 1000)
+    sleep_ms(rt, 10 * 60 * 1000)
 
     # time.sleep(1000000.0)
 

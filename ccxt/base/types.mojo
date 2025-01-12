@@ -244,6 +244,29 @@ struct Entry:
             self.api = ApiType.Public
         elif api == "private":
             self.api = ApiType.Private
+
+        elif api.startswith("fapi"):
+            # 以下是币安期货API的命名规则
+            # fapiPublic
+            # fapiPublicV2
+            # fapiPrivate
+            # fapiPrivateV2
+            # fapiPrivateV3
+            var api_ = api.replace("fapi", "")
+            if api_.startswith("Public"):
+                self.api = ApiType.Public
+                api_ = api_.replace("Public", "")
+            elif api_.startswith("Private"):
+                self.api = ApiType.Private
+                api_ = api_.replace("Private", "")
+            else:
+                self.api = ApiType.Public
+            if api_.startswith("V2"):
+                self.path = "/fapi/v2/" + path
+            elif api_.startswith("V3"):
+                self.path = "/fapi/v3/" + path
+            else:
+                self.path = "/fapi/v1/" + path
         else:
             self.api = ApiType.Public
 
@@ -272,6 +295,8 @@ struct Entry:
                     self.config[key[]] = int(f)
                 else:
                     self.config[key[]] = f
+            elif v_type == JsonType.JsonType_Array:
+                pass
             else:
                 logi("unknown type: " + str(v_type._value))
         # logd("Entry init end")
@@ -1116,7 +1141,15 @@ struct MarketInterface(Stringable):
         var symbol_str = String(
             ""
         ) if self.symbol is None else self.symbol.value()
-        return String.write("MarketInterface(symbol=", symbol_str, ")")
+        return String.write(
+            "MarketInterface(symbol=",
+            symbol_str,
+            ", contractSize=",
+            str(self.contractSize),
+            ", precision=",
+            str(self.precision),
+            ")",
+        )
 
 
 @value

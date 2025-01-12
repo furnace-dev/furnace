@@ -77,3 +77,12 @@ fn _init_async_trading_channel() -> Channel:
 
 fn async_trading_channel_ptr() -> UnsafePointer[Channel]:
     return _ASYNC_TRADING_CHANNEL.get_or_create_ptr()
+
+
+fn save_text_to_file(file_name: String, text: String):
+    """Save text to file."""
+    try:
+        with open(file_name, "w") as f:
+            f.write(text)
+    except e:
+        print("save_text_to_file error: " + str(e))

@@ -179,20 +179,6 @@ struct Gate(Exchangeable):
                 return response.text
         return response.text
 
-    # @always_inline
-    # fn _request_with_callback(
-    #     self,
-    #     entry: Entry,
-    #     params: Dict[String, Any],
-    #     query: String,
-    #     payload: String,
-    #     callback: HttpResponseCallback = request_callback,
-    # ) raises -> None:
-    #     # logd("entry: " + entry.path)
-    #     self._request_with_callback(
-    #         entry.method, entry.path, params, query, payload, entry.api, callback
-    #     )
-
     @always_inline
     fn _request_with_callback(
         self,
