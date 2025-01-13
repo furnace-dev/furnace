@@ -1,0 +1,108 @@
+from sys._build import is_debug_build
+from collections import Dict, List
+from os import getenv
+from testing import assert_equal, assert_true
+from memory import UnsafePointer, stack_allocation
+from mojoenv import load_mojo_env
+from monoio_connect import *
+from ccxt.base.types import Any, OrderType, OrderSide, Num, Order, Ticker, OrderBook, OrderbookEntry
+from ccxt.foundation.gate import Gate
+from ccxt.base.pro_exchangeable import TradingContext, ExchangeId
+from time import sleep, perf_counter_ns
+
+
+fn get_order_book_mid(order_book: OrderBook) raises -> Fixed:
+    if len(order_book.asks) > 0 and len(order_book.bids) > 0:
+        var ask_price = order_book.asks[0].price
+        var bid_price = order_book.bids[0].price
+        return (ask_price + bid_price) / Fixed(2.0)
+    return Fixed(0.0)
+
+
+fn main() raises:
+    # 初始化日志和配置
+    var logger = init_logger(LogLevel.Debug, "", "")
+    var env_vars = load_mojo_env(".env")
+    var api_key = env_vars["GATEIO_API_KEY"]
+    var api_secret = env_vars["GATEIO_API_SECRET"]
+    var testnet = parse_bool(env_vars["GATEIO_TESTNET"])
+    
+    # 初始化交易上下文和API
+    var config = Dict[String, Any]()
+    config["api_key"] = api_key
+    config["api_secret"] = api_secret
+    config["testnet"] = testnet
+    
+    var symbol = String("BTC_USDT")
+    var trading_context = TradingContext(
+        exchange_id=ExchangeId.gateio,
+        account_id="zsyhsapi",
+        trader_id="1"
+    )
+    
+    var rt = create_monoio_runtime()
+    var gate = Gate(config, trading_context, rt)
+    
+    # 获取市场数据
+    var params = Dict[String, Any]()
+    var order_book = gate.fetch_order_book(symbol, 1, params)
+    var mid_price = get_order_book_mid(order_book)
+    
+    # 设置订单参数
+    var price = mid_price * Fixed(0.8)  # 使用中间价格的80%
+    var amount = Fixed(1)  # 使用最小交易量，避免实际成交
+    var results = List[Float64]()
+    
+    # 测试下单和撤单延迟
+    for i in range(600):
+        try:
+            # 创建限价买单
+            var order = gate.create_order(
+                symbol,
+                OrderType.Limit,
+                OrderSide.Buy,
+                amount,
+                price,
+                params
+            )
+            
+            # 记录开始时间
+            var start_time = perf_counter_ns()
+
+            # 撤销订单
+            _ = gate.cancel_order(order.id, symbol, params)
+            
+            # 计算延迟
+            var end_time = perf_counter_ns()
+            var elapsed = Float64(end_time - start_time) / 1_000_000.0  # 转换为毫秒
+            # 跳过第一次请求的数据
+            if i > 0:
+                results.append(elapsed)
+            
+            logd("Order " + str(i) + " RTT: " + str(elapsed) + "ms")
+            
+        except e:
+            logd("Error: " + str(e))
+            # try:
+            #     _ = gate.cancel_all_orders(symbol, params)
+            # except:
+            #     logd("Error cancelling orders")
+        
+        # 每次测试间隔10秒
+        sleep_ms(rt, 10000)
+    
+    # 计算平均延迟
+    var total: Float64 = 0.0
+    for i in range(len(results)):
+        total += results[i]
+    
+    if len(results) > 0:
+        var avg_rtt = total / Float64(len(results))
+        logd("Successfully tested " + str(len(results)) + " orders")
+        logd("Average round-trip time: " + str(avg_rtt) + " milliseconds")
+    
+    # # 清理所有未完成订单
+    # try:
+    #     _ = gate.cancel_all_orders(symbol, params)
+    # except:
+    #     logd("Error cancelling final orders")

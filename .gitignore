@@ -8,6 +8,7 @@ __pycache__
 .env
 *.so
 *.dylib
+.idea
 
 ccxt-bitmex-demo
 ccxt-gateio-demo
