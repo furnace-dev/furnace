@@ -19,16 +19,6 @@ fn get_order_book_mid(order_book: OrderBook) raises -> Fixed:
     return Fixed(0.0)
 
 
-fn list_to_str[T: StringableCollectionElement](results: List[T]) -> String:
-    var output = String("[")
-    for i in range(len(results)):
-        if i > 0:
-            output += String(", ")
-        output += String(str(results[i]))
-    output += String("]")
-    return output
-
-
 fn main() raises:
     # 初始化日志和配置
     var logger = init_logger(LogLevel.Debug, "", "")
@@ -90,7 +80,7 @@ fn main() raises:
                 results.append(elapsed)
             
             logd("Order " + str(i) + " RTT: " + str(elapsed) + "ms")
-            logd(list_to_str(results))
+            logd(String(",").join(results))
         except e:
             logd("Error: " + str(e))
             # try:
