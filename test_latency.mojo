@@ -19,6 +19,16 @@ fn get_order_book_mid(order_book: OrderBook) raises -> Fixed:
     return Fixed(0.0)
 
 
+fn str_float_list(results: List[Float64]) -> String:
+    var output = String("[")
+    for i in range(len(results)):
+        if i > 0:
+            output += String(", ")
+        output += String(str(results[i]))
+    output += String("]")
+    return output
+
+
 fn main() raises:
     # 初始化日志和配置
     var logger = init_logger(LogLevel.Debug, "", "")
@@ -33,7 +43,7 @@ fn main() raises:
     config["api_secret"] = api_secret
     config["testnet"] = testnet
     
-    var symbol = String("BTC_USDT")
+    var symbol = String("XRP_USDT")
     var trading_context = TradingContext(
         exchange_id=ExchangeId.gateio,
         account_id="zsyhsapi",
@@ -54,7 +64,7 @@ fn main() raises:
     var results = List[Float64]()
     
     # 测试下单和撤单延迟
-    for i in range(600):
+    for i in range(3):
         try:
             # 创建限价买单
             var order = gate.create_order(
@@ -80,7 +90,7 @@ fn main() raises:
                 results.append(elapsed)
             
             logd("Order " + str(i) + " RTT: " + str(elapsed) + "ms")
-            
+            logd(str_float_list(results))
         except e:
             logd("Error: " + str(e))
             # try:
