@@ -19,7 +19,7 @@ fn get_order_book_mid(order_book: OrderBook) raises -> Fixed:
     return Fixed(0.0)
 
 
-fn str_float_list(results: List[Float64]) -> String:
+fn list_to_str[T: StringableCollectionElement](results: List[T]) -> String:
     var output = String("[")
     for i in range(len(results)):
         if i > 0:
@@ -90,7 +90,7 @@ fn main() raises:
                 results.append(elapsed)
             
             logd("Order " + str(i) + " RTT: " + str(elapsed) + "ms")
-            logd(str_float_list(results))
+            logd(list_to_str(results))
         except e:
             logd("Error: " + str(e))
             # try:
