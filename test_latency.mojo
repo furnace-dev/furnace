@@ -54,7 +54,7 @@ fn main() raises:
     var results = List[Float64]()
     
     # 测试下单和撤单延迟
-    for i in range(3):
+    for i in range(600):
         try:
             # 创建限价买单
             var order = gate.create_order(
