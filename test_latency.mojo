@@ -129,7 +129,7 @@ fn main() raises:
         var percentiles = List[Int]()
         percentiles.append(5)
         percentiles.append(15)
-        percentiles.append(95)
+        percentiles.append(90)
         var stats = calculate_percentiles(results, percentiles)
         for p in percentiles:
             logd(str(p[]) + "th percentile: " + str(stats[p[]]) + "ms")
