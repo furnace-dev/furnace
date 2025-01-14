@@ -124,25 +124,20 @@ fn test_binance() raises -> None:
     # for trade in trades:
     #     logd(str(trade))
 
-    var balance = binance.fetch_balance(params)
-    logd(str(balance))
+    # var balance = binance.fetch_balance(params)
+    # logd(str(balance))
 
-    # monoio_sleep_ms(rt, 10)
+    # sleep_ms(rt, 10)
 
-    # logd("create_order")
-    # try:
-    #     var order = binance.create_order(
-    #         "BTC_USDT",
-    #         OrderType.Limit,
-    #         OrderSide.Buy,
-    #         Fixed(1.0),
-    #         Fixed(93000),
-    #         params,
-    #     )
-    #     logd(str(order))
-    # except e:
-    #     logd("create_order error: " + str(e))
-    # logd("create_order end")
+    var order = binance.create_order(
+        "BTCUSDT",
+        OrderType.Limit,
+        OrderSide.Buy,
+        Fixed(1.0),
+        Fixed(93000),
+        params,
+    )
+    logd(str(order))
 
     # try:
     #     _ = binance.create_order_async(

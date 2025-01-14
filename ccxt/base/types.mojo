@@ -244,7 +244,6 @@ struct Entry:
             self.api = ApiType.Public
         elif api == "private":
             self.api = ApiType.Private
-
         elif api.startswith("fapi"):
             # 以下是币安期货API的命名规则
             # fapiPublic
@@ -252,6 +251,7 @@ struct Entry:
             # fapiPrivate
             # fapiPrivateV2
             # fapiPrivateV3
+            # logd("path: " + path + ", api=" + api)
             var api_ = api.replace("fapi", "")
             if api_.startswith("Public"):
                 self.api = ApiType.Public
@@ -261,12 +261,29 @@ struct Entry:
                 api_ = api_.replace("Private", "")
             else:
                 self.api = ApiType.Public
+                api_ = api_.replace("Public", "")
             if api_.startswith("V2"):
                 self.path = "/fapi/v2/" + path
             elif api_.startswith("V3"):
                 self.path = "/fapi/v3/" + path
             else:
                 self.path = "/fapi/v1/" + path
+        elif api.startswith("dapi"):
+            # dapiPrivate
+            # dapiPrivateV2
+            # dapiPublic
+            # dapiPublicV2
+            var api_ = api.replace("dapi", "")
+            if api_.startswith("Private"):
+                self.api = ApiType.Private
+                api_ = api_.replace("Private", "")
+            else:
+                self.api = ApiType.Public
+                api_ = api_.replace("Public", "")
+            if api_.startswith("V2"):
+                self.path = "/dapi/v2/" + path
+            else:
+                self.path = "/dapi/v1/" + path
         else:
             self.api = ApiType.Public
 

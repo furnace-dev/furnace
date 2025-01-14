@@ -116,6 +116,7 @@ struct Binance(Exchangeable):
             var query_ = self._sign(headers, query)
             full_path += "?" + query_
 
+        logd("full_path: " + full_path)
         var response = self._client[].request(
             full_path, method, headers, payload
         )
@@ -802,49 +803,58 @@ struct Binance(Exchangeable):
         price: Fixed,
         mut params: Dict[String, Any],
     ) raises -> Order:
-        var data = JsonObject()
-        data.insert_str("contract", symbol)
-        data.insert_i64("size", amount.to_int())
-        # if iceberg >= 0:
-        #     data.insert_i64("iceberg", iceberg)
-        if type == OrderType.Market:
-            data.insert_str("price", "0")
+        """Create a trade order.
+        :param str symbol: unified symbol of the market to create an order in
+        :param str type: 'market' or 'limit'
+        :param str side: 'buy' or 'sell'
+        :param float amount: how much of currency you want to trade in units of base currency
+        :param float price: the price at which the order is to be fullfilled, in units of the quote currency, ignored in market orders
+        :param dict [params]: extra parameters specific to the binance api endpoint
+        :param str [params.time_in_force]: 'GTC', 'IOC', 'FOK', or 'GTX'
+        :param bool [params.reduce_only]: True or False, default False
+        :returns Order
+
+        有效方式 (timeInForce):
+
+        GTC - Good Till Cancel 成交为止（下单后仅有1年有效期，1年后自动取消）
+        IOC - Immediate or Cancel 无法立即成交(吃单)的部分就撤销
+        FOK - Fill or Kill 无法全部立即成交就撤销
+        GTX - Good Till Crossing 无法成为挂单方就撤销
+        GTD - Good Till Date 在特定时间之前有效，到期自动撤销.
+        """
+        var query_values = QueryStringBuilder()
+        query_values["symbol"] = symbol
+        query_values["side"] = (
+            "BUY" if side == OrderSide.Buy else "SELL"
+        )  # SELL, BUY
+        # 订单类型 LIMIT, MARKET, STOP, TAKE_PROFIT, STOP_MARKET, TAKE_PROFIT_MARKET, TRAILING_STOP_MARKET
+        query_values["type"] = "LIMIT" if type == OrderType.Limit else "MARKET"
+        # positionSide: 持仓方向，单向持仓模式下非必填，默认且仅可填BOTH;在双向持仓模式下必填,且仅可选择 LONG 或 SHORT
+        if "position_side" in params:
+            query_values["positionSide"] = params["position_side"].string()
+        if not amount.is_zero():
+            query_values["quantity"] = amount.to_string()
+        if not price.is_zero():
+            query_values["price"] = price.to_string()
+        if "time_in_force" in params:
+            query_values["timeInForce"] = params["time_in_force"].string()
         else:
-            # price_to_precision
-            data.insert_str("price", price.to_string())
+            query_values["timeInForce"] = "GTC"
+        if "reduce_only" in params and params["reduce_only"].bool():
+            query_values["reduceOnly"] = "true"
+        var query_str = query_values.to_string()
+        logd("query_str: " + query_str)
 
-        if "reduce_only" in params:
-            data.insert_bool("reduce_only", params["reduce_only"].bool())
-        if "tif" in params:
-            data.insert_str("tif", params["tif"].string())
-        if "text" in params:
-            data.insert_str("text", params["text"].string())
-        if "auto_size" in params:
-            data.insert_str("auto_size", params["auto_size"].string())
-        # if close:
-        #     data.insert_bool("close", close)
-        # if reduce_only:
-        #     data.insert_bool("reduce_only", reduce_only)
-        # if len(tif):
-        #     data.insert_str("tif", tif)
-        data.insert_str("tif", "gtc")
-        # if len(text) > 0:
-        #     data.insert_str("text", text)
-        # if len(auto_size) > 0:
-        #     data.insert_str("auto_size", auto_size)
-        var payload = data.to_string()
-
-        # logd(payload)
-
-        params["settle"] = "usdt"
-
-        var text = ""  # self._request(
-        #     self._api.futures_post_settle_orders,
-        #     params,
-        #     query="",
-        #     payload=payload,
-        # )
-        logd(text)
+        var params_ = Dict[String, Any]()
+        var payload = String("")
+        var text = self._request(
+            self._api.fapiprivate_post_order,
+            params_,
+            query=query_str,
+            payload=payload,
+        )
+        # logd(text)
+        # {"code":-1102,"msg":"Mandatory parameter 'timeinforce' was not sent, was empty/null, or malformed."}
         var doc = JsonObject(text)
         var result = self.parse_order(doc)
         # logd("result: " + str(result))
@@ -887,36 +897,33 @@ struct Binance(Exchangeable):
 
     @staticmethod
     fn parse_order(doc: JsonObject) raises -> Order:
-        # TODO: 1
-        if not doc.contains_key("id"):
-            raise Error("error")
+        # {"code":-1102,"msg":"Mandatory parameter 'timeinforce' was not sent, was empty/null, or malformed."}
+        var code = doc.get_i64("code")
+        if code != 0:
+            var msg = doc.get_str("msg")
+            raise Error(String.format("code: {0}, msg: {1}", code, msg))
 
-        var symbol_ = doc.get_str("contract")
-        var id = doc.get_u64("id")
-        var clientOrderId = doc.get_str("text")
-        var status = doc.get_str("status")
-        var type_ = doc.get_str("type")
-        # var side = doc.get_str("side")
-        # var left = doc.get_i64("left")
-        # var amount_ = doc.get_str("amount", "0")
-        var amount_ = doc.get_i64("size")
-        var left = doc.get_i64("left")
-        var filled_amount = amount_ - left
-        var price_ = doc.get_str("price")
-        var avg_price = doc.get_str("avg_deal_price")
-        # var fee = doc.get_str("fee")
-        # var cost = doc.get_str("cost")
-        var datetime = doc.get_str("create_time")
-        var timestamp = int(doc.get_i64("create_time"))
-        var update_timestamp = int(doc.get_i64("update_time"))
-        # var create_time_ms = int(doc.get_i64("create_time_ms"))
-        # var update_time_ms = int(doc.get_i64("update_time_ms"))
+        # {"orderId":4077634200,"symbol":"BTCUSDT","status":"NEW","clientOrderId":"pRxDtGFyxElEV3emIYz1tb","price":"93000.00","avgPrice":"0.00","origQty":"1.000","executedQty":"0.000","cumQty":"0.000","cumQuote":"0.00000","timeInForce":"GTC","type":"LIMIT","reduceOnly":false,"closePosition":false,"side":"BUY","positionSide":"BOTH","stopPrice":"0.00","workingType":"CONTRACT_PRICE","priceProtect":false,"origType":"LIMIT","priceMatch":"NONE","selfTradePreventionMode":"NONE","goodTillDate":0,"updateTime":1736869853102}
+
+        var symbol_ = str(doc.get_str_ref("symbol"))
+        var id = doc.get_u64("orderId")
+        var clientOrderId = str(doc.get_str_ref("clientOrderId"))
+        var status = str(doc.get_str_ref("status"))
+        var type_ = str(doc.get_str_ref("type"))
+        var amount_ = Fixed(str(doc.get_str_ref("origQty")))
+        var filled_amount = Fixed(str(doc.get_str_ref("executedQty")))
+        var left = amount_ - filled_amount
+
+        var price_ = Fixed(str(doc.get_str_ref("price")))
+        # var avg_price = Fixed(0)
+        var timestamp = int(doc.get_i64("updateTime"))
+        var update_timestamp = timestamp
         var time_in_force = doc.get_str("time_in_force")
         var result = Order(
             info=Dict[String, Any](),
             id=str(id),
             clientOrderId=clientOrderId,
-            datetime=datetime,
+            datetime="",
             timestamp=timestamp,
             lastTradeTimestamp=update_timestamp,
             lastUpdateTimestamp=update_timestamp,
@@ -925,11 +932,11 @@ struct Binance(Exchangeable):
             type=type_,
             timeInForce=time_in_force,
             side=OrderSide.Buy,  # todo: side
-            price=Fixed(price_),
-            average=Fixed(avg_price),
-            amount=Fixed(amount_),
-            filled=Fixed(filled_amount),
-            remaining=Fixed(left),
+            price=price_,
+            average=Fixed(0),
+            amount=amount_,
+            filled=filled_amount,
+            remaining=left,
             stopPrice=Fixed(0),
             takeProfitPrice=Fixed(0),
             stopLossPrice=Fixed(0),

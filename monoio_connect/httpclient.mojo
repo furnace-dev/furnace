@@ -4,6 +4,36 @@ from .log import logd
 
 
 @value
+struct QueryStringBuilder:
+    var data: Dict[String, String]
+
+    fn __init__(out self):
+        self.data = Dict[String, String]()
+
+    fn __setitem__(mut self, name: String, value: String):
+        self.data[name] = value
+
+    fn to_string(self) raises -> String:
+        if len(self.data) == 0:
+            return ""
+
+        var url = String("?")
+        for item in self.data.items():
+            url += item[].key + "=" + item[].value + "&"
+        return url[1:-1]
+
+    fn debug(mut self) raises:
+        for item in self.data.items():
+            logi(
+                # str(i)
+                # + ": "
+                str(item[].key)
+                + " = "
+                + str(item[].value)
+            )
+
+
+@value
 struct HttpClientOptions:
     """
     HttpClient 构造函数的参数.
@@ -58,7 +88,9 @@ struct HttpClient:
         client_builder_enable_https(self._builder)
         client_builder_http1_only(self._builder)
         # self._client = client_builder_build(self._builder)
-        self._client = client_builder_build_with_runtime(self._rt, self._builder)
+        self._client = client_builder_build_with_runtime(
+            self._rt, self._builder
+        )
         self._base_url = options.base_url
 
     fn __del__(owned self):
@@ -81,7 +113,7 @@ struct HttpClient:
         payload: String,
     ) -> HttpResponse:
         var url = self._base_url + path
-        # logd("url: " + url)
+        logd("url: " + url)
         var req = new_http_request(
             method,
             url.unsafe_cstr_ptr(),
