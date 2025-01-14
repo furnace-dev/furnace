@@ -291,6 +291,10 @@ struct Entry:
             self.method = Method.METHOD_GET
         elif method == "POST":
             self.method = Method.METHOD_POST
+        elif method == "PUT":
+            self.method = Method.METHOD_PUT
+        elif method == "DELETE":
+            self.method = Method.METHOD_DELETE
         else:
             # raise Error("Invalid method: " + method)
             self.method = Method.METHOD_GET

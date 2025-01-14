@@ -113,7 +113,7 @@ struct HttpClient:
         payload: String,
     ) -> HttpResponse:
         var url = self._base_url + path
-        logd("url: " + url)
+        logt("url: " + url)
         var req = new_http_request(
             method,
             url.unsafe_cstr_ptr(),

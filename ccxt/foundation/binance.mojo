@@ -116,7 +116,7 @@ struct Binance(Exchangeable):
             var query_ = self._sign(headers, query)
             full_path += "?" + query_
 
-        logd("full_path: " + full_path)
+        logt("full_path: " + full_path)
         var response = self._client[].request(
             full_path, method, headers, payload
         )
@@ -864,35 +864,25 @@ struct Binance(Exchangeable):
     fn cancel_order(
         self, id: String, symbol: Str, mut params: Dict[String, Any]
     ) raises -> Order:
+        var query_values = QueryStringBuilder()
+        query_values["symbol"] = symbol.value()
+        query_values["orderId"] = id
+        var query_str = query_values.to_string()
+        logt("query_str: " + query_str)
+
+        var params_ = Dict[String, Any]()
         var payload = String("")
-        params["settle"] = "usdt"
-        var path = "futures/usdt/orders/" + id
-        logd("cancel_order request start")
-        var query = String("")
-        var text = ""  # self._request(
-        #     Method.METHOD_DELETE,
-        #     path,
-        #     params,
-        #     query,
-        #     payload=payload,
-        #     api=ApiType.Private,
-        # )
-        logd("cancel_order request end")
-        logd(text)
-        # if "ORDER_NOT_FOUND" in text:
-        #     logd("ORDER_NOT_FOUND")
-        #     raise Error("ORDER_NOT_FOUND")
-        # logd("cancel_order request success")
+        var text = self._request(
+            self._api.fapiprivate_delete_order,
+            params_,
+            query=query_str,
+            payload=payload,
+        )
+        logt(text)
+        # {"code":-2011,"msg":"Unknown order sent."}
+        # {"orderId":4077634200,"symbol":"BTCUSDT","status":"CANCELED","clientOrderId":"pRxDtGFyxElEV3emIYz1tb","price":"93000.00","avgPrice":"0.00","origQty":"1.000","executedQty":"0.000","cumQty":"0.000","cumQuote":"0.00000","timeInForce":"GTC","type":"LIMIT","reduceOnly":false,"closePosition":false,"side":"BUY","positionSide":"BOTH","stopPrice":"0.00","workingType":"CONTRACT_PRICE","priceProtect":false,"origType":"LIMIT","priceMatch":"NONE","selfTradePreventionMode":"NONE","goodTillDate":0,"updateTime":1736898322718}
         var doc = JsonObject(text)
-        logd("parse_order start")
-        if doc.contains_key("label"):
-            var label = doc.get_str("label")
-            if label == "ORDER_NOT_FOUND":
-                raise Error("ORDER_NOT_FOUND")
-            raise Error(label)
         var result = self.parse_order(doc)
-        logd("parse_order end")
-        # logd(str(result))
         return result
 
     @staticmethod

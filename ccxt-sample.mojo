@@ -129,35 +129,20 @@ fn test_binance() raises -> None:
 
     # sleep_ms(rt, 10)
 
-    var order = binance.create_order(
-        "BTCUSDT",
-        OrderType.Limit,
-        OrderSide.Buy,
-        Fixed(1.0),
-        Fixed(93000),
-        params,
-    )
-    logd(str(order))
-
-    # try:
-    #     _ = binance.create_order_async(
-    #         "BTC_USDT",
-    #         OrderType.Limit,
-    #         OrderSide.Buy,
-    #         Fixed(1.0),
-    #         Fixed(93000),
-    #         params,
-    #     )
-    # except e:
-    #     logd("create_order_async error: " + str(e))
-
-    # logd("cancel_order")
-
-    # var cancel_order = binance.cancel_order(
-    #     String("58828270140601928"), String("BTC_USDT"), params
+    # var order = binance.create_order(
+    #     "BTCUSDT",
+    #     OrderType.Limit,
+    #     OrderSide.Buy,
+    #     Fixed(1.0),
+    #     Fixed(93000),
+    #     params,
     # )
-    # logd(str(cancel_order))
-    # logd("cancel_order end")
+    # logd(str(order))
+
+    var cancel_order = binance.cancel_order(
+        String("4077634200"), String("BTCUSDT"), params
+    )
+    logd(str(cancel_order))
 
     logd("sleep")
 
