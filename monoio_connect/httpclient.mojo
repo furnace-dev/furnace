@@ -57,7 +57,8 @@ struct HttpClient:
         # client_builder_max_concurrent_streams(self._builder, 100)
         client_builder_enable_https(self._builder)
         client_builder_http1_only(self._builder)
-        self._client = client_builder_build(self._builder)
+        # self._client = client_builder_build(self._builder)
+        self._client = client_builder_build_with_runtime(self._rt, self._builder)
         self._base_url = options.base_url
 
     fn __del__(owned self):

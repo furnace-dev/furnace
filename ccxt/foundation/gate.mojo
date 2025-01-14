@@ -53,6 +53,7 @@ struct Gate(Exchangeable):
     ):
         self._testnet = config.get("testnet", False).bool()
         var base_url = "https://api.gateio.ws" if not self._testnet else "https://fx-api-testnet.gateio.ws"
+
         self._host = String(base_url).replace("https://", "")
         self._default_type = String("future")
         self._client = UnsafePointer[HttpClient].alloc(1)
@@ -127,8 +128,13 @@ struct Gate(Exchangeable):
         # logd("path: " + path_)
         var headers = Headers()
 
-        headers["Accept"] = "application/json"
-        headers["Content-Type"] = "application/json"
+        # headers["Accept"] = "application/json"
+        # # headers["Content-Type"] = "application/json"
+        # print(self._host)
+        headers["host"] = self._host
+        headers["user-agent"] = "monoio-http"
+        headers["content-type"] = "application/json"
+        headers["accept-encoding"] = "gzip, deflate"
 
         if api == ApiType.Private:
             var sign = String("")
@@ -1115,7 +1121,6 @@ struct Gate(Exchangeable):
         var payload = String("")
         params["settle"] = "usdt"
         var path = "futures/usdt/orders/" + id
-        logd("cancel_order request start")
         var query = String("")
         var text = self._request(
             Method.METHOD_DELETE,
@@ -1125,8 +1130,7 @@ struct Gate(Exchangeable):
             payload=payload,
             api=ApiType.Private,
         )
-        logd("cancel_order request end")
-        logd(text)
+        # logd(text)
         # {"label":"ORDER_NOT_FOUND"}
         # {"refu":0,"tkfr":"0.0005","mkfr":"0.0002","contract":"BTC_USDT","id":58828270139457759,"price":"93000","tif":"gtc","iceberg":0,"text":"api","user":16792411,"is_reduce_only":false,"is_close":false,"is_liq":false,"fill_price":"0","create_time":1733801848.473,"update_time":1733812040.073,"finish_time":1733812040.073,"finish_as":"cancelled","status":"finished","left":1,"refr":"0","size":1,"biz_info":"ch:daniugege","amend_text":"-","stp_act":"-","stp_id":0,"update_id":2,"pnl":"0","pnl_margin":"0"}
         # {"label":"ORDER_NOT_FOUND"}
@@ -1134,16 +1138,13 @@ struct Gate(Exchangeable):
         if "ORDER_NOT_FOUND" in text:
             logd("ORDER_NOT_FOUND")
             raise Error("ORDER_NOT_FOUND")
-        logd("cancel_order request success")
         var doc = JsonObject(text)
-        logd("parse_order start")
         if doc.contains_key("label"):
             var label = doc.get_str("label")
             if label == "ORDER_NOT_FOUND":
                 raise Error("ORDER_NOT_FOUND")
             raise Error(label)
         var result = self.parse_order(doc)
-        logd("parse_order end")
         # logd(str(result))
         return result
 

@@ -105,8 +105,12 @@ struct Binance(Exchangeable):
         var full_path = path
         var headers = Headers()
 
-        headers["Accept"] = "application/json"
-        headers["Content-Type"] = "application/json"
+        # headers["Accept"] = "application/json"
+        # headers["Content-Type"] = "application/json"
+        headers["host"] = self._host
+        headers["user-agent"] = "monoio-http"
+        headers["content-type"] = "application/json"
+        headers["accept-encoding"] = "gzip, deflate"
 
         if api == ApiType.Private:
             var query_ = self._sign(headers, query)

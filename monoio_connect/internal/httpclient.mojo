@@ -131,6 +131,10 @@ alias fn_client_builder_build = fn (
     client_builder: ClientBuilderPtr
 ) -> HttpClientPtr
 
+alias fn_client_builder_build_with_runtime = fn (
+    runtime: MonoioRuntimePtr, client_builder: ClientBuilderPtr
+) -> HttpClientPtr
+
 alias fn_new_http_request = fn (
     method: c_uint8, url: c_char_ptr, version: c_uint8, body: c_char_ptr
 ) -> HttpRequestPtr
@@ -173,6 +177,8 @@ alias fn_http_response_body = fn (
 ) -> c_size_t
 
 alias fn_test_http_client = fn () -> None
+
+alias fn_test_monoiohttpclient = fn () -> None
 
 var _handle: DLHandle = DLHandle(LIBNAME)
 
@@ -239,6 +245,9 @@ var _client_builder_enable_https = _handle.get_function[
 var _client_builder_build = _handle.get_function[fn_client_builder_build](
     "client_builder_build"
 )
+var _client_builder_build_with_runtime = _handle.get_function[
+    fn_client_builder_build_with_runtime
+]("client_builder_build_with_runtime")
 
 var _new_http_request = _handle.get_function[fn_new_http_request](
     "new_http_request"
@@ -278,6 +287,10 @@ var _http_response_body = _handle.get_function[fn_http_response_body](
 
 var _test_http_client = _handle.get_function[fn_test_http_client](
     "test_http_client"
+)
+
+var _test_monoiohttpclient = _handle.get_function[fn_test_monoiohttpclient](
+    "test_monoiohttpclient"
 )
 
 
@@ -387,6 +400,13 @@ fn client_builder_build(client_builder: ClientBuilderPtr) -> HttpClientPtr:
 
 
 @always_inline
+fn client_builder_build_with_runtime(
+    runtime: MonoioRuntimePtr, client_builder: ClientBuilderPtr
+) -> HttpClientPtr:
+    return _client_builder_build_with_runtime(runtime, client_builder)
+
+
+@always_inline
 fn new_http_request(
     method: Method, url: c_char_ptr, version: HttpVersion, body: c_char_ptr
 ) -> HttpRequestPtr:
@@ -452,3 +472,8 @@ fn http_response_body(
 @always_inline
 fn test_http_client():
     return _test_http_client()
+
+
+@always_inline
+fn test_monoiohttpclient():
+    return _test_monoiohttpclient()

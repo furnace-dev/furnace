@@ -12,6 +12,21 @@ from ccxt.foundation.gate import Gate
 from ccxt.pro.gate import Gate as GatePro
 
 
+fn test_http_get() raises -> None:
+    var base_url = String("https://httpbin.org")
+    var options = HttpClientOptions(base_url=base_url)
+    var http = HttpClient(options)
+    var headers = Headers()
+    headers["Host"] = "captive.apple.com"
+    headers["Accept"] = "*/*"
+    headers["User-Agent"] = "monoio-http"
+    headers["Accept-Encoding"] = "gzip, deflate"
+    var path = String("/get")
+    var resp = http.request(path, Method.METHOD_GET, headers, "")
+    print(resp.status_code)
+    print(resp.text)
+
+
 fn test_binance_fetch_balance() raises -> None:
     var env_vars = load_mojo_env(".env")
     var api_key = env_vars["BINANCE_API_KEY"]
@@ -19,9 +34,15 @@ fn test_binance_fetch_balance() raises -> None:
     var testnet = parse_bool(env_vars["BINANCE_TESTNET"])
 
     var base_url = String("https://testnet.binancefuture.com")
+    # var base_url = String("https://fx-api-testnet.gateio.ws")
     var options = HttpClientOptions(base_url=base_url)
     var http = HttpClient(options)
     var headers = Headers()
+    headers["host"] = "testnet.binancefuture.com"
+    # headers["host"] = "fx-api-testnet.gateio.ws"
+    # headers["accept"] = "*/*"
+    headers["user-agent"] = "monoio-http"
+    headers["accept-encoding"] = "gzip, deflate"
     var path = String("/fapi/v3/account")
     var data = ""
     var ts_str = "recvWindow=5000&timestamp=" + str(now_ms())
@@ -196,6 +217,8 @@ fn test_ws(api_key: String, api_secret: String, testnet: Bool) raises -> None:
 fn main() raises:
     var logger = init_logger(LogLevel.Debug, "", "")
 
+    # test_monoiohttpclient()
+    # test_http_get()
     # test_binance_fetch_balance()
     test_binance()
     # test_ws(api_key, api_secret, testnet)
