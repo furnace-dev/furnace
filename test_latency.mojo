@@ -19,6 +19,23 @@ fn get_order_book_mid(order_book: OrderBook) raises -> Fixed:
     return Fixed(0.0)
 
 
+fn calculate_percentiles(mut data: List[Float64], percentiles: List[Int]) -> Dict[Int, Float64]:
+    # 首先对数据进行排序
+    var results = Dict[Int, Float64]()
+    for p in percentiles:
+        var k = (len(data) - 1) * (float(p[]) / 100.0)
+        var f = int(k)  # 下标索引
+        var c = f + 1   # 上标索引
+        
+        if c >= len(data):
+            results[p[]] = data[f]
+        else:
+            var d0 = data[f] * (Float64(c) - k)
+            var d1 = data[c] * (k - Float64(f))
+            results[p[]] = d0 + d1
+    return results
+
+
 fn main() raises:
     # 初始化日志和配置
     var logger = init_logger(LogLevel.Debug, "", "")
@@ -100,6 +117,22 @@ fn main() raises:
         var avg_rtt = total / Float64(len(results))
         logd("Successfully tested " + str(len(results)) + " orders")
         logd("Average round-trip time: " + str(avg_rtt) + " milliseconds")
+
+        # Calculate and print min/max values
+        sort(results)
+        var max_latency = results[-1]
+        var min_latency = results[0]
+
+        logd("Max: " + str(max_latency) + "ms")
+        logd("Min: " + str(min_latency) + "ms")
+
+        var percentiles = List[Int]()
+        percentiles.append(5)
+        percentiles.append(15)
+        percentiles.append(95)
+        var stats = calculate_percentiles(results, percentiles)
+        for p in percentiles:
+            logd(str(p[]) + "th percentile: " + str(stats[p[]]) + "ms")
     
     # # 清理所有未完成订单
     # try:
