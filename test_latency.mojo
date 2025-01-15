@@ -6,7 +6,7 @@ from memory import UnsafePointer, stack_allocation
 from mojoenv import load_mojo_env
 from monoio_connect import *
 from ccxt.base.types import Any, OrderType, OrderSide, Num, Order, Ticker, OrderBook, OrderbookEntry
-from ccxt.foundation.gate import Gate
+from ccxt.foundation.binance import Binance
 from ccxt.base.pro_exchangeable import TradingContext, ExchangeId
 from time import sleep, perf_counter_ns
 
@@ -40,9 +40,9 @@ fn main() raises:
     # 初始化日志和配置
     var logger = init_logger(LogLevel.Debug, "", "")
     var env_vars = load_mojo_env(".env")
-    var api_key = env_vars["GATEIO_API_KEY"]
-    var api_secret = env_vars["GATEIO_API_SECRET"]
-    var testnet = parse_bool(env_vars["GATEIO_TESTNET"])
+    var api_key = env_vars["BINANCE_API_KEY"]
+    var api_secret = env_vars["BINANCE_API_SECRET"]
+    var testnet = parse_bool(env_vars["BINANCE_TESTNET"])
     
     # 初始化交易上下文和API
     var config = Dict[String, Any]()
@@ -50,19 +50,19 @@ fn main() raises:
     config["api_secret"] = api_secret
     config["testnet"] = testnet
     
-    var symbol = String("XRP_USDT")
+    var symbol = String("XRPUSDT")
     var trading_context = TradingContext(
-        exchange_id=ExchangeId.gateio,
+        exchange_id=ExchangeId.binance,
         account_id="zsyhsapi",
         trader_id="1"
     )
     
     var rt = create_monoio_runtime()
-    var gate = Gate(config, trading_context, rt)
+    var api = Binance(config, trading_context, rt)
     
     # 获取市场数据
     var params = Dict[String, Any]()
-    var order_book = gate.fetch_order_book(symbol, 1, params)
+    var order_book = api.fetch_order_book(symbol, 1, params)
     var mid_price = get_order_book_mid(order_book)
     
     # 设置订单参数
@@ -74,7 +74,7 @@ fn main() raises:
     for i in range(600):
         try:
             # 创建限价买单
-            var order = gate.create_order(
+            var order = api.create_order(
                 symbol,
                 OrderType.Limit,
                 OrderSide.Buy,
@@ -87,7 +87,7 @@ fn main() raises:
             var start_time = perf_counter_ns()
 
             # 撤销订单
-            _ = gate.cancel_order(order.id, symbol, params)
+            _ = api.cancel_order(order.id, symbol, params)
             
             # 计算延迟
             var end_time = perf_counter_ns()
@@ -101,7 +101,7 @@ fn main() raises:
         except e:
             logd("Error: " + str(e))
             # try:
-            #     _ = gate.cancel_all_orders(symbol, params)
+            #     _ = api.cancel_all_orders(symbol, params)
             # except:
             #     logd("Error cancelling orders")
         
@@ -136,6 +136,6 @@ fn main() raises:
     
     # # 清理所有未完成订单
     # try:
-    #     _ = gate.cancel_all_orders(symbol, params)
+    #     _ = api.cancel_all_orders(symbol, params)
     # except:
     #     logd("Error cancelling final orders")
