@@ -141,10 +141,10 @@ fn test_binance() raises -> None:
     # )
     # logd(str(order))
 
-    var cancel_order = binance.cancel_order(
-        String("4077634200"), String(symbol), params
-    )
-    logd(str(cancel_order))
+    # var cancel_order = binance.cancel_order(
+    #     String("4077634200"), String(symbol), params
+    # )
+    # logd(str(cancel_order))
 
     logd("sleep")
 
@@ -197,7 +197,7 @@ fn test_ws(api_key: String, api_secret: String, testnet: Bool) raises -> None:
 
 
 fn main() raises:
-    var logger = init_logger(LogLevel.Debug, "", "")
+    var logger = init_logger(LogLevel.Trace, "", "")
 
     # test_monoiohttpclient()
     # test_http_get()

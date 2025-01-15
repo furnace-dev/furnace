@@ -115,6 +115,8 @@ struct Binance(Exchangeable):
         if api == ApiType.Private:
             var query_ = self._sign(headers, query)
             full_path += "?" + query_
+        elif query != "":
+            full_path += "?" + query
 
         logt("full_path: " + full_path)
         var response = self._client[].request(
@@ -668,6 +670,7 @@ struct Binance(Exchangeable):
         if limit is not None:
             query["limit"] = limit.value()
         var query_str = self._base.url_encode(query)
+        logd("query_str: " + query_str)
         var text = self._request(
             self._api.fapipublic_get_depth, params, query_str, ""
         )
