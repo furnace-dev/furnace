@@ -696,8 +696,16 @@ struct Binance(Exchangeable):
         }
         """
 
-        var result = OrderBook()
+        # {"code":-1102,"msg":"Mandatory parameter 'symbol' was not sent, was empty/null, or malformed."}
+
         var doc = JsonObject(text)
+
+        var code = doc.get_i64("code")
+        if code != 0:
+            var msg = str(doc.get_str_ref("msg"))
+            raise Error(msg)
+
+        var result = OrderBook()
         var timestamp = int(doc.get_i64("E"))
         var id = int(doc.get_i64("lastUpdateId"))
         result.timestamp = timestamp
@@ -771,7 +779,7 @@ struct Binance(Exchangeable):
         var doc = JsonObject(text)
         var code = doc.get_i64("code")
         if code != 0:
-            var msg = doc.get_str("msg")
+            var msg = str(doc.get_str_ref("msg"))
             raise Error(msg)
 
         var result = Balances()

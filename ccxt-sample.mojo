@@ -94,6 +94,8 @@ fn test_binance() raises -> None:
 
     binance.set_on_order(on_order)
 
+    var symbol = "XRPUSDT"
+
     # var markets = binance.fetch_markets(params)
     # for market in markets:
     #     logt(str(market[].value()))
@@ -102,7 +104,7 @@ fn test_binance() raises -> None:
     # for currency in currencies:
     #     print(str(currency[].value()))
 
-    # var ticker = binance.fetch_ticker("BTCUSDT")
+    # var ticker = binance.fetch_ticker(symbol)
     # logd(str(ticker))
 
     # var symbols = List[String](capacity=2)
@@ -112,15 +114,15 @@ fn test_binance() raises -> None:
     # for ticker in tickers:
     #     logd(str(ticker[]))
 
-    # var order_book = binance.fetch_order_book("BTCUSDT", 10, params)
-    # logd(str(order_book))
+    var order_book = binance.fetch_order_book(symbol, 10, params)
+    logd(str(order_book))
 
     # logd("len(asks)=" + str(len(order_book.asks)))
     # logd("len(bids)=" + str(len(order_book.bids)))
     # logd("ask: " + str(order_book.asks[0]))
     # logd("bid: " + str(order_book.bids[0]))
 
-    # var trades = binance.fetch_trades("BTCUSDT", None, None, params)
+    # var trades = binance.fetch_trades(symbol, None, None, params)
     # for trade in trades:
     #     logd(str(trade))
 
@@ -130,7 +132,7 @@ fn test_binance() raises -> None:
     # sleep_ms(rt, 10)
 
     # var order = binance.create_order(
-    #     "BTCUSDT",
+    #     symbol,
     #     OrderType.Limit,
     #     OrderSide.Buy,
     #     Fixed(1.0),
@@ -140,7 +142,7 @@ fn test_binance() raises -> None:
     # logd(str(order))
 
     var cancel_order = binance.cancel_order(
-        String("4077634200"), String("BTCUSDT"), params
+        String("4077634200"), String(symbol), params
     )
     logd(str(cancel_order))
 
