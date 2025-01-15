@@ -1,6 +1,7 @@
 from memory import UnsafePointer
 from ccxt.base.types import *
 from ._common_utils import *
+from .binance import Binance
 from .bitmex import BitMEX
 from .bybit import Bybit
 from .gate import Gate
@@ -39,8 +40,10 @@ fn _create_order(request: UnsafePointer[AsyncTradingRequest]):
         if exchange_id == ExchangeId.gateio:
             _create_order_internal[Gate](request)
         elif exchange_id == ExchangeId.binance:
+            _create_order_internal[Binance](request)
+        elif exchange_id == ExchangeId.bybit:
             _create_order_internal[Bybit](request)
-        elif exchange_id == ExchangeId.kucoin:
+        elif exchange_id == ExchangeId.bitmex:
             _create_order_internal[BitMEX](request)
         else:
             logw("unknown exchange_id: " + str(exchange_id))
@@ -70,8 +73,10 @@ fn _cancel_order(request: UnsafePointer[AsyncTradingRequest]):
         if exchange_id == ExchangeId.gateio:
             _cancel_order_internal[Gate](request)
         elif exchange_id == ExchangeId.binance:
+            _cancel_order_internal[Binance](request)
+        elif exchange_id == ExchangeId.bybit:
             _cancel_order_internal[Bybit](request)
-        elif exchange_id == ExchangeId.kucoin:
+        elif exchange_id == ExchangeId.bitmex:
             _cancel_order_internal[BitMEX](request)
         else:
             logw("unknown exchange_id: " + str(exchange_id))

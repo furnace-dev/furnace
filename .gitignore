@@ -18,3 +18,4 @@ gateio-ws
 memory_leak
 monoio-connect-demo
 ccxt-sample
+test_latency

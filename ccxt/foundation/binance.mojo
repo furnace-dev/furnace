@@ -125,7 +125,7 @@ struct Binance(Exchangeable):
         if response.status_code >= 200 and response.status_code < 300:
             return response.text
         elif response.status_code >= 400 and response.status_code < 500:
-            logd("response.text: " + response.text)
+            logt("response.text: " + response.text)
             if response.text.startswith("{") and response.text.endswith("}"):
                 var doc = JsonObject(response.text)
                 var code = doc.get_i64("code")
@@ -672,7 +672,7 @@ struct Binance(Exchangeable):
             self._api.fapipublic_get_depth, params, query_str, ""
         )
 
-        logd(text)
+        logt(text)
 
         # {"lastUpdateId":37528941958,"E":1736586508705,"T":1736586508697,"bids":[["96053.50","0.020"],["95900.10","0.005"],["95890.10","0.100"],["95708.00","0.005"],["95707.30","0.083"],["95646.10","0.013"],["95550.00","0.010"],["95535.50","0.100"],["95488.00","0.010"],["95480.00","0.260"]],"asks":[["96174.30","0.180"],["96174.40","2.938"],["96174.50","2.346"],["96174.60","18.000"],["96174.70","1.572"],["96174.90","3.976"],["96175.00","5.609"],["96178.10","1.900"],["96178.30","7.288"],["96178.40","18.000"]]}
 
@@ -763,7 +763,7 @@ struct Binance(Exchangeable):
         var text = self._request(
             self._api.fapiprivatev3_get_account, params, "", "", "v3"
         )
-        logd(text)
+        logt(text)
         # {"code":-5000,"msg":"Path /fapi/v1/account, Method GET is invalid"}
         # {"code":-1021,"msg":"Timestamp for this request was 1000ms ahead of the server's time."}
         # {"code":-2015,"msg":"Invalid API-key, IP, or permissions for action"}
@@ -843,7 +843,7 @@ struct Binance(Exchangeable):
         if "reduce_only" in params and params["reduce_only"].bool():
             query_values["reduceOnly"] = "true"
         var query_str = query_values.to_string()
-        logd("query_str: " + query_str)
+        logt("query_str: " + query_str)
 
         var params_ = Dict[String, Any]()
         var payload = String("")
@@ -853,11 +853,11 @@ struct Binance(Exchangeable):
             query=query_str,
             payload=payload,
         )
-        # logd(text)
+        # logt(text)
         # {"code":-1102,"msg":"Mandatory parameter 'timeinforce' was not sent, was empty/null, or malformed."}
         var doc = JsonObject(text)
         var result = self.parse_order(doc)
-        # logd("result: " + str(result))
+        # logt("result: " + str(result))
         result.side = side
         return result
 
@@ -1012,9 +1012,7 @@ struct Binance(Exchangeable):
         _ = async_trading_channel_ptr()[].send(request)
 
     fn on_order(self, order: Order) -> None:
-        logd("on_order start")
         self._on_order(self._trading_context, order)
-        logd("on_order end")
 
     fn keep_alive(self) -> None:
         pass
