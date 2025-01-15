@@ -154,9 +154,9 @@ struct Fixed(Stringable):
 
 # Create a Fixed12 from a string
 fn fixed12_new_string(s: String) raises -> Int64:
-    var sign: Int64 = -1 if s[0] == '-' else 1
+    var sign: Int64 = -1 if s[0] == "-" else 1
     var s_ = s[1:] if sign == -1 else s
-    var period = s_.find('.')
+    var period = s_.find(".")
 
     var i: Int64 = 0
     var f: Int64 = 0
@@ -166,9 +166,9 @@ fn fixed12_new_string(s: String) raises -> Int64:
     else:
         if period > 0:
             i = atol(s_[0:period])
-        var fs = s_[period + 1:]
+        var fs = s_[period + 1 :]
         if len(fs) > MAX_FRAC_BITS_12:
-            var decimalPart = atol(fs[0:MAX_FRAC_BITS_12 + 1])
+            var decimalPart = atol(fs[0 : MAX_FRAC_BITS_12 + 1])
             if decimalPart % 10 >= 5:
                 fs = str(decimalPart / 10 + 1)
             else:
@@ -184,9 +184,11 @@ fn fixed12_new_string(s: String) raises -> Int64:
 fn fixed12_int_part(fixed: Int64) -> Int64:
     return fixed / FIXED_SCALE_I
 
+
 @always_inline
 fn fixed12_frac_part(fixed: Int64) -> Int64:
     return fixed % FIXED_SCALE_I
+
 
 # Convert a Fixed12 to a string
 fn fixed12_to_string(fixed: Int64) -> String:
@@ -199,7 +201,7 @@ fn fixed12_to_string(fixed: Int64) -> String:
         result = "0"
     else:
         while intPart > 0:
-            result = chr(int(ord('0') + intPart % 10)) + result
+            result = chr(int(ord("0") + intPart % 10)) + result
             intPart /= 10
 
     if isNegative:
@@ -215,19 +217,21 @@ fn fixed12_to_string(fixed: Int64) -> String:
             result += "0" * zerosToAdd
         var fracPartN = 0
         for i in range(fracPartLength - 1, 0, -1):
-            if fracPart[i] == '0':
+            if fracPart[i] == "0":
                 fracPartN += 1
             else:
                 break
-        result += fracPart[0:fracPartLength - fracPartN]
+        result += fracPart[0 : fracPartLength - fracPartN]
 
     return result
 
+
 # Rounds to a fractional number with a given scale
 fn fixed12_round_to_fractional(a: Int64, scale: Int64) -> Int64:
-    return round(a / scale) * scale
+    return int(round(float(a) / float(scale)) * float(scale))
+
 
 # Rounds to a given number of decimal places
 fn fixed12_round(a: Int64, decimalPlaces: Int) -> Int64:
-    var scale = pow(10, MAX_FRAC_BITS_12 - decimalPlaces)
-    return round(a / scale) * scale
+    var scale: Int = pow(10, MAX_FRAC_BITS_12 - decimalPlaces)
+    return int(round(float(a) / float(scale)) * float(scale))

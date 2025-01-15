@@ -1,5 +1,5 @@
 from testing import assert_equal, assert_true, assert_raises
-from monoio_connect import Fixed
+from monoio_connect import Fixed, fixed12_round
 
 
 fn test_empty_string() raises:
@@ -127,3 +127,18 @@ fn test_max() raises:
 
     var p7 = Fixed("-1.123456789012345678")
     assert_equal(str(p7), "-1.123456789012")
+
+
+fn test_round() raises:
+    var p1 = Fixed("1.123456789012")
+    assert_equal(str(p1.round(2)), "1.12")
+    assert_equal(str(p1.round(3)), "1.123")
+    assert_equal(str(p1.round(4)), "1.1235")
+    assert_equal(str(p1.round(5)), "1.12346")
+    assert_equal(str(p1.round(6)), "1.123457")
+    assert_equal(str(p1.round(7)), "1.1234568")
+    assert_equal(str(p1.round(8)), "1.12345679")
+    assert_equal(str(p1.round(9)), "1.123456789")
+    assert_equal(str(p1.round(10)), "1.123456789")
+    assert_equal(str(p1.round(11)), "1.12345678901")
+    assert_equal(str(p1.round(12)), "1.123456789012")
