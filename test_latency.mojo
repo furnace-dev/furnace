@@ -62,16 +62,18 @@ fn main() raises:
     
     # 获取市场数据
     var params = Dict[String, Any]()
-    var order_book = api.fetch_order_book(symbol, 1, params)
+    var order_book = api.fetch_order_book(symbol, None, params)
     var mid_price = get_order_book_mid(order_book)
     
     # 设置订单参数
-    var price = mid_price * Fixed(0.8)  # 使用中间价格的80%
-    var amount = Fixed(1)  # 使用最小交易量，避免实际成交
+    var price = (mid_price * Fixed(0.8)).round(4)  # 使用中间价格的80%
+    var amount = Fixed(3)  # 使用最小交易量，避免实际成交
     var results = List[Float64]()
     
+    var rounds = 600
+    logd("rounds: " + str(rounds))
     # 测试下单和撤单延迟
-    for i in range(600):
+    for i in range(rounds):
         try:
             # 创建限价买单
             var order = api.create_order(
