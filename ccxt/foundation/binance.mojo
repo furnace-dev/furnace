@@ -670,7 +670,7 @@ struct Binance(Exchangeable):
         if limit is not None:
             query["limit"] = limit.value()
         var query_str = self._base.url_encode(query)
-        logd("query_str: " + query_str)
+        logt("query_str: " + query_str)
         var text = self._request(
             self._api.fapipublic_get_depth, params, query_str, ""
         )
