@@ -75,8 +75,8 @@ struct Fixed(Stringable):
         return fixed12_to_string(self._value)
 
     @always_inline
-    fn round_to_fractional(self, scale: Int) -> Self:
-        var v = fixed12_round_to_fractional(self._value, scale)
+    fn round_to_fractional(self, scale: Self) -> Self:
+        var v = fixed12_round_to_fractional(self._value, int(scale._value))
         return Self {
             _value: v,
         }
@@ -227,7 +227,7 @@ fn fixed12_to_string(fixed: Int64) -> String:
 
 
 # Rounds to a fractional number with a given scale
-fn fixed12_round_to_fractional(a: Int64, scale: Int64) -> Int64:
+fn fixed12_round_to_fractional(a: Int64, scale: Int) -> Int64:
     return int(round(float(a) / float(scale)) * float(scale))
 
 

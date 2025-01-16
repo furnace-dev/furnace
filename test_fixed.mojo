@@ -1,5 +1,5 @@
 from testing import assert_equal, assert_true, assert_raises
-from monoio_connect import Fixed, fixed12_round
+from monoio_connect import Fixed, fixed12_round_to_fractional, fixed12_round
 
 
 fn test_empty_string() raises:
@@ -127,6 +127,39 @@ fn test_max() raises:
 
     var p7 = Fixed("-1.123456789012345678")
     assert_equal(str(p7), "-1.123456789012")
+
+
+fn test_fixed12_round_to_fractional() raises:
+    assert_equal(fixed12_round_to_fractional(12345, 100), 12300)
+    var p1 = 1123456789012
+    assert_equal(p1, 1123456789012)
+    assert_equal(fixed12_round_to_fractional(p1, 1), 1123456789012)
+    assert_equal(fixed12_round_to_fractional(p1, 10), 1123456789010)
+    assert_equal(fixed12_round_to_fractional(p1, 100), 1123456789000)
+    assert_equal(fixed12_round_to_fractional(p1, 1000), 1123456789000)
+    assert_equal(fixed12_round_to_fractional(p1, 10000), 1123456790000)
+    assert_equal(fixed12_round_to_fractional(p1, 100000), 1123456800000)
+
+
+fn test_round_to_fractional() raises:
+    var p1 = Fixed("1.123456789012")
+    assert_equal(str(p1.round_to_fractional(Fixed(0.01))), "1.12")
+    assert_equal(str(p1.round_to_fractional(Fixed(0.001))), "1.123")
+    assert_equal(str(p1.round_to_fractional(Fixed(0.0001))), "1.1235")
+    assert_equal(str(p1.round_to_fractional(Fixed(0.00001))), "1.12346")
+    assert_equal(str(p1.round_to_fractional(Fixed(0.000001))), "1.123457")
+    assert_equal(str(p1.round_to_fractional(Fixed(0.0000001))), "1.1234568")
+    assert_equal(str(p1.round_to_fractional(Fixed(0.00000001))), "1.12345679")
+    assert_equal(str(p1.round_to_fractional(Fixed(0.000000001))), "1.123456789")
+    assert_equal(
+        str(p1.round_to_fractional(Fixed(0.0000000001))), "1.123456789"
+    )
+    assert_equal(
+        str(p1.round_to_fractional(Fixed(0.00000000001))), "1.12345678901"
+    )
+    assert_equal(
+        str(p1.round_to_fractional(Fixed(0.000000000001))), "1.123456789012"
+    )
 
 
 fn test_round() raises:
