@@ -66,7 +66,7 @@ fn main() raises:
     var mid_price = get_order_book_mid(order_book)
     
     # 设置订单参数
-    var price = (mid_price * Fixed(0.8)).round(4)  # 使用中间价格的80%
+    var price = (mid_price * Fixed(0.8)).round_to_fractional(Fixed(0.0001))  # 使用中间价格的80%
     var amount = Fixed(3)  # 使用最小交易量，避免实际成交
     var results = List[Float64]()
     
@@ -134,7 +134,7 @@ fn main() raises:
         percentiles.append(90)
         var stats = calculate_percentiles(results, percentiles)
         for p in percentiles:
-            logd(str(p[]) + "th percentile: " + str(stats[p[]]) + "ms")
+            logd(str(p[]) + "%: " + str(stats[p[]]) + "ms")
     
     # # 清理所有未完成订单
     # try:
