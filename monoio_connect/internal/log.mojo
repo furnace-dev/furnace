@@ -1,38 +1,6 @@
 from memory import UnsafePointer, memcpy
 from builtin._location import __call_location
-from sys.ffi import DLHandle, c_char, c_size_t
-
-
-@value
-@register_passable("trivial")
-struct LogLevel(Stringable):
-    var _value: UInt8
-
-    alias Error = LogLevel(1)
-    alias Warn = LogLevel(2)
-    alias Info = LogLevel(3)
-    alias Debug = LogLevel(4)
-    alias Trace = LogLevel(5)
-
-    fn __init__(out self, value: UInt8):
-        self._value = value
-
-    fn __eq__(self, other: LogLevel) -> Bool:
-        return self._value == other._value
-
-    fn __str__(self) -> String:
-        if self == LogLevel.Error:
-            return "Error"
-        elif self == LogLevel.Warn:
-            return "Warn"
-        elif self == LogLevel.Info:
-            return "Info"
-        elif self == LogLevel.Debug:
-            return "Debug"
-        elif self == LogLevel.Trace:
-            return "Trace"
-        else:
-            return "Unknown"
+from sys.ffi import DLHandle, c_char, c_size_t, external_call
 
 
 alias LoggerPtr = UnsafePointer[c_void]
@@ -75,22 +43,38 @@ fn init_logger(
     time_format: UnsafePointer[c_char],
     path: UnsafePointer[c_char],
 ) -> LoggerPtr:
-    return _init_logger(level, time_format, path)
+    @parameter
+    if is_static_build():
+        return external_call["init_logger", LoggerPtr](level, time_format, path)
+    else:
+        return _init_logger(level, time_format, path)
 
 
 @always_inline
 fn destroy_logger(logger: LoggerPtr) -> None:
-    _destroy_logger(logger)
+    @parameter
+    if is_static_build():
+        external_call["destroy_logger", NoneType](logger)
+    else:
+        return _destroy_logger(logger)
 
 
 @always_inline
 fn test_log() -> None:
-    _test_log()
+    @parameter
+    if is_static_build():
+        external_call["test_log", NoneType]()
+    else:
+        _test_log()
 
 
 @always_inline
 fn log_max_level() -> c_uint8:
-    return _log_max_level()
+    @parameter
+    if is_static_build():
+        return external_call["log_max_level", c_uint8]()
+    else:
+        return _log_max_level()
 
 
 @always_inline
@@ -101,4 +85,8 @@ fn log(
     col: c_uint32,
     msg: UnsafePointer[c_char],
 ) -> None:
-    _log(level, file, line, col, msg)
+    @parameter
+    if is_static_build():
+        external_call["log", NoneType](level, file, line, col, msg)
+    else:
+        _log(level, file, line, col, msg)

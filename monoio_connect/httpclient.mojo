@@ -58,6 +58,77 @@ struct HttpResponse:
         self.text = text
 
 
+@value
+@register_passable("trivial")
+struct Method(Stringable):
+    var _value: UInt8
+
+    alias METHOD_OPTIONS = Method(0)
+    alias METHOD_GET = Method(1)
+    alias METHOD_POST = Method(2)
+    alias METHOD_PUT = Method(3)
+    alias METHOD_DELETE = Method(4)
+    alias METHOD_HEAD = Method(5)
+    alias METHOD_TRACE = Method(6)
+    alias METHOD_CONNECT = Method(7)
+    alias METHOD_PATCH = Method(8)
+
+    fn __eq__(self, other: Method) -> Bool:
+        return self._value == other._value
+
+    fn __str__(self) -> String:
+        if self == Method.METHOD_OPTIONS:
+            return "OPTIONS"
+        elif self == Method.METHOD_GET:
+            return "GET"
+        elif self == Method.METHOD_POST:
+            return "POST"
+        elif self == Method.METHOD_PUT:
+            return "PUT"
+        elif self == Method.METHOD_DELETE:
+            return "DELETE"
+        elif self == Method.METHOD_HEAD:
+            return "HEAD"
+        elif self == Method.METHOD_TRACE:
+            return "TRACE"
+        elif self == Method.METHOD_CONNECT:
+            return "CONNECT"
+        elif self == Method.METHOD_PATCH:
+            return "PATCH"
+        else:
+            return "UNKNOWN"
+
+
+@value
+@register_passable("trivial")
+struct HttpVersion(Stringable):
+    var _value: UInt8
+
+    alias HTTP_VERSION_HTTP09 = HttpVersion(0)
+    alias HTTP_VERSION_HTTP10 = HttpVersion(1)
+    alias HTTP_VERSION_HTTP11 = HttpVersion(2)
+    alias HTTP_VERSION_H2 = HttpVersion(3)
+    alias HTTP_VERSION_H3 = HttpVersion(4)
+    alias HTTP_VERSION___NON_EXHAUSTIVE = HttpVersion(5)
+
+    fn __eq__(self, other: HttpVersion) -> Bool:
+        return self._value == other._value
+
+    fn __str__(self) -> String:
+        if self == HttpVersion.HTTP_VERSION_HTTP09:
+            return "HTTP/0.9"
+        elif self == HttpVersion.HTTP_VERSION_HTTP10:
+            return "HTTP/1.0"
+        elif self == HttpVersion.HTTP_VERSION_HTTP11:
+            return "HTTP/1.1"
+        elif self == HttpVersion.HTTP_VERSION_H2:
+            return "HTTP/2"
+        elif self == HttpVersion.HTTP_VERSION_H3:
+            return "HTTP/3"
+        else:
+            return "UNKNOWN"
+
+
 struct HttpClient:
     var _builder: ClientBuilderPtr
     var _client: HttpClientPtr

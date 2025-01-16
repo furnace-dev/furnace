@@ -1,5 +1,5 @@
 from memory import UnsafePointer, memcpy
-from sys.ffi import DLHandle, c_char, c_size_t
+from sys.ffi import DLHandle, c_char, c_size_t, external_call
 from utils import StringRef
 from .monoio import MonoioRuntimePtr, StrBoxed, free_str
 
@@ -83,20 +83,37 @@ fn connect_ws(
     on_close: fn_on_close,
     on_timer: fn_on_timer,
 ) -> Int32:
-    return _connect_ws(
-        rt,
-        id,
-        uri,
-        port,
-        path,
-        timer_sec,
-        on_open,
-        on_message,
-        on_ping,
-        on_error,
-        on_close,
-        on_timer,
-    )
+    @parameter
+    if is_static_build():
+        return external_call["connect_ws", Int32](
+            rt,
+            id,
+            uri,
+            port,
+            path,
+            timer_sec,
+            on_open,
+            on_message,
+            on_ping,
+            on_error,
+            on_close,
+            on_timer,
+        )
+    else:
+        return _connect_ws(
+            rt,
+            id,
+            uri,
+            port,
+            path,
+            timer_sec,
+            on_open,
+            on_message,
+            on_ping,
+            on_error,
+            on_close,
+            on_timer,
+        )
 
 
 @always_inline
@@ -114,24 +131,45 @@ fn connect_ws_no_blocking(
     on_close: fn_on_close,
     on_timer: fn_on_timer,
 ) -> Int32:
-    return _connect_ws_no_blocking(
-        rt,
-        id,
-        uri,
-        port,
-        path,
-        timer_sec,
-        on_open,
-        on_message,
-        on_ping,
-        on_error,
-        on_close,
-        on_timer,
-    )
+    @parameter
+    if is_static_build():
+        return external_call["connect_ws_no_blocking", Int32](
+            rt,
+            id,
+            uri,
+            port,
+            path,
+            timer_sec,
+            on_open,
+            on_message,
+            on_ping,
+            on_error,
+            on_close,
+            on_timer,
+        )
+    else:
+        return _connect_ws_no_blocking(
+            rt,
+            id,
+            uri,
+            port,
+            path,
+            timer_sec,
+            on_open,
+            on_message,
+            on_ping,
+            on_error,
+            on_close,
+            on_timer,
+        )
 
 
 @always_inline
 fn ws_send_text(
     ws: UnsafePointer[c_void], text: UnsafePointer[c_char]
 ) -> Int32:
-    return _ws_send_text(ws, text)
+    @parameter
+    if is_static_build():
+        return external_call["ws_send_text", Int32](ws, text)
+    else:
+        return _ws_send_text(ws, text)

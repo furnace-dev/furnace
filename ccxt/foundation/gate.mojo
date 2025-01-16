@@ -185,71 +185,71 @@ struct Gate(Exchangeable):
                 return response.text
         return response.text
 
-    @always_inline
-    fn _request_with_callback(
-        self,
-        method: Method,
-        path: String,
-        params: Dict[String, Any],
-        query: String,
-        payload: String,
-        api: ApiType = ApiType.Public,
-        callback: HttpResponseCallback = request_callback,
-    ) raises -> None:
-        # logd("entry: " + entry.path)
-        var entry_path = path
-        for key in params:
-            # logi("key: " + key[] + ", value: " + str(params[key[]]))
-            var value = params[key[]]
-            entry_path = entry_path.replace("{" + key[] + "}", str(value))
-        var path_ = "/api/v4/" + entry_path
-        # if self._debug:
-        #     path_ = entry_path
-        var full_path = path_
-        if query != "":
-            full_path += "?" + query
-        # logd("path: " + path_)
-        var headers = Headers()
+    # @always_inline
+    # fn _request_with_callback(
+    #     self,
+    #     method: Method,
+    #     path: String,
+    #     params: Dict[String, Any],
+    #     query: String,
+    #     payload: String,
+    #     api: ApiType = ApiType.Public,
+    #     callback: HttpResponseCallback = request_callback,
+    # ) raises -> None:
+    #     # logd("entry: " + entry.path)
+    #     var entry_path = path
+    #     for key in params:
+    #         # logi("key: " + key[] + ", value: " + str(params[key[]]))
+    #         var value = params[key[]]
+    #         entry_path = entry_path.replace("{" + key[] + "}", str(value))
+    #     var path_ = "/api/v4/" + entry_path
+    #     # if self._debug:
+    #     #     path_ = entry_path
+    #     var full_path = path_
+    #     if query != "":
+    #         full_path += "?" + query
+    #     # logd("path: " + path_)
+    #     var headers = Headers()
 
-        headers["Accept"] = "application/json"
-        headers["Content-Type"] = "application/json"
-        # headers["Host"] = self._host
-        # logd("Host: " + self._host)
+    #     headers["Accept"] = "application/json"
+    #     headers["Content-Type"] = "application/json"
+    #     # headers["Host"] = self._host
+    #     # logd("Host: " + self._host)
 
-        if api == ApiType.Private:
-            # headers["SIGN"] = self._api_secret
-            var ts = str(int(now_ms() / 1000))
-            var method_str = String("")
-            if method == Method.METHOD_GET:
-                method_str = "GET"
-            elif method == Method.METHOD_POST:
-                method_str = "POST"
-            elif method == Method.METHOD_DELETE:
-                method_str = "DELETE"
-            else:
-                raise Error("Invalid method: " + str(method))
-            # logd("method_str: " + method_str)
-            # logd("path_: " + path_)
-            # logd("query: " + query)
-            # TODO: This line is necessary, without it there seems to be a Mojo language bug
-            # logd("payload: " + payload)
-            # logd("ts: " + ts)
-            var payload_ = payload
-            var sign = self._sign_payload(
-                method_str, path_, query, payload_, ts
-            )
-            # logd("sign: " + sign)
-            headers["KEY"] = self._api_key
-            headers["SIGN"] = sign
-            headers["Timestamp"] = ts
-            # headers["X-Gate-Channel-Id"] = "daniugege"
+    #     if api == ApiType.Private:
+    #         # headers["SIGN"] = self._api_secret
+    #         var ts = str(int(now_ms() / 1000))
+    #         var method_str = String("")
+    #         if method == Method.METHOD_GET:
+    #             method_str = "GET"
+    #         elif method == Method.METHOD_POST:
+    #             method_str = "POST"
+    #         elif method == Method.METHOD_DELETE:
+    #             method_str = "DELETE"
+    #         else:
+    #             raise Error("Invalid method: " + str(method))
+    #         # logd("method_str: " + method_str)
+    #         # logd("path_: " + path_)
+    #         # logd("query: " + query)
+    #         # TODO: This line is necessary, without it there seems to be a Mojo language bug
+    #         # logd("payload: " + payload)
+    #         # logd("ts: " + ts)
+    #         var payload_ = payload
+    #         var sign = self._sign_payload(
+    #             method_str, path_, query, payload_, ts
+    #         )
+    #         # logd("sign: " + sign)
+    #         headers["KEY"] = self._api_key
+    #         headers["SIGN"] = sign
+    #         headers["Timestamp"] = ts
+    #         # headers["X-Gate-Channel-Id"] = "daniugege"
 
-        # logd("body: " + payload)
-        # logd("body_len: " + str(len(payload)))
-        # headers["Content-Length"] = str(len(payload))
-        self._client[].request_with_callback(
-            full_path, method, headers, payload, 0, callback
-        )
+    #     # logd("body: " + payload)
+    #     # logd("body_len: " + str(len(payload)))
+    #     # headers["Content-Length"] = str(len(payload))
+    #     self._client[].request_with_callback(
+    #         full_path, method, headers, payload, 0, callback
+    #     )
 
     @always_inline
     fn _sign_payload(

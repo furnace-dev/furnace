@@ -15,6 +15,10 @@ from typing import List
 def make_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument(
+        "--command", default="build", choices=["build", "run", "package"], 
+        help="Specify the command to execute (default: build)"
+    )
+    parser.add_argument(
         "--debug-level", default='none', action="store", dest="debug_level"
     )
     parser.add_argument(
@@ -79,12 +83,12 @@ def run_mojo(args, mojo_args):
     mojoc_real_dir = os.path.dirname(os.path.realpath(__file__))
     env["PATH"] = mojoc_real_dir + ":" + env["PATH"]
 
-    #print("MOJOC_LD_FWD", ld_fwd_json)
+    # print("MOJOC_LD_FWD", ld_fwd_json)
     
     # print(*mojo_args)
     
     exec_args = (
-        "mojo", "build", "--debug-level", args.debug_level, *mojo_args
+        "mojo", args.command, "--debug-level", args.debug_level, "-D", "IS_STATIC_BUILD", *mojo_args
     )
     exec_kwargs = {
         "env": env,

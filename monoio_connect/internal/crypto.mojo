@@ -1,5 +1,5 @@
 from memory import UnsafePointer, memcpy, stack_allocation
-from sys.ffi import DLHandle, c_char, c_size_t
+from sys.ffi import DLHandle, c_char, c_size_t, external_call
 from utils import StringRef
 
 alias fn_compute_sha512_hex = fn (
@@ -54,7 +54,13 @@ fn compute_sha512_hex(
     result: UnsafePointer[c_void],
     len: c_size_t,
 ) -> c_size_t:
-    return _compute_sha512_hex(content, result, len)
+    @parameter
+    if is_static_build():
+        return external_call["compute_sha512_hex", c_size_t](
+            content, result, len
+        )
+    else:
+        return _compute_sha512_hex(content, result, len)
 
 
 @always_inline
@@ -64,7 +70,13 @@ fn compute_hmac_sha512_hex(
     result: UnsafePointer[c_void],
     len: c_size_t,
 ) -> c_size_t:
-    return _compute_hmac_sha512_hex(content, secret, result, len)
+    @parameter
+    if is_static_build():
+        return external_call["compute_hmac_sha512_hex", c_size_t](
+            content, secret, result, len
+        )
+    else:
+        return _compute_hmac_sha512_hex(content, secret, result, len)
 
 
 @always_inline
@@ -73,7 +85,13 @@ fn compute_sha256_hex(
     result: UnsafePointer[c_void],
     len: c_size_t,
 ) -> c_size_t:
-    return _compute_sha256_hex(content, result, len)
+    @parameter
+    if is_static_build():
+        return external_call["compute_sha256_hex", c_size_t](
+            content, result, len
+        )
+    else:
+        return _compute_sha256_hex(content, result, len)
 
 
 @always_inline
@@ -83,4 +101,10 @@ fn compute_hmac_sha256_hex(
     result: UnsafePointer[c_void],
     len: c_size_t,
 ) -> c_size_t:
-    return _compute_hmac_sha256_hex(content, secret, result, len)
+    @parameter
+    if is_static_build():
+        return external_call["compute_hmac_sha256_hex", c_size_t](
+            content, secret, result, len
+        )
+    else:
+        return _compute_hmac_sha256_hex(content, secret, result, len)

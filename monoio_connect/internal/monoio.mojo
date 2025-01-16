@@ -1,5 +1,5 @@
 from memory import UnsafePointer, memcpy
-from sys.ffi import DLHandle, c_char, c_size_t
+from sys.ffi import DLHandle, c_char, c_size_t, external_call
 from utils import StringRef
 
 
@@ -93,48 +93,84 @@ var _free_str = _handle.get_function[fn_free_str]("free_str")
 
 @always_inline
 fn create_monoio_runtime() -> MonoioRuntimePtr:
-    return _create_monoio_runtime()
+    @parameter
+    if is_static_build():
+        return external_call["create_monoio_runtime", MonoioRuntimePtr]()
+    else:
+        return _create_monoio_runtime()
 
 
 @always_inline
 fn destroy_monoio_runtime(rt: MonoioRuntimePtr) -> None:
-    return _destroy_monoio_runtime(rt)
+    @parameter
+    if is_static_build():
+        external_call["destroy_monoio_runtime", NoneType](rt)
+    else:
+        _destroy_monoio_runtime(rt)
 
 
 @always_inline
 fn destroy_client_builder(client_builder: UnsafePointer[c_void]) -> None:
-    return _destroy_client_builder(client_builder)
+    @parameter
+    if is_static_build():
+        external_call["destroy_client_builder", NoneType](client_builder)
+    else:
+        _destroy_client_builder(client_builder)
 
 
 @always_inline
 fn block_on_runtime(
     rt: MonoioRuntimePtr, f: fn_task_entry, arg: TaskEntryArg
 ) -> None:
-    return _block_on_runtime(rt, f, arg)
+    @parameter
+    if is_static_build():
+        external_call["block_on_runtime", NoneType](rt, f, arg)
+    else:
+        _block_on_runtime(rt, f, arg)
 
 
 @always_inline
 fn spawn_task_on_runtime(
     rt: MonoioRuntimePtr, f: fn_task_entry, arg: TaskEntryArg
 ) -> None:
-    return _spawn_task_on_runtime(rt, f, arg)
+    @parameter
+    if is_static_build():
+        external_call["spawn_task_on_runtime", NoneType](rt, f, arg)
+    else:
+        _spawn_task_on_runtime(rt, f, arg)
 
 
 @always_inline
 fn monoio_sleep_ms(rt: MonoioRuntimePtr, duration_ms: UInt64) -> None:
-    return _monoio_sleep_ms(rt, duration_ms)
+    @parameter
+    if is_static_build():
+        external_call["monoio_sleep_ms", NoneType](rt, duration_ms)
+    else:
+        _monoio_sleep_ms(rt, duration_ms)
 
 
 @always_inline
 fn monoio_sleep_ns(rt: MonoioRuntimePtr, duration_ns: UInt64) -> None:
-    return _monoio_sleep_ns(rt, duration_ns)
+    @parameter
+    if is_static_build():
+        external_call["monoio_sleep_ns", NoneType](rt, duration_ns)
+    else:
+        _monoio_sleep_ns(rt, duration_ns)
 
 
 @always_inline
 fn bind_to_cpu_set(core_id: UInt32) -> None:
-    return _bind_to_cpu_set(core_id)
+    @parameter
+    if is_static_build():
+        external_call["bind_to_cpu_set", NoneType](core_id)
+    else:
+        _bind_to_cpu_set(core_id)
 
 
 @always_inline
 fn free_str(s: StrBoxed) -> None:
-    _free_str(s)
+    @parameter
+    if is_static_build():
+        external_call["free_str", NoneType](s)
+    else:
+        _free_str(s)

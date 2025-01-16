@@ -1,5 +1,5 @@
 from memory import UnsafePointer, memcpy
-from sys.ffi import DLHandle, c_char, c_size_t
+from sys.ffi import DLHandle, c_char, c_size_t, external_call
 
 
 # [`NS_PER_SEC`]  The number of nanoseconds in each second is equal to one billion nanoseconds.
@@ -34,14 +34,28 @@ var _tscns_read_nanos = _handle.get_function[fn_tscns_read_nanos](
 
 @always_inline
 fn tscns_init(init_calibrate_ns: Int64, calibrate_interval_ns: Int64) -> None:
-    _tscns_init(init_calibrate_ns, calibrate_interval_ns)
+    @parameter
+    if is_static_build():
+        external_call["tscns_init", NoneType](
+            init_calibrate_ns, calibrate_interval_ns
+        )
+    else:
+        _tscns_init(init_calibrate_ns, calibrate_interval_ns)
 
 
 @always_inline
 fn tscns_calibrate() -> None:
-    _tscns_calibrate()
+    @parameter
+    if is_static_build():
+        external_call["tscns_calibrate", NoneType]()
+    else:
+        _tscns_calibrate()
 
 
 @always_inline
 fn tscns_read_nanos() -> Int64:
-    return _tscns_read_nanos()
+    @parameter
+    if is_static_build():
+        return external_call["tscns_read_nanos", Int64]()
+    else:
+        return _tscns_read_nanos()
