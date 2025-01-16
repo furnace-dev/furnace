@@ -226,12 +226,14 @@ fn fixed12_to_string(fixed: Int64) -> String:
     return result
 
 
-# Rounds to a fractional number with a given scale
+@always_inline
 fn fixed12_round_to_fractional(a: Int64, scale: Int) -> Int64:
+    """Rounds to a fractional number with a given scale."""
     return int(round(float(a) / float(scale)) * float(scale))
 
 
-# Rounds to a given number of decimal places
+@always_inline
 fn fixed12_round(a: Int64, decimalPlaces: Int) -> Int64:
-    var scale: Int = pow(10, MAX_FRAC_BITS_12 - decimalPlaces)
+    """Rounds to a given number of decimal places."""
+    var scale = pow(10, MAX_FRAC_BITS_12 - decimalPlaces)
     return int(round(float(a) / float(scale)) * float(scale))
