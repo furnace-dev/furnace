@@ -143,6 +143,12 @@ fn test_fixed12_round_to_fractional() raises:
 
 fn test_round_to_fractional() raises:
     var p1 = Fixed("1.123456789012")
+    assert_equal(str(p1.round_to_fractional(Fixed(10000))), "0")
+    assert_equal(str(p1.round_to_fractional(Fixed(1000))), "0")
+    assert_equal(str(p1.round_to_fractional(Fixed(100))), "0")
+    assert_equal(str(p1.round_to_fractional(Fixed(10))), "0")
+    assert_equal(str(p1.round_to_fractional(Fixed(1))), "1")
+    assert_equal(str(p1.round_to_fractional(Fixed(0.1))), "1.1")
     assert_equal(str(p1.round_to_fractional(Fixed(0.01))), "1.12")
     assert_equal(str(p1.round_to_fractional(Fixed(0.001))), "1.123")
     assert_equal(str(p1.round_to_fractional(Fixed(0.0001))), "1.1235")
@@ -164,6 +170,8 @@ fn test_round_to_fractional() raises:
 
 fn test_round() raises:
     var p1 = Fixed("1.123456789012")
+    assert_equal(str(p1.round(0)), "1")
+    assert_equal(str(p1.round(1)), "1.1")
     assert_equal(str(p1.round(2)), "1.12")
     assert_equal(str(p1.round(3)), "1.123")
     assert_equal(str(p1.round(4)), "1.1235")
