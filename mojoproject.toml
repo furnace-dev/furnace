@@ -1,6 +1,6 @@
 [project]
 authors = ["yl <2201441955@qq.com>"]
-channels = ["conda-forge", "https://conda.modular.com/max"]
+channels = ["conda-forge", "https://conda.modular.com/max", "https://repo.prefix.dev/mojo-community"]
 description = "furnace"
 name = "furnace"
 platforms = ["linux-64"]
@@ -18,3 +18,4 @@ orjson = ">=3.10.7,<4"
 sortedcontainers = ">=2.4.0,<3"
 multidict = ">=6.1.0,<7"
 yarl = ">=1.15.5,<2"
+small_time = ">=0.1.6,<0.2"
