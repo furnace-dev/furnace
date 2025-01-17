@@ -638,20 +638,13 @@ struct Gate(ProExchangeable):
     fn subscribe_order_internal(mut self, symbol: String) raises -> None:
         if self._uid[] == "":
             raise Error("uid is not set")
-        logd("100")
         var name = String.format("{}.orders", self._app)
-        logd("101")
         var p = JsonValue.from_str("[]")
-        logd("102")
         var pv = JsonValueArrayView(p)
-        logd("103")
         logd("uid=" + self._uid[])
         pv.push_str(self._uid[])
-        logd("104")
         pv.push_str(symbol)
-        logd("105")
         self.subscribe(name, p, True)
-        logd("106")
         _ = p^
 
     fn subscribe_my_trades(
