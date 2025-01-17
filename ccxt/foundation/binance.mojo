@@ -129,9 +129,9 @@ struct Binance(Exchangeable):
         elif response.status_code >= 400 and response.status_code < 500:
             logt("response.text: " + response.text)
             if response.text.startswith("{") and response.text.endswith("}"):
-                var doc = JsonObject(response.text)
-                var code = doc.get_i64("code")
-                var message = doc.get_str("msg")
+                # var doc = JsonObject(response.text)
+                # var code = doc.get_i64("code")
+                # var message = doc.get_str("msg")
                 # raise Error(label + ": " + message)
                 return response.text
             else:
@@ -312,6 +312,9 @@ struct Binance(Exchangeable):
         self, symbol_view: JsonValueRefObjectView, settleId: String
     ) raises -> MarketInterface:
         """
+        Parse a Binance exchange info into a MarketInterface.
+        """
+        """
         {
             "symbol": "BTCUSDT",
             "pair": "BTCUSDT",
@@ -478,70 +481,7 @@ struct Binance(Exchangeable):
         ticker.timestamp = int(now_ms())
         return ticker
 
-    fn parse_ticker(self, doc: JsonValueObjectView) raises -> Ticker:
-        """Parse a ticker from a JSON response.
-
-        :param dict [doc]: associative dictionary of the JSON response
-        :returns dict: a dictionary of ticker info.
-        """
-
-        """
-        {
-            "symbol": "BTCUSDT",
-            "priceChange": "-454.50",
-            "priceChangePercent": "-0.472",
-            "weightedAvgPrice": "95569.51",
-            "lastPrice": "95771.60",
-            "lastQty": "0.012",
-            "openPrice": "96226.10",
-            "highPrice": "97241.30",
-            "lowPrice": "92000.00",
-            "volume": "5315.893",
-            "quoteVolume": "508037300.13",
-            "openTime": 1736496420000,
-            "closeTime": 1736582843623,
-            "firstId": 294643039,
-            "lastId": 294680807,
-            "count": 37500
-        }
-        """
-        var timestamp = doc.get_i64("closeTime")
-        # var marketType = "swap"
-        var marketId = doc.get_str("symbol")
-        var symbol = marketId
-        var last = doc.get_str("lastPrice")
-        # var wAvg = doc.get_str('weightedAvgPrice')
-        var baseVolume = doc.get_str("volume")
-        var quoteVolume = doc.get_str("quoteVolume")
-        var high = doc.get_str("highPrice")
-        var low = doc.get_str("lowPrice")
-        var percentage = doc.get_str("priceChangePercent")
-        return Ticker(
-            info=Dict[String, Any](),
-            symbol=symbol,
-            timestamp=int(timestamp),
-            datetime=String(""),
-            high=Fixed(high),
-            low=Fixed(low),
-            bid=Fixed(0),
-            bidVolume=Fixed(0),
-            ask=Fixed(0),
-            askVolume=Fixed(0),
-            vwap=Fixed.zero,
-            open=Fixed.zero,
-            close=Fixed(last),
-            last=Fixed(last),
-            previousClose=Fixed.zero,
-            change=Fixed.zero,
-            percentage=Fixed(percentage),
-            average=Fixed.zero,
-            baseVolume=Fixed(baseVolume),
-            quoteVolume=Fixed(quoteVolume),
-            markPrice=Fixed(0),
-            indexPrice=Fixed(0),
-        )
-
-    fn parse_ticker(self, doc: JsonValueRefObjectView) raises -> Ticker:
+    fn parse_ticker[T: JsonObjectViewable](self, doc: T) raises -> Ticker:
         """Parse a ticker from a JSON response.
 
         :param dict [doc]: associative dictionary of the JSON response
@@ -815,6 +755,7 @@ struct Binance(Exchangeable):
         mut params: Dict[String, Any],
     ) raises -> Order:
         """Create a trade order.
+
         :param str symbol: unified symbol of the market to create an order in
         :param str type: 'market' or 'limit'
         :param str side: 'buy' or 'sell'

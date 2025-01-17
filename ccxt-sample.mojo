@@ -1,3 +1,4 @@
+import time
 from collections import Dict
 from os import getenv
 from testing import assert_equal, assert_true
