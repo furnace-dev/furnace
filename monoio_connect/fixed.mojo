@@ -1,5 +1,5 @@
 from memory import UnsafePointer
-from .internal.fixed12 import *
+from .internal.fixed12 import fixed12_truediv, fixed12_mul
 
 
 alias FIXED_SCALE_I = 1000000000000

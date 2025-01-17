@@ -1,5 +1,12 @@
 from collections import Optional
-from .internal.channel import *
+from memory import UnsafePointer
+from .internal.channel import (
+    create_channel,
+    destroy_channel,
+    channel_send,
+    channel_recv,
+    ChannelPtr,
+)
 
 
 struct Channel(Movable):

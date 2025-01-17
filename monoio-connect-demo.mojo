@@ -1,14 +1,11 @@
 import time
-from memory import UnsafePointer, memcpy
+from memory import UnsafePointer, memcpy, stack_allocation
 from sys.ffi import DLHandle, c_char, c_size_t
-
 from utils import StringRef
 from testing import assert_equal, assert_true
 from monoio_connect import *
 from monoio_connect.internal import *
 from monoio_connect.pthread import *
-from monoio_connect.internal.monoio import MonoioRuntimePtr, StrBoxed, free_str
-from monoio_connect.timeutil import now_ms
 
 
 alias c_char_ptr = UnsafePointer[c_char]
@@ -211,7 +208,7 @@ fn http_callback_test() raises:
         "/", Method.METHOD_GET, headers, "", 0, http_callback
     )
     print("done")
-    monoio_sleep_ms(rt, 10000)
+    sleep_ms(rt, 10000)
     _ = http^
     # destroy_monoio_runtime(rt)
 
@@ -465,7 +462,7 @@ fn websocket_test() raises:
 
 fn log_test() raises:
     var logger = init_logger(LogLevel.Debug, "", "")
-    test_log()
+    # test_log()
     logi("hello")
     destroy_logger(logger)
 

@@ -1,5 +1,12 @@
 from memory import UnsafePointer, stack_allocation
 from utils import StringRef
+from .internal.httpclient import (
+    HeaderMapPtr,
+    create_header_map,
+    destroy_header_map,
+    header_map_get,
+    header_map_set,
+)
 
 
 struct HeaderMap(Movable):

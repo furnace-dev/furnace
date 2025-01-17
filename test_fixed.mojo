@@ -1,5 +1,6 @@
 from testing import assert_equal, assert_true, assert_raises
-from monoio_connect import Fixed, fixed12_round_to_fractional, fixed12_round
+from monoio_connect import Fixed
+from monoio_connect.fixed import fixed12_to_string, fixed12_round_to_fractional, fixed12_round
 
 
 fn test_empty_string() raises:

@@ -1,3 +1,4 @@
+import time
 from sys._build import is_debug_build
 from collections import Dict
 from os import getenv

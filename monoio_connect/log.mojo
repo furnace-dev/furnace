@@ -3,7 +3,7 @@ from sys.param_env import is_defined
 from sys.ffi import DLHandle, c_char, c_size_t
 from builtin._location import __call_location
 from small_time.small_time import now
-from libc.unistd import gettid
+# from libc.unistd import gettid
 import .internal.log as internal_log
 
 
@@ -58,6 +58,10 @@ fn init_logger(
     return internal_log.init_logger(
         level._value, time_format.unsafe_cstr_ptr(), path.unsafe_cstr_ptr()
     )
+
+@always_inline
+fn destroy_logger(logger: internal_log.LoggerPtr) -> None:
+    internal_log.destroy_logger(logger)
 
 @always_inline
 fn log_max_level() -> LogLevel:
@@ -141,10 +145,10 @@ fn log_console(
         # 2025-01-05 15:36:04.645534|Info|th=1372098|monoio-connect-demo.mojo:468|hello
         # 2025-01-05 15:32:56.991245 0ms DEBUG  [monoio-connect/src/log.rs:88] Hello world!
         var t = now()
-        var tid = gettid()
+        # var tid = gettid()
         var text = t.format("YYYY-MM-DD HH:mm:ss.SSSSSS")
-            + " 0ms " + str(level) + " th="
-            + str(tid)
+            + " 0ms " + str(level) #+ " th="
+            # + str(tid)
             + " ["
             + file_name
             + ":"

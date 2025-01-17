@@ -1,4 +1,5 @@
 from memory import UnsafePointer, memcpy, stack_allocation
+from utils import StringRef
 import .internal.nanoid as nanoid_internal
 
 

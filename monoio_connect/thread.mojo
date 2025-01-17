@@ -1,3 +1,4 @@
+from memory import UnsafePointer
 from .pthread import pthread_create
 from .log import loge
 

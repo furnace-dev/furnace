@@ -1,6 +1,9 @@
 from collections.dict import Dict
 from memory import UnsafePointer
+from utils import StringRef
 from sys.ffi import _Global
+from .internal import c_void, StrBoxed, free_str
+from .internal.fastwebsockets import connect_ws, ws_send_text
 
 
 alias WebSocketOpenCallback = fn () escaping -> None
