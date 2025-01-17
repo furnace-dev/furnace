@@ -263,16 +263,6 @@ struct Gate(ProExchangeable):
         """
         Connect to the Gate.io API.
         """
-        # var host = "api.gateio.ws"
-        # var port = 443
-        # var path = String("/ws/v4/")
-        # if self._app == "futures":
-        #     host = (
-        #         "fx-ws.gateio.ws" if not self._testnet else "fx-ws-testnet.gateio.ws"
-        #     )
-        #     path = "/v4/ws/" + self._settle
-        # __get_address_as_uninit_lvalue(self._ws.address) = WebSocket(host=host, port=port, path=path)
-
         var on_open = self.get_on_open()
         var on_message = self.get_on_message()
         var on_ping = self.get_on_ping()
@@ -547,7 +537,7 @@ struct Gate(ProExchangeable):
             self._on_login()
         else:
             logi("unknown channel: " + channel)
-    
+
     fn _on_login(mut self) -> None:
         logd("_on_login")
         try:
