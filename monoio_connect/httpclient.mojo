@@ -86,13 +86,35 @@ alias Headers = Dict[String, String]
 
 
 @value
-struct HttpResponse:
+struct HttpResponse(Stringable):
     var status_code: Int
     var text: String
 
     fn __init__(out self, status_code: Int, text: String):
         self.status_code = status_code
         self.text = text
+
+    fn __str__(self) -> String:
+        return String.write(
+            "[",
+            str(self.status_code),
+            " ",
+            http_status_code_to_string(self.status_code),
+            "] ",
+            self.text,
+        )
+
+
+@always_inline
+fn http_status_code_to_string(code: Int) -> String:
+    if code == 200:
+        return "OK"
+    elif code == 404:
+        return "Not Found"
+    elif code == 500:
+        return "Internal Server Error"
+    else:
+        return "Unknown"
 
 
 @value
@@ -172,11 +194,13 @@ struct HttpClient:
     var _headers: HeaderMapPtr
     var _rt: MonoioRuntimePtr
     var _base_url: String
+    var _verbose: Bool
 
     fn __init__(
         out self,
         options: HttpClientOptions,
         rt: MonoioRuntimePtr = MonoioRuntimePtr(),
+        verbose: Bool = False,
     ):
         self._rt = rt if rt != MonoioRuntimePtr() else create_monoio_runtime()
         self._builder = create_client_builder()
@@ -200,6 +224,7 @@ struct HttpClient:
             self._rt, self._builder
         )
         self._base_url = options.base_url
+        self._verbose = verbose
 
     fn __del__(owned self):
         if self._builder:
@@ -219,9 +244,13 @@ struct HttpClient:
         method: Method,
         headers: Headers,
         payload: String,
-    ) -> HttpResponse:
+    ) raises -> HttpResponse:
         var url = self._base_url + path
-        logt("url: " + url)
+        if self._verbose:
+            logd(String.format("Request: {} {}", str(method), url))
+            if len(payload):
+                logd("Request payload:")
+                logd(payload)
         var req = new_http_request(
             method,
             url.unsafe_cstr_ptr(),
@@ -234,21 +263,29 @@ struct HttpClient:
                 item[].key.unsafe_cstr_ptr(),
                 item[].value.unsafe_cstr_ptr(),
             )
+        if self._verbose:
+            logd("Request headers:")
+            for item in headers.items():
+                logd(item[].key + ": " + item[].value)
         # retry 3 times
         for i in range(3):
             var ret = self.request_internal[max_body_size](req)
             if ret.status_code != 0:
                 destroy_http_request(req)
+                if self._verbose:
+                    logd("Request succeeded: " + str(ret))
                 return ret
-            logi(
-                "request failed, status_code: "
-                + str(ret.status_code)
-                + ", retrying "
-                + str(i)
-                + "/3"
-            )
+            if self._verbose:
+                logd(
+                    "Request failed, status_code: "
+                    + str(ret.status_code)
+                    + ", retrying "
+                    + str(i)
+                    + "/3"
+                )
         destroy_http_request(req)
-        logw("request failed")
+        if self._verbose:
+            logw("request failed")
         return HttpResponse(0, "")
 
     @always_inline

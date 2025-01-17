@@ -86,6 +86,7 @@ fn test_binance() raises -> None:
     config["api_key"] = api_key
     config["api_secret"] = api_secret
     config["testnet"] = testnet
+    config["verbose"] = True
 
     var trading_context = TradingContext(
         exchange_id=ExchangeId.binance, account_id="1", trader_id="1"
@@ -105,8 +106,8 @@ fn test_binance() raises -> None:
     # for currency in currencies:
     #     print(str(currency[].value()))
 
-    # var ticker = binance.fetch_ticker(symbol)
-    # logd(str(ticker))
+    var ticker = binance.fetch_ticker(symbol)
+    logd(str(ticker))
 
     # var symbols = List[String](capacity=2)
     # symbols.append("BTCUSDT")
@@ -115,8 +116,8 @@ fn test_binance() raises -> None:
     # for ticker in tickers:
     #     logd(str(ticker[]))
 
-    var order_book = binance.fetch_order_book(symbol, 10, params)
-    logd(str(order_book))
+    # var order_book = binance.fetch_order_book(symbol, 10, params)
+    # logd(str(order_book))
 
     # logd("len(asks)=" + str(len(order_book.asks)))
     # logd("len(bids)=" + str(len(order_book.bids)))
@@ -132,15 +133,38 @@ fn test_binance() raises -> None:
 
     # sleep_ms(rt, 10)
 
+    var mid_price = (
+        (ticker.high + ticker.low) / Fixed(2) * Fixed(0.9)
+    ).round_to_fractional(Fixed(0.0001))
+    logd("mid_price: " + str(mid_price))
+
+    var qty = (Fixed(10.0) / mid_price).round_to_fractional(Fixed(1))
+
     # var order = binance.create_order(
     #     symbol,
     #     OrderType.Limit,
     #     OrderSide.Buy,
-    #     Fixed(1.0),
-    #     Fixed(93000),
+    #     qty,
+    #     mid_price,
     #     params,
     # )
     # logd(str(order))
+
+    # var order_id = order.id
+    var order_id = "260630021"
+
+    # var order_result = binance.fetch_order(order_id, String(symbol), params)
+    # logd(str(order_result))
+
+    # var orders = binance.fetch_orders(String(symbol), None, None, params)
+    # logd("len(orders)=" + str(len(orders)))
+    # for order in orders:
+    #     logd(str(order))
+
+    var open_orders = binance.fetch_open_orders(String(symbol), None, None, params)
+    logd("len(open_orders)=" + str(len(open_orders)))
+    for order in open_orders:
+        logd(str(order))
 
     # var cancel_order = binance.cancel_order(
     #     String("4077634200"), String(symbol), params
@@ -198,7 +222,7 @@ fn test_ws(api_key: String, api_secret: String, testnet: Bool) raises -> None:
 
 
 fn main() raises:
-    var logger = init_logger(LogLevel.Trace, "", "")
+    var logger = init_logger(LogLevel.Debug, "", "")
 
     # test_monoiohttpclient()
     # test_http_get()

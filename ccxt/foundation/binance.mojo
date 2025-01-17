@@ -29,6 +29,7 @@ struct Binance(Exchangeable):
     var _trading_context: TradingContext
     var _host: String
     var _testnet: Bool
+    var _verbose: Bool
 
     fn __init__(
         out self,
@@ -38,6 +39,7 @@ struct Binance(Exchangeable):
     ):
         # Reference: https://developers.binance.com/docs/zh-CN/derivatives/usds-margined-futures/general-info
         self._testnet = config.get("testnet", False).bool()
+        self._verbose = config.get("verbose", False).bool()
         var base_url = "https://fapi.binance.com" if not self._testnet else "https://testnet.binancefuture.com"
         # logd("base_url: " + str(base_url))
         self._host = String(base_url).replace("https://", "")
@@ -45,7 +47,7 @@ struct Binance(Exchangeable):
         self._client = UnsafePointer[HttpClient].alloc(1)
         var options = HttpClientOptions(base_url)
         __get_address_as_uninit_lvalue(self._client.address) = HttpClient(
-            options, rt
+            options, rt, self._verbose
         )
         self._api = ImplicitAPI()
         self._base = Exchange(config)
@@ -70,6 +72,7 @@ struct Binance(Exchangeable):
         self._on_order = other._on_order
         self._trading_context = other._trading_context
         self._testnet = other._testnet
+        self._verbose = other._verbose
 
     fn id(self) -> ExchangeId:
         return ExchangeId.binance
@@ -84,7 +87,6 @@ struct Binance(Exchangeable):
         params: Dict[String, Any],
         query: String,
         payload: String,
-        v: String = "v1",
     ) raises -> String:
         # logd("entry: " + entry.path)
         return self._request(
@@ -118,7 +120,6 @@ struct Binance(Exchangeable):
         elif query != "":
             full_path += "?" + query
 
-        logt("full_path: " + full_path)
         var response = self._client[].request(
             full_path, method, headers, payload
         )
@@ -712,7 +713,7 @@ struct Binance(Exchangeable):
         :returns dict: a `balance structure <https://docs.ccxt.com/#/?id=balance-structure>`.
         """
         var text = self._request(
-            self._api.fapiprivatev3_get_account, params, "", "", "v3"
+            self._api.fapiprivatev3_get_account, params, "", ""
         )
         logt(text)
         # {"code":-5000,"msg":"Path /fapi/v1/account, Method GET is invalid"}
@@ -838,29 +839,29 @@ struct Binance(Exchangeable):
         return result
 
     @staticmethod
-    fn parse_order(doc: JsonObject) raises -> Order:
+    fn parse_order[T: JsonObjectViewable](obj: T) raises -> Order:
         # {"code":-1102,"msg":"Mandatory parameter 'timeinforce' was not sent, was empty/null, or malformed."}
-        var code = doc.get_i64("code")
+        var code = obj.get_i64("code")
         if code != 0:
-            var msg = doc.get_str("msg")
+            var msg = obj.get_str("msg")
             raise Error(String.format("code: {0}, msg: {1}", code, msg))
 
         # {"orderId":4077634200,"symbol":"BTCUSDT","status":"NEW","clientOrderId":"pRxDtGFyxElEV3emIYz1tb","price":"93000.00","avgPrice":"0.00","origQty":"1.000","executedQty":"0.000","cumQty":"0.000","cumQuote":"0.00000","timeInForce":"GTC","type":"LIMIT","reduceOnly":false,"closePosition":false,"side":"BUY","positionSide":"BOTH","stopPrice":"0.00","workingType":"CONTRACT_PRICE","priceProtect":false,"origType":"LIMIT","priceMatch":"NONE","selfTradePreventionMode":"NONE","goodTillDate":0,"updateTime":1736869853102}
 
-        var symbol_ = str(doc.get_str_ref("symbol"))
-        var id = doc.get_u64("orderId")
-        var clientOrderId = str(doc.get_str_ref("clientOrderId"))
-        var status = str(doc.get_str_ref("status"))
-        var type_ = str(doc.get_str_ref("type"))
-        var amount_ = Fixed(str(doc.get_str_ref("origQty")))
-        var filled_amount = Fixed(str(doc.get_str_ref("executedQty")))
+        var symbol_ = str(obj.get_str_ref("symbol"))
+        var id = obj.get_u64("orderId")
+        var clientOrderId = str(obj.get_str_ref("clientOrderId"))
+        var status = str(obj.get_str_ref("status"))
+        var type_ = str(obj.get_str_ref("type"))
+        var amount_ = Fixed(str(obj.get_str_ref("origQty")))
+        var filled_amount = Fixed(str(obj.get_str_ref("executedQty")))
         var left = amount_ - filled_amount
 
-        var price_ = Fixed(str(doc.get_str_ref("price")))
+        var price_ = Fixed(str(obj.get_str_ref("price")))
         # var avg_price = Fixed(0)
-        var timestamp = int(doc.get_i64("updateTime"))
+        var timestamp = int(obj.get_i64("updateTime"))
         var update_timestamp = timestamp
-        var time_in_force = doc.get_str("time_in_force")
+        var time_in_force = obj.get_str("time_in_force")
         var result = Order(
             info=Dict[String, Any](),
             id=str(id),
@@ -893,7 +894,29 @@ struct Binance(Exchangeable):
     fn fetch_order(
         self, id: String, symbol: Str, mut params: Dict[String, Any]
     ) raises -> Order:
-        raise Error("NotImplemented")
+        var query_values = QueryStringBuilder()
+        query_values["symbol"] = symbol.value()
+        if len(id) > 0:
+            query_values["orderId"] = id
+        if "client_order_id" in params:
+            query_values["origClientOrderId"] = params[
+                "client_order_id"
+            ].string()
+        var query_str = query_values.to_string()
+        var text = self._request(
+            self._api.fapiprivate_get_order, params, query_str, ""
+        )
+        logt(text)
+        # {"code":-2013,"msg":"Order does not exist."}
+        var doc = JsonObject(text)
+        var code = doc.get_i64("code")
+        if code != 0:
+            var msg = str(doc.get_str_ref("msg"))
+            raise Error(msg)
+
+        # {"orderId":260630021,"symbol":"XRPUSDT","status":"NEW","clientOrderId":"VmySP2fdDzEwT9bSpp0OHr","price":"3.0937","avgPrice":"0.00","origQty":"3.0","executedQty":"0.0","cumQuote":"0.00000","timeInForce":"GTC","type":"LIMIT","reduceOnly":false,"closePosition":false,"side":"BUY","positionSide":"BOTH","stopPrice":"0.0000","workingType":"CONTRACT_PRICE","priceProtect":false,"origType":"LIMIT","priceMatch":"NONE","selfTradePreventionMode":"NONE","goodTillDate":0,"time":1737108984856,"updateTime":1737108984856}
+
+        return self.parse_order(doc)
 
     fn fetch_orders(
         self,
@@ -902,7 +925,39 @@ struct Binance(Exchangeable):
         limit: IntOpt,
         mut params: Dict[String, Any],
     ) raises -> List[Order]:
-        raise Error("NotImplemented")
+        var query_values = QueryStringBuilder()
+        query_values["symbol"] = symbol.value()
+        if "order_id" in params:
+            query_values["orderId"] = params["order_id"].string()
+        if since:
+            query_values["startTime"] = str(since.value())
+        if limit:
+            query_values["limit"] = str(limit.value())
+        var query_str = query_values.to_string()
+        var text = self._request(
+            self._api.fapiprivate_get_allorders, params, query_str, ""
+        )
+        var doc = JsonObject(text)
+        var code = doc.get_i64("code")
+        if code != 0:
+            var msg = str(doc.get_str_ref("msg"))
+            raise Error(msg)
+
+        # [{"orderId":260630021,"symbol":"XRPUSDT","status":"NEW","clientOrderId":"VmySP2fdDzEwT9bSpp0OHr","price":"3.0937","avgPrice":"0.00000","origQty":"3","executedQty":"0","cumQuote":"0","timeInForce":"GTC","type":"LIMIT","reduceOnly":false,"closePosition":false,"side":"BUY","positionSide":"BOTH","stopPrice":"0","workingType":"CONTRACT_PRICE","priceMatch":"NONE","selfTradePreventionMode":"NONE","goodTillDate":0,"priceProtect":false,"origType":"LIMIT","time":1737108984856,"updateTime":1737108984856}]
+
+        var arr = JsonValueArrayView(doc)
+        var n = arr.len()
+        var result = List[Order](capacity=n)
+        for i in range(0, n):
+            var obj = arr.get(i)
+            var obj_view = JsonValueRefObjectView(obj)
+            var order = self.parse_order(obj_view)
+            _ = obj^
+            result.append(order)
+        _ = arr^
+        _ = doc^
+
+        return result
 
     fn fetch_open_orders(
         self,
@@ -911,7 +966,34 @@ struct Binance(Exchangeable):
         limit: IntOpt,
         mut params: Dict[String, Any],
     ) raises -> List[Order]:
-        raise Error("NotImplemented")
+        var query_values = QueryStringBuilder()
+        if symbol:
+            query_values["symbol"] = symbol.value()
+        var query_str = query_values.to_string()
+        var text = self._request(
+            self._api.fapiprivate_get_openorders, params, query_str, ""
+        )
+        var doc = JsonObject(text)
+        var code = doc.get_i64("code")
+        if code != 0:
+            var msg = str(doc.get_str_ref("msg"))
+            raise Error(msg)
+
+        # [{"orderId":260630021,"symbol":"XRPUSDT","status":"NEW","clientOrderId":"VmySP2fdDzEwT9bSpp0OHr","price":"3.0937","avgPrice":"0","origQty":"3","executedQty":"0","cumQuote":"0.00000","timeInForce":"GTC","type":"LIMIT","reduceOnly":false,"closePosition":false,"side":"BUY","positionSide":"BOTH","stopPrice":"0","workingType":"CONTRACT_PRICE","priceProtect":false,"origType":"LIMIT","priceMatch":"NONE","selfTradePreventionMode":"NONE","goodTillDate":0,"time":1737108984856,"updateTime":1737108984856}]
+
+        var arr = JsonValueArrayView(doc)
+        var n = arr.len()
+        var result = List[Order](capacity=n)
+        for i in range(0, n):
+            var obj = arr.get(i)
+            var obj_view = JsonValueRefObjectView(obj)
+            var order = self.parse_order(obj_view)
+            _ = obj^
+            result.append(order)
+        _ = arr^
+        _ = doc^
+
+        return result
 
     fn fetch_closed_orders(
         self,

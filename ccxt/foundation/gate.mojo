@@ -1,8 +1,23 @@
 import time
 from collections.optional import _NoneType
 from memory import stack_allocation
-from monoio_connect import logd, logi, logw
-from monoio_connect.fixed import Fixed
+from monoio_connect import (
+    logd,
+    logi,
+    logw,
+    Fixed,
+    now_ms,
+    compute_sha512_hex,
+    compute_hmac_sha512_hex,
+    HttpClientOptions,
+    HttpClient,
+    Headers,
+    Method,
+    HttpResponsePtr,
+    MonoioRuntimePtr,
+    http_response_status_code,
+    http_response_body,
+)
 from ccxt.base.types import *
 from ccxt.base.exchange import Exchange
 from ccxt.base.exchangeable import (
@@ -11,21 +26,7 @@ from ccxt.base.exchangeable import (
     CancelOrderRequest,
 )
 from ccxt.abstract.gate import ImplicitAPI
-from monoio_connect import now_ms
 from sonic import *
-from monoio_connect import compute_sha512_hex, compute_hmac_sha512_hex
-from monoio_connect import (
-    HttpClientOptions,
-    HttpClient,
-    Method,
-    HttpResponsePtr,
-)
-from monoio_connect import (
-    MonoioRuntimePtr,
-    http_response_status_code,
-    http_response_body,
-)
-from monoio_connect import HttpResponseCallback, Headers
 from ._common_utils import *
 
 
@@ -44,6 +45,7 @@ struct Gate(Exchangeable):
     var _trading_context: TradingContext
     var _host: String
     var _testnet: Bool
+    var _verbose: Bool
 
     fn __init__(
         out self,
@@ -52,6 +54,7 @@ struct Gate(Exchangeable):
         rt: MonoioRuntimePtr = MonoioRuntimePtr(),
     ):
         self._testnet = config.get("testnet", False).bool()
+        self._verbose = config.get("verbose", False).bool()
         var base_url = "https://api.gateio.ws" if not self._testnet else "https://fx-api-testnet.gateio.ws"
 
         self._host = String(base_url).replace("https://", "")
@@ -60,7 +63,7 @@ struct Gate(Exchangeable):
         var options = HttpClientOptions(base_url)
         # self._client.init_pointee_move(PhotonHttpClient(options))
         __get_address_as_uninit_lvalue(self._client.address) = HttpClient(
-            options, rt
+            options, rt, self._verbose
         )
         self._api = ImplicitAPI()
         self._base = Exchange(config)
@@ -85,6 +88,7 @@ struct Gate(Exchangeable):
         self._on_order = other._on_order
         self._trading_context = other._trading_context
         self._testnet = other._testnet
+        self._verbose = other._verbose
 
     fn id(self) -> ExchangeId:
         return ExchangeId.gateio

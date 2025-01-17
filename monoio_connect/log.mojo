@@ -2,7 +2,7 @@ from memory import UnsafePointer, memcpy
 from sys.param_env import is_defined
 from sys.ffi import DLHandle, c_char, c_size_t
 from builtin._location import __call_location
-from small_time.small_time import now
+from small_time import now
 # from libc.unistd import gettid
 from .internal.log import (
     LoggerPtr,

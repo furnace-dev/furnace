@@ -5,7 +5,7 @@ from .value_ref import JsonValueRef
 
 
 struct JsonValueRefObjectView[origin: MutableOrigin, T: JsonRefContainerTrait](
-    Stringable, JsonObjectViewable
+    JsonObjectViewable, Stringable
 ):
     var _src: Pointer[T, origin]
     var _object: UnsafePointer[JObjectRef]
