@@ -152,8 +152,9 @@ struct Fixed(Stringable):
         return self.to_string()
 
 
-# Create a Fixed12 from a string
+@always_inline
 fn fixed12_new_string(s: String) raises -> Int64:
+    """Create a Fixed12 from a string."""
     var sign: Int64 = -1 if s[0] == "-" else 1
     var s_ = s[1:] if sign == -1 else s
     var period = s_.find(".")
@@ -190,8 +191,9 @@ fn fixed12_frac_part(fixed: Int64) -> Int64:
     return fixed % FIXED_SCALE_I
 
 
-# Convert a Fixed12 to a string
+@always_inline
 fn fixed12_to_string(fixed: Int64) -> String:
+    """Convert a Fixed12 to a string."""
     var result = String("")
     var isNegative = fixed < 0
     var fixed_ = -fixed if isNegative else fixed

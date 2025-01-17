@@ -4,7 +4,13 @@ from sys.ffi import DLHandle, c_char, c_size_t
 from builtin._location import __call_location
 from small_time.small_time import now
 # from libc.unistd import gettid
-import .internal.log as internal_log
+from .internal.log import (
+    LoggerPtr,
+    init_logger as _init_logger,
+    destroy_logger as _destroy_logger,
+    log_max_level as _log_max_level,
+    log as _log
+)
 
 
 @value
@@ -54,24 +60,24 @@ struct LogLevel(Stringable):
 @always_inline
 fn init_logger(
     level: LogLevel, time_format: String, path: String
-) -> internal_log.LoggerPtr:
-    return internal_log.init_logger(
+) -> LoggerPtr:
+    return _init_logger(
         level._value, time_format.unsafe_cstr_ptr(), path.unsafe_cstr_ptr()
     )
 
 @always_inline
-fn destroy_logger(logger: internal_log.LoggerPtr) -> None:
-    internal_log.destroy_logger(logger)
+fn destroy_logger(logger: LoggerPtr) -> None:
+    _destroy_logger(logger)
 
 @always_inline
 fn log_max_level() -> LogLevel:
-    return LogLevel(internal_log.log_max_level())
+    return LogLevel(_log_max_level())
 
 @always_inline
 fn log(
     level: LogLevel, file: String, line: UInt32, col: UInt32, msg: String
 ) -> None:
-    internal_log.log(
+    _log(
         level._value, file.unsafe_cstr_ptr(), line, col, msg.unsafe_cstr_ptr()
     )
 
