@@ -22,8 +22,6 @@ from ccxt.base.types import *
 from ccxt.base.exchange import Exchange
 from ccxt.base.exchangeable import (
     Exchangeable,
-    SubmitOrderRequest,
-    CancelOrderRequest,
 )
 from ccxt.abstract.gate import ImplicitAPI
 from sonic import *
@@ -1267,7 +1265,7 @@ struct Gate(Exchangeable):
     ) raises -> None:
         var request = AsyncTradingRequest(
             type=0,
-            data=SubmitOrderData(
+            data=CreateOrderRequestData(
                 symbol=symbol,
                 order_type=type,
                 order_side=side,
@@ -1283,7 +1281,7 @@ struct Gate(Exchangeable):
     ) raises -> None:
         var request = AsyncTradingRequest(
             type=1,
-            data=SubmitCancelOrderData(symbol=symbol, order_id=id),
+            data=CancelOrderRequestData(symbol=symbol, order_id=id),
             exchange=UnsafePointer.address_of(self),
         )
         _ = async_trading_channel_ptr()[].send(request)

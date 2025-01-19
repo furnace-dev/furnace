@@ -18,8 +18,16 @@ from monoio_connect import (
     destroy_logger,
     LogLevel,
 )
-from ccxt.base.types import Any, OrderType, OrderSide, Num, Order, Ticker
-from ccxt.base.pro_exchangeable import TradingContext, ExchangeId
+from ccxt.base.types import (
+    Any,
+    OrderType,
+    OrderSide,
+    Num,
+    Order,
+    Ticker,
+    ExchangeId,
+    TradingContext,
+)
 from ccxt.foundation.gate import Gate
 from ccxt.pro.gate import Gate as GatePro
 from ccxt.foundation.async_trading_operations import (

@@ -38,6 +38,7 @@ from .httpclient import (
     new_http_request,
     destroy_http_request,
     destroy_http_response,
+    HttpResponseCallback,
 )
 from .log import (
     LogLevel,

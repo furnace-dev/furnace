@@ -5,9 +5,17 @@ from os import getenv
 from testing import assert_equal
 from memory import UnsafePointer, stack_allocation
 from monoio_connect import *
-from ccxt.base.types import Any, OrderType, OrderSide, Num, Order, Ticker
+from ccxt.base.types import (
+    Any,
+    OrderType,
+    OrderSide,
+    Num,
+    Order,
+    Ticker,
+    ExchangeId,
+    TradingContext,
+)
 from ccxt.foundation.bitmex import BitMEX
-from ccxt.base.pro_exchangeable import TradingContext, ExchangeId
 
 
 fn on_order(trading_context: TradingContext, order: Order) -> None:

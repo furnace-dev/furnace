@@ -1,11 +1,25 @@
 from memory import UnsafePointer
 from monoio_connect.fixed import Fixed
-from ccxt.base.types import *
+from ccxt.base.types import (
+    ExchangeId,
+    Market,
+    Currency,
+    Ticker,
+    OrderBook,
+    Trade,
+    Order,
+    Balances,
+)
 
 
-# 定义 Exchangeable 接口
 trait Exchangeable:
-    # 公共方法
+    """
+    Exchangeable trait, which is implemented by all exchanges.
+
+    Exchanges implementing this trait are required to provide some
+    basic methods for interacting with the exchange.
+    """
+
     fn id(self) -> ExchangeId:
         ...
 
@@ -138,58 +152,3 @@ trait Exchangeable:
 
     fn on_order(self, order: Order) -> None:
         ...
-
-
-struct SubmitOrderRequest[T: Exchangeable]:
-    """
-    提交订单请求.
-    """
-
-    var symbol: String
-    var type: OrderType
-    var side: OrderSide
-    var amount: Fixed
-    var price: Fixed
-    var params: Dict[String, Any]
-    var exchange: UnsafePointer[T]
-
-    fn __init__(
-        out self,
-        symbol: String,
-        type: OrderType,
-        side: OrderSide,
-        amount: Fixed,
-        price: Fixed,
-        params: Dict[String, Any],
-        exchange: UnsafePointer[T],
-    ):
-        self.symbol = symbol
-        self.type = type
-        self.side = side
-        self.amount = amount
-        self.price = price
-        self.params = params
-        self.exchange = exchange
-
-
-struct CancelOrderRequest[T: Exchangeable]:
-    """
-    取消订单请求.
-    """
-
-    var id: String
-    var symbol: String
-    var params: Dict[String, Any]
-    var exchange: UnsafePointer[T]
-
-    fn __init__(
-        out self,
-        id: String,
-        symbol: String,
-        params: Dict[String, Any],
-        exchange: UnsafePointer[T],
-    ):
-        self.id = id
-        self.symbol = symbol
-        self.params = params
-        self.exchange = exchange

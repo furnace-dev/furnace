@@ -6,11 +6,18 @@ from testing import assert_equal, assert_true
 from memory import UnsafePointer, stack_allocation
 from mojoenv import load_mojo_env
 from monoio_connect import *
-from ccxt.base.types import Any, OrderType, OrderSide, Num, Order, Ticker
-from ccxt.foundation.bybit import Bybit
+from ccxt.base.types import (
+    Any,
+    OrderType,
+    OrderSide,
+    Num,
+    Order,
+    Ticker,
+    ExchangeId,
+    TradingContext,
+)
 from ccxt.foundation.gate import Gate
 from ccxt.pro.gate import Gate as GatePro
-from ccxt.base.pro_exchangeable import TradingContext, ExchangeId
 
 
 fn test_http_client_post() raises -> None:

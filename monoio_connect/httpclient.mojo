@@ -309,9 +309,13 @@ struct HttpClient:
         payload: String,
         req_id: UInt64,
         cb: HttpResponseCallback,
-    ) -> None:
+    ) raises -> None:
         var url = self._base_url + path
-        logd("url: " + url)
+        if self._verbose:
+            logd(String.format("Request: {} {}", str(method), url))
+            if len(payload):
+                logd("Request payload:")
+                logd(payload)
         var req = new_http_request(
             method,
             url.unsafe_cstr_ptr(),
@@ -324,20 +328,13 @@ struct HttpClient:
                 item[].key.unsafe_cstr_ptr(),
                 item[].value.unsafe_cstr_ptr(),
             )
-            # logd("key: " + item[].key + " value: " + item[].value)
+        if self._verbose:
+            logd("Request headers:")
+            for item in headers.items():
+                logd(item[].key + ": " + item[].value)
         http_client_request_with_callback(
             self._rt, self._client, req, req_id, 0, UnsafePointer[c_void](), cb
         )
-        # var resp = http_client_request(self._rt, self._client, req)
-        # var status_code = int(http_response_status_code(resp))
-        # alias max_body_size: Int = 1024 * 1000
-        # var buf = stack_allocation[max_body_size, Int8]()
-        # var body = http_response_body(resp, buf, max_body_size)
-        # var ret = HttpResponse(status_code, String(StringRef(buf, body)))
-        # logd("status_code: " + str(status_code))
-        # logd("body: " + ret.text)
-        # destroy_http_response(resp)
-        # destroy_http_request(req)
 
     fn test(self):
         var method = Method.METHOD_GET

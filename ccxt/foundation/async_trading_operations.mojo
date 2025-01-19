@@ -13,7 +13,7 @@ fn _create_order_internal[
     T: Exchangeable
 ](request: UnsafePointer[AsyncTradingRequest]) raises:
     var exchange = request[].bitcast[T]()
-    var req = request[].data[SubmitOrderData]
+    var req = request[].data[CreateOrderRequestData]
     var symbol = req.symbol
     var order_type = req.order_type
     var order_side = req.order_side
@@ -56,7 +56,7 @@ fn _cancel_order_internal[
     T: Exchangeable
 ](request: UnsafePointer[AsyncTradingRequest]) raises:
     var exchange = request[].bitcast[T]()
-    var req = request[].data[SubmitCancelOrderData]
+    var req = request[].data[CancelOrderRequestData]
     var symbol = req.symbol
     var order_id = req.order_id
     var params = Dict[String, Any]()

@@ -4,6 +4,7 @@ from utils import StringRef
 from sys.ffi import _Global
 from .internal import c_void, StrBoxed, free_str
 from .internal.fastwebsockets import connect_ws, ws_send_text
+from .log import logt, logd, logi, logw, loge
 
 
 alias WebSocketOpenCallback = fn () escaping -> None
@@ -118,7 +119,7 @@ fn ws_timer_callbacks_ptr() -> UnsafePointer[WebSocketTimerCallbacks]:
 
 
 fn _ws_on_open(id: Int64, ws: UnsafePointer[c_void]) -> None:
-    print("ws_on_open ws: " + str(ws) + " ws_id: " + str(int(ws)))
+    logt("ws_on_open ws: " + str(ws) + " ws_id: " + str(int(ws)))
     var id_ = int(id)
     try:
         var ws_ = ws_map_ptr()[][id_]
@@ -129,7 +130,7 @@ fn _ws_on_open(id: Int64, ws: UnsafePointer[c_void]) -> None:
 
 
 fn _ws_on_message(id: Int64, ws: UnsafePointer[c_void], msg: StrBoxed) -> None:
-    print("ws_on_message ws: " + str(ws))
+    logt("ws_on_message ws: " + str(ws))
     var s = String(StringRef(msg.ptr, msg.len))
     try:
         ws_message_callbacks_ptr()[][int(id)](s)
@@ -139,7 +140,7 @@ fn _ws_on_message(id: Int64, ws: UnsafePointer[c_void], msg: StrBoxed) -> None:
 
 
 fn _ws_on_ping(id: Int64, ws: UnsafePointer[c_void]) -> None:
-    print("ws_on_ping ws: " + str(ws))
+    logt("ws_on_ping ws: " + str(ws))
     try:
         ws_ping_callbacks_ptr()[][int(id)]()
     except e:
@@ -148,7 +149,7 @@ fn _ws_on_ping(id: Int64, ws: UnsafePointer[c_void]) -> None:
 
 fn _ws_on_error(id: Int64, ws: UnsafePointer[c_void], err: StrBoxed) -> None:
     var s = String(StringRef(err.ptr, err.len))
-    print("ws_on_error ws: " + str(ws))
+    logt("ws_on_error ws: " + str(ws))
     try:
         ws_error_callbacks_ptr()[][int(id)](s)
     except e:
@@ -157,7 +158,7 @@ fn _ws_on_error(id: Int64, ws: UnsafePointer[c_void], err: StrBoxed) -> None:
 
 
 fn _ws_on_close(id: Int64, ws: UnsafePointer[c_void]) -> None:
-    print("ws_on_close ws: " + str(ws))
+    logt("ws_on_close ws: " + str(ws))
     try:
         ws_close_callbacks_ptr()[][int(id)]()
     except e:
@@ -165,7 +166,7 @@ fn _ws_on_close(id: Int64, ws: UnsafePointer[c_void]) -> None:
 
 
 fn _ws_on_timer(id: Int64, ws: UnsafePointer[c_void], count: UInt64) -> None:
-    print("ws_on_timer ws: " + str(ws) + " count: " + str(count))
+    logt("ws_on_timer ws: " + str(ws) + " count: " + str(count))
     try:
         ws_timer_callbacks_ptr()[][int(id)](count)
     except e:
@@ -180,14 +181,12 @@ struct WebSocket:
     var _path: String
 
     fn __init__(out self, host: String, port: Int, path: String):
-        print("WebSocket.__init__")
         self._id = int(idgen_next_id())
         self._ws = UnsafePointer[c_void]()
         self._uri = host
         self._port = port
         self._path = path
         ws_map_ptr()[][self._id] = UnsafePointer[Self].address_of(self)
-        print("WebSocket.__init__ done")
 
     fn set_on_open(self: Self, owned on_open: WebSocketOpenCallback) -> None:
         ws_open_callbacks_ptr()[][self._id] = on_open^
@@ -219,7 +218,7 @@ struct WebSocket:
         self._ws = ws
 
     fn run(mut self: Self, rt: MonoioRuntimePtr) -> None:
-        print("WebSocket.run")
+        logd("WebSocket.run")
         var ret = connect_ws(
             rt,
             self._id,
@@ -234,11 +233,11 @@ struct WebSocket:
             _ws_on_close,
             _ws_on_timer,
         )
-        print("connect_ws ret: " + str(ret))
+        logd("connect_ws ret: " + str(ret))
 
     fn send(self: Self, text: String) -> Int:
         if self._ws == UnsafePointer[c_void]():
-            print("ws is not connected")
+            logw("ws is not connected")
             return -1
         var ret = ws_send_text(self._ws, text.unsafe_cstr_ptr())
         return int(ret)

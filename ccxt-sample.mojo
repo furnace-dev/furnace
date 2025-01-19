@@ -4,13 +4,44 @@ from os import getenv
 from testing import assert_equal, assert_true
 from memory import UnsafePointer, stack_allocation
 from mojoenv import load_mojo_env
-from monoio_connect import *
-from ccxt.base.types import Any, OrderType, OrderSide, Num, Order, Ticker
-from ccxt.base.pro_exchangeable import TradingContext, ExchangeId
+from monoio_connect import (
+    create_monoio_runtime,
+    parse_bool,
+    logd,
+    logi,
+    Fixed,
+    init_logger,
+    destroy_logger,
+    LogLevel,
+    HttpClientOptions,
+    HttpClient,
+    HttpResponse,
+    HttpResponseCallback,
+    Headers,
+    Method,
+    compute_hmac_sha256_hex,
+    now_ms,
+    sleep_ms,
+    sleep,
+)
+from ccxt.base.types import (
+    Any,
+    OrderType,
+    OrderSide,
+    Num,
+    Order,
+    Ticker,
+    ExchangeId,
+    TradingContext,
+)
 from ccxt.foundation.bybit import Bybit
 from ccxt.foundation.binance import Binance
+from ccxt.pro.binance import Binance as BinancePro
 from ccxt.foundation.gate import Gate
 from ccxt.pro.gate import Gate as GatePro
+from ccxt.foundation.async_trading_operations import (
+    run_async_trading_thread,
+)
 
 
 fn test_http_get() raises -> None:
@@ -74,7 +105,7 @@ fn on_order(trading_context: TradingContext, order: Order) -> None:
     logd("on_order end")
 
 
-fn test_binance() raises -> None:
+fn test_binance() raises:
     var env_vars = load_mojo_env(".env")
     var api_key = env_vars["BINANCE_API_KEY"]
     var api_secret = env_vars["BINANCE_API_SECRET"]
@@ -161,7 +192,9 @@ fn test_binance() raises -> None:
     # for order in orders:
     #     logd(str(order))
 
-    var open_orders = binance.fetch_open_orders(String(symbol), None, None, params)
+    var open_orders = binance.fetch_open_orders(
+        String(symbol), None, None, params
+    )
     logd("len(open_orders)=" + str(len(open_orders)))
     for order in open_orders:
         logd(str(order))
@@ -183,52 +216,65 @@ fn on_ticker(trading_context: TradingContext, ticker: Ticker) -> None:
 
 
 # ws
-fn test_ws(api_key: String, api_secret: String, testnet: Bool) raises -> None:
-    var rt = create_monoio_runtime()
-    var config_pro = Dict[String, Any]()
+fn test_ws() raises:
+    var env_vars = load_mojo_env(".env")
+    var api_key = env_vars["BINANCE_API_KEY"]
+    var api_secret = env_vars["BINANCE_API_SECRET"]
+    var testnet = parse_bool(env_vars["BINANCE_TESTNET"])
 
-    config_pro["api_key"] = api_key
-    config_pro["api_secret"] = api_secret
-    config_pro["testnet"] = testnet
-    config_pro["settle"] = "usdt"
+    var rt = create_monoio_runtime()
+    var config = Dict[String, Any]()
+
+    config["api_key"] = api_key
+    config["api_secret"] = api_secret
+    config["testnet"] = testnet
+    config["verbose"] = True
 
     var trading_context = TradingContext(
-        exchange_id=ExchangeId.gateio, account_id="1", trader_id="1"
+        exchange_id=ExchangeId.binance, account_id="1", trader_id="1"
     )
-    var gate_pro = GatePro(config_pro, trading_context)
-    gate_pro.set_on_ticker(on_ticker)
-    gate_pro.set_on_order(on_order)
+    # var binance = Binance(config, trading_context, rt)
+    # var listen_key = binance.generate_listen_key()
+    # logd("listen_key: " + listen_key)
+
+    var binance_pro = BinancePro(config, trading_context)
+    binance_pro.set_on_ticker(on_ticker)
+    binance_pro.set_on_order(on_order)
 
     # Subscribe to order book depth data
     # var params0 = Dict[String, Any]()
     # params0["interval"] = "100ms"  # Update interval is 100ms
-    # gate_pro.subscribe_order_book("BTC_USDT", params0)  # Subscribe to BTC/USDT order book
+    # binance_pro.subscribe_order_book("BTC_USDT", params0)  # Subscribe to BTC/USDT order book
 
     # Subscribe to real-time ticker data
-    var params1 = Dict[String, Any]()
-    gate_pro.subscribe_ticker(
-        "BTC_USDT", params1
-    )  # Subscribe to BTC/USDT real-time ticker
+    # var params1 = Dict[String, Any]()
+    # binance_pro.subscribe_ticker(
+    #     "BTC_USDT", params1
+    # )  # Subscribe to BTC/USDT real-time ticker
 
     # Subscribe to order data
     # var params2 = Dict[String, Any]()
-    # gate_pro.subscribe_order("BTC_USDT", params2)  # Subscribe to BTC/USDT order
+    # binance_pro.subscribe_order("BTC_USDT", params2)  # Subscribe to BTC/USDT order
 
-    gate_pro.connect(rt)
+    binance_pro.connect(rt)
 
-    time.sleep(1000000.0)
+    logd("sleep")
+    sleep_ms(rt, 10 * 60 * 1000)
 
-    _ = gate_pro^
+    # _ = binance^
+    # _ = binance_pro^
 
 
 fn main() raises:
     var logger = init_logger(LogLevel.Debug, "", "")
 
+    # run_async_trading_thread()
+
     # test_monoiohttpclient()
     # test_http_get()
     # test_binance_fetch_balance()
-    test_binance()
-    # test_ws(api_key, api_secret, testnet)
+    # test_binance()
+    test_ws()
 
     time.sleep(1000000.0)
 

@@ -1,14 +1,15 @@
 from sys.ffi import _Global
+from collections import Dict
 from memory import UnsafePointer
 from utils import Variant
 from monoio_connect.channel import Channel
 from monoio_connect import Fixed
-from ccxt.base.types import OrderType, OrderSide, ExchangeId
+from ccxt.base.types import OrderType, OrderSide, ExchangeId, Any
 from ccxt.base.exchangeable import Exchangeable
 
 
 @value
-struct SubmitOrderData:
+struct CreateOrderRequestData:
     var symbol: String
     var order_type: OrderType
     var order_side: OrderSide
@@ -31,7 +32,7 @@ struct SubmitOrderData:
 
 
 @value
-struct SubmitCancelOrderData:
+struct CancelOrderRequestData:
     var symbol: String
     var order_id: String
 
@@ -41,9 +42,31 @@ struct SubmitCancelOrderData:
 
 
 @value
+struct CustomRequestData:
+    var name: String
+    var data: Dict[String, Any]
+
+    fn __init__(out self, name: String):
+        self.name = name
+        self.data = Dict[String, Any]()
+
+    fn __init__(out self, name: String, data: Dict[String, Any]):
+        self.name = name
+        self.data = data
+
+    fn __setitem__(mut self, key: String, value: Any):
+        self.data[key] = value
+
+    fn __getitem__(self, key: String) raises -> Any:
+        return self.data[key]
+
+
+@value
 struct AsyncTradingRequest:
-    var type: Int  # 0-下单 1-撤单
-    var data: Variant[SubmitOrderData, SubmitCancelOrderData]
+    var type: Int  # 0-下单 1-撤单 9-自定义
+    var data: Variant[
+        CreateOrderRequestData, CancelOrderRequestData, CustomRequestData
+    ]
     var exchange_id: ExchangeId
     var exchange: UnsafePointer[UInt8]
 
@@ -52,7 +75,11 @@ struct AsyncTradingRequest:
     ](
         out self,
         type: Int,
-        data: Variant[SubmitOrderData, SubmitCancelOrderData],
+        data: Variant[
+            CreateOrderRequestData,
+            CancelOrderRequestData,
+            CustomRequestData,
+        ],
         exchange: UnsafePointer[T],
     ):
         self.type = type

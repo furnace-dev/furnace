@@ -6,8 +6,6 @@ from ccxt.base.types import *
 from ccxt.base.exchange import Exchange
 from ccxt.base.exchangeable import (
     Exchangeable,
-    SubmitOrderRequest,
-    CancelOrderRequest,
 )
 from ccxt.abstract.bitmex import ImplicitAPI
 from monoio_connect import now_ms

@@ -10,7 +10,6 @@ from utils import Variant
 from mojoenv import load_mojo_env
 from ccxt.base.types import *
 from monoio_connect import *
-from ccxt.base.pro_exchangeable import TradingContext, ExchangeId
 from ccxt.foundation.gate import Gate
 from ccxt.foundation.async_trading_operations import (
     run_async_trading_thread,

@@ -6,8 +6,6 @@ from ccxt.base.types import *
 from ccxt.base.exchange import Exchange
 from ccxt.base.exchangeable import (
     Exchangeable,
-    SubmitOrderRequest,
-    CancelOrderRequest,
 )
 from ccxt.abstract.binance import ImplicitAPI
 from sonic import *
@@ -139,6 +137,60 @@ struct Binance(Exchangeable):
                 # raise Error("HTTP status code: " + str(response.status_code))
                 return response.text
         return response.text
+
+    @always_inline
+    fn _request_with_callback(
+        self,
+        entry: Entry,
+        params: Dict[String, Any],
+        query: String,
+        payload: String,
+        callback: HttpResponseCallback = _request_callback,
+    ) raises -> None:
+        # logd("entry: " + entry.path)
+        self._request_with_callback(
+            entry.method,
+            entry.path,
+            params,
+            query,
+            payload,
+            entry.api,
+            callback,
+        )
+
+    @always_inline
+    fn _request_with_callback(
+        self,
+        method: Method,
+        path: String,
+        params: Dict[String, Any],
+        query: String,
+        payload: String,
+        api: ApiType = ApiType.Public,
+        callback: HttpResponseCallback = _request_callback,
+    ) raises -> None:
+        var full_path = path
+        var headers = Headers()
+
+        # headers["Accept"] = "application/json"
+        # headers["Content-Type"] = "application/json"
+        headers["host"] = self._host
+        headers["user-agent"] = "monoio-http"
+        headers["content-type"] = "application/json"
+        headers["accept-encoding"] = "gzip, deflate"
+
+        if api == ApiType.Private:
+            var query_ = self._sign(headers, query)
+            full_path += "?" + query_
+        elif query != "":
+            full_path += "?" + query
+
+        # var response = self._client[].request(
+        #     full_path, method, headers, payload
+        # )
+        self._client[].request_with_callback(
+            full_path, method, headers, payload, 0, callback
+        )
 
     @always_inline
     fn _sign(self, mut headers: Headers, data: String) raises -> String:
@@ -1013,6 +1065,60 @@ struct Binance(Exchangeable):
     ) raises -> List[Trade]:
         raise Error("NotImplemented")
 
+    fn generate_listen_key(self) raises -> String:
+        """Generate listen key (USER_STREAM)."""
+        var params = Dict[String, Any]()
+        var text = self._request(
+            self._api.fapiprivate_post_listenkey, params, "", ""
+        )
+        # {"listenKey":"mVTxhyLvz3uGAqe0xUrcvrya5BDWpqUIssujladplYBK71n8cK4gGnPsRZd8u1vD"}
+        var doc = JsonObject(text)
+        var code = doc.get_i64("code")
+        if code != 0:
+            var msg = str(doc.get_str_ref("msg"))
+            raise Error(msg)
+
+        var listen_key = str(doc.get_str_ref("listenKey"))
+        return listen_key
+
+    fn extend_listen_key(self) raises -> Bool:
+        """Extend listen key (USER_STREAM)."""
+        var params = Dict[String, Any]()
+        var text = self._request(
+            self._api.fapiprivate_put_listenkey, params, "", ""
+        )
+        # {"success":true}
+        var doc = JsonObject(text)
+        var code = doc.get_i64("code")
+        if code != 0:
+            var msg = str(doc.get_str_ref("msg"))
+            raise Error(msg)
+
+        return True
+
+    fn extend_listen_key_with_callback(
+        self, callback: HttpResponseCallback = _request_callback
+    ) raises -> Bool:
+        """Extend listen key (USER_STREAM)."""
+        var params = Dict[String, Any]()
+        self._request_with_callback(
+            self._api.fapiprivate_put_listenkey, params, "", "", callback
+        )
+
+        return True
+
+    fn extend_listen_key_async(self) raises -> None:
+        """Extend listen key (USER_STREAM)."""
+        var name = String("")
+        var data = CustomRequestData(name)
+        data[""] = ""
+        var request = AsyncTradingRequest(
+            type=9,
+            data=data,
+            exchange=UnsafePointer.address_of(self),
+        )
+        _ = async_trading_channel_ptr()[].send(request)
+
     fn create_order_async(
         self,
         symbol: String,
@@ -1024,7 +1130,7 @@ struct Binance(Exchangeable):
     ) raises -> None:
         var request = AsyncTradingRequest(
             type=0,
-            data=SubmitOrderData(
+            data=CreateOrderRequestData(
                 symbol=symbol,
                 order_type=type,
                 order_side=side,
@@ -1040,7 +1146,7 @@ struct Binance(Exchangeable):
     ) raises -> None:
         var request = AsyncTradingRequest(
             type=1,
-            data=SubmitCancelOrderData(symbol=symbol, order_id=id),
+            data=CancelOrderRequestData(symbol=symbol, order_id=id),
             exchange=UnsafePointer.address_of(self),
         )
         _ = async_trading_channel_ptr()[].send(request)
@@ -1050,3 +1156,17 @@ struct Binance(Exchangeable):
 
     fn keep_alive(self) -> None:
         pass
+
+
+fn _request_callback(
+    req_id: UInt64,
+    type_: UInt32,
+    source: UnsafePointer[c_void],
+    res: HttpResponsePtr,
+) -> None:
+    logd("request_callback req_id: " + str(req_id))
+    logd("request_callback status_code: " + str(http_response_status_code(res)))
+    alias buf_size = 1024 * 1000
+    var buf = stack_allocation[buf_size, Int8]()
+    var body = http_response_body(res, buf, buf_size)
+    logd("request_callback text: " + String(StringRef(buf, body)))

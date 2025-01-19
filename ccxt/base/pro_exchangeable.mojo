@@ -1,8 +1,19 @@
-from .types import *
+from .types import (
+    OnTicker,
+    OnTickers,
+    OnOrderBook,
+    OnTrade,
+    OnBalance,
+    OnOrder,
+    OnMyTrade,
+)
 
 
-# 定义 ProExchangeable 接口
 trait ProExchangeable:
+    """
+    ProExchangeable trait, which is implemented by all exchanges.
+    """
+
     fn set_on_ticker(mut self: Self, on_ticker: OnTicker) raises -> None:
         ...
 

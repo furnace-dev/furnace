@@ -5,9 +5,19 @@ from testing import assert_equal, assert_true
 from memory import UnsafePointer, stack_allocation
 from mojoenv import load_mojo_env
 from monoio_connect import *
-from ccxt.base.types import Any, OrderType, OrderSide, Num, Order, Ticker, OrderBook, OrderbookEntry
+from ccxt.base.types import (
+    Any,
+    OrderType,
+    OrderSide,
+    Num,
+    Order,
+    Ticker,
+    OrderBook,
+    OrderbookEntry,
+    ExchangeId,
+    TradingContext,
+)
 from ccxt.foundation.binance import Binance
-from ccxt.base.pro_exchangeable import TradingContext, ExchangeId
 from time import sleep, perf_counter_ns
 
 
@@ -19,14 +29,16 @@ fn get_order_book_mid(order_book: OrderBook) raises -> Fixed:
     return Fixed(0.0)
 
 
-fn calculate_percentiles(mut data: List[Float64], percentiles: List[Int]) -> Dict[Int, Float64]:
+fn calculate_percentiles(
+    mut data: List[Float64], percentiles: List[Int]
+) -> Dict[Int, Float64]:
     # 首先对数据进行排序
     var results = Dict[Int, Float64]()
     for p in percentiles:
         var k = (len(data) - 1) * (float(p[]) / 100.0)
         var f = int(k)  # 下标索引
-        var c = f + 1   # 上标索引
-        
+        var c = f + 1  # 上标索引
+
         if c >= len(data):
             results[p[]] = data[f]
         else:
@@ -43,33 +55,33 @@ fn main() raises:
     var api_key = env_vars["BINANCE_API_KEY"]
     var api_secret = env_vars["BINANCE_API_SECRET"]
     var testnet = parse_bool(env_vars["BINANCE_TESTNET"])
-    
+
     # 初始化交易上下文和API
     var config = Dict[String, Any]()
     config["api_key"] = api_key
     config["api_secret"] = api_secret
     config["testnet"] = testnet
-    
+
     var symbol = String("XRPUSDT")
     var trading_context = TradingContext(
-        exchange_id=ExchangeId.binance,
-        account_id="zsyhsapi",
-        trader_id="1"
+        exchange_id=ExchangeId.binance, account_id="zsyhsapi", trader_id="1"
     )
-    
+
     var rt = create_monoio_runtime()
     var api = Binance(config, trading_context, rt)
-    
+
     # 获取市场数据
     var params = Dict[String, Any]()
     var order_book = api.fetch_order_book(symbol, None, params)
     var mid_price = get_order_book_mid(order_book)
-    
+
     # 设置订单参数
-    var price = (mid_price * Fixed(0.8)).round_to_fractional(Fixed(0.0001))  # 使用中间价格的80%
+    var price = (mid_price * Fixed(0.8)).round_to_fractional(
+        Fixed(0.0001)
+    )  # 使用中间价格的80%
     var amount = Fixed(3)  # 使用最小交易量，避免实际成交
     var results = List[Float64]()
-    
+
     var rounds = 600
     logd("rounds: " + str(rounds))
     # 测试下单和撤单延迟
@@ -77,27 +89,22 @@ fn main() raises:
         try:
             # 创建限价买单
             var order = api.create_order(
-                symbol,
-                OrderType.Limit,
-                OrderSide.Buy,
-                amount,
-                price,
-                params
+                symbol, OrderType.Limit, OrderSide.Buy, amount, price, params
             )
-            
+
             # 记录开始时间
             var start_time = perf_counter_ns()
 
             # 撤销订单
             _ = api.cancel_order(order.id, symbol, params)
-            
+
             # 计算延迟
             var end_time = perf_counter_ns()
             var elapsed = Float64(end_time - start_time) / 1_000_000.0  # 转换为毫秒
             # 跳过第一次请求的数据
             if i > 0:
                 results.append(elapsed)
-            
+
             logd("Order " + str(i) + " RTT: " + str(elapsed) + "ms")
             logd(String(",").join(results))
         except e:
@@ -106,15 +113,15 @@ fn main() raises:
             #     _ = api.cancel_all_orders(symbol, params)
             # except:
             #     logd("Error cancelling orders")
-        
+
         # 每次测试间隔10秒
         sleep_ms(rt, 10000)
-    
+
     # 计算平均延迟
     var total: Float64 = 0.0
     for i in range(len(results)):
         total += results[i]
-    
+
     if len(results) > 0:
         var avg_rtt = total / Float64(len(results))
         logd("Successfully tested " + str(len(results)) + " orders")
@@ -135,7 +142,7 @@ fn main() raises:
         var stats = calculate_percentiles(results, percentiles)
         for p in percentiles:
             logd(str(p[]) + "%: " + str(stats[p[]]) + "ms")
-    
+
     # # 清理所有未完成订单
     # try:
     #     _ = api.cancel_all_orders(symbol, params)
