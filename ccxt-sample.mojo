@@ -229,6 +229,7 @@ fn test_ws() raises:
     config["api_secret"] = api_secret
     config["testnet"] = testnet
     config["verbose"] = True
+    config["is_private"] = True
 
     var trading_context = TradingContext(
         exchange_id=ExchangeId.binance, account_id="1", trader_id="1"
@@ -247,10 +248,10 @@ fn test_ws() raises:
     # binance_pro.subscribe_order_book("BTC_USDT", params0)  # Subscribe to BTC/USDT order book
 
     # Subscribe to real-time ticker data
-    # var params1 = Dict[String, Any]()
-    # binance_pro.subscribe_ticker(
-    #     "BTC_USDT", params1
-    # )  # Subscribe to BTC/USDT real-time ticker
+    var params1 = Dict[String, Any]()
+    binance_pro.subscribe_ticker(
+        "xrpusdt", params1
+    )
 
     # Subscribe to order data
     # var params2 = Dict[String, Any]()

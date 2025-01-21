@@ -26,6 +26,7 @@ from monoio_connect import (
     MonoioRuntimePtr,
     http_response_status_code,
     http_response_body,
+    idgen_next_id,
 )
 from sonic import *
 from ccxt.base.types import (
@@ -102,6 +103,8 @@ struct Binance(ProExchangeable):
     var _uid: UnsafePointer[String]
     var _trading_context: TradingContext
     var _subscriptions: List[Dict[String, Any]]
+    var _ticker_subscriptions: List[String]  # (symbol)
+    var _order_book_subscriptions: List[Tuple[String, Int]]  # (symbol, levels)
     var _client: UnsafePointer[BinanceClient]
     var _is_private: Bool
     var _last_renewal_time: Int
@@ -139,6 +142,8 @@ struct Binance(ProExchangeable):
         self._uid = UnsafePointer[String].alloc(1)
         self._trading_context = trading_context
         self._subscriptions = List[Dict[String, Any]]()
+        self._ticker_subscriptions = List[String]()
+        self._order_book_subscriptions = List[Tuple[String, Int]]()
         self._client = UnsafePointer[BinanceClient].alloc(1)
         self._last_renewal_time = 0
 
@@ -159,6 +164,8 @@ struct Binance(ProExchangeable):
         self._uid = other._uid
         self._trading_context = other._trading_context
         self._subscriptions = other._subscriptions
+        self._ticker_subscriptions = other._ticker_subscriptions
+        self._order_book_subscriptions = other._order_book_subscriptions
         self._client = other._client
         other._client = UnsafePointer[BinanceClient]()
         self._is_private = other._is_private
@@ -209,8 +216,8 @@ struct Binance(ProExchangeable):
         var port = 443
         var path = String()
 
-        var topics = String()
-        topics = "xrpusdt@bookTicker"
+        # var topics = String()
+        # topics = "xrpusdt@bookTicker"
         if self._is_private:
             var listen_key = self._client[].generate_listen_key()
             logi("listen_key=" + listen_key)
@@ -222,10 +229,11 @@ struct Binance(ProExchangeable):
             # wss://fstream.binance.com/stream?streams=bnbusdt@aggTrade/btcusdt@markPrice
             # stream名称中所有交易对均为小写。
             # 每个链接有效期不超过24小时，请妥善处理断线重连。
-            path = "/stream?streams=" + topics
+            # path = "/stream?streams=" + topics
+            path = "/ws/0"
 
         logd(
-            "Connecting to Binance WebSocket at: "
+            "Connecting to Binance WebSocket at: wss://"
             + host
             + ":"
             + str(port)
@@ -256,7 +264,10 @@ struct Binance(ProExchangeable):
         var self_ptr = UnsafePointer.address_of(self)
 
         fn wrapper():
-            self_ptr[].__on_open()
+            try:
+                self_ptr[].__on_open()
+            except e:
+                logw("__on_open error: " + str(e))
 
         return wrapper
 
@@ -300,33 +311,161 @@ struct Binance(ProExchangeable):
 
         return wrapper
 
-    fn __on_open(mut self) -> None:
+    fn __on_open(mut self) raises -> None:
         logd("__on_open")
-        self._last_renewal_time = now_ms()
+        if self._is_private:
+            self._last_renewal_time = now_ms()
+        else:
+            #
+            for symbol in self._ticker_subscriptions:
+                var symbol_ = symbol[].lower()
+                var stream = String.format("{}@bookTicker", symbol_)
+                self.subscribe(List[String](stream))
+
+            #
+            for sub in self._order_book_subscriptions:
+                var symbol = sub[][0]
+                var levels = sub[][1]
+                var symbol_ = symbol.lower()
+                var stream = String.format("{}@depth{}".format(symbol_, levels))
+                self.subscribe(List[String](stream))
 
     @always_inline
     fn __on_message(mut self, message: String) -> None:
         """Handler for parsing WS messages."""
-        # TODO: refactor
         logd("message: " + message)
-        # {"error":{"code":2,"msg":"Invalid request: missing field `method`"},"id":null}
+        # {"stream":"xrpusdt@bookTicker","data":{"e":"bookTicker","u":6500077103850,"s":"XRPUSDT","b":"3.0290","B":"1850.6","a":"3.0291","A":"12824.3","T":1737442178641,"E":1737442178641}}
+
+        # {"e":"ORDER_TRADE_UPDATE","T":1737448064726,"E":1737448064726,"o":{"s":"1000PEPEUSDT","c":"XgV42c0IEpacopoGASgVgo","S":"BUY","o":"LIMIT","f":"GTC","q":"1000","p":"0.0050000","ap":"0","sp":"0","x":"CANCELED","X":"CANCELED","i":16534440354,"l":"0","z":"0","L":"0","n":"0","N":"USDT","T":1737448064726,"t":0,"b":"10","a":"0","m":false,"R":false,"wt":"CONTRACT_PRICE","ot":"LIMIT","ps":"LONG","cp":false,"rp":"0","pP":false,"si":0,"ss":0,"V":"NONE","pm":"NONE","gtd":0}}
 
         var json_obj = JsonObject(message)
-
-        # var channel = json_obj.get_str_ref("channel")
-        # # logd("channel: " + str(channel))
-        # if channel == "futures.book_ticker":
-        #     self.__on_ticker(json_obj)
-        # elif channel == "futures.order_book_update":
-        #     self.__on_order_book_update(json_obj)
-        # elif channel == "futures.orders":
-        #     self.__on_orders(json_obj)
-        # elif channel == "futures.pong":
-        #     self.__on_pong(json_obj)
-        # else:
-        #     logi("unknown channel: " + str(channel))
+        if self._is_private:
+            var e = json_obj.get_str("e")
+            if e == "ORDER_TRADE_UPDATE":
+                self.__on_order(json_obj)
+        else:
+            var stream = json_obj.get_str("stream")
+            if "bookTicker" in stream:
+                self.__on_ticker(json_obj)
 
         _ = json_obj^
+
+    @always_inline
+    fn __on_ticker(self, json_obj: JsonObject) -> None:
+        # {"stream":"xrpusdt@bookTicker","data":{"e":"bookTicker","u":6500077103850,"s":"XRPUSDT","b":"3.0290","B":"1850.6","a":"3.0291","A":"12824.3","T":1737442178641,"E":1737442178641}}
+        # {
+        #     "e":"bookTicker",		// 事件类型
+        #     "u":400900217,     	// 更新ID
+        #     "E": 1568014460893,	// 事件推送时间
+        #     "T": 1568014460891,	// 撮合时间
+        #     "s":"BNBUSDT",     	// 交易对
+        #     "b":"25.35190000", 	// 买单最优挂单价格
+        #     "B":"31.21000000", 	// 买单最优挂单数量
+        #     "a":"25.36520000", 	// 卖单最优挂单价格
+        #     "A":"40.66000000"  	// 卖单最优挂单数量
+        # }
+        var data = json_obj.get_object_mut("data")
+        var symbol = String(data.get_str("s"))
+        var bid = Fixed(data.get_str("b"))
+        var ask = Fixed(data.get_str("a"))
+        var bid_size = data.get_str("B")
+        var ask_size = data.get_str("A")
+        var ticker = Ticker()
+        ticker.symbol = symbol
+        ticker.bid = bid
+        ticker.ask = ask
+        ticker.bidVolume = Fixed(bid_size)
+        ticker.askVolume = Fixed(ask_size)
+        ticker.timestamp = int(data.get_i64("E"))
+        ticker.datetime = str(ticker.timestamp)
+        self._on_ticker(self._trading_context, ticker)
+        _ = data^
+
+    @always_inline
+    fn __on_order(self, json_obj: JsonObject) -> None:
+        """
+        {"e":"ORDER_TRADE_UPDATE","T":1737448064726,"E":1737448064726,"o":{"s":"1000PEPEUSDT","c":"XgV42c0IEpacopoGASgVgo","S":"BUY","o":"LIMIT","f":"GTC","q":"1000","p":"0.0050000","ap":"0","sp":"0","x":"CANCELED","X":"CANCELED","i":16534440354,"l":"0","z":"0","L":"0","n":"0","N":"USDT","T":1737448064726,"t":0,"b":"10","a":"0","m":false,"R":false,"wt":"CONTRACT_PRICE","ot":"LIMIT","ps":"LONG","cp":false,"rp":"0","pP":false,"si":0,"ss":0,"V":"NONE","pm":"NONE","gtd":0}}
+
+        {
+            "e":"ORDER_TRADE_UPDATE",			// 事件类型
+            "E":1568879465651,				    // 事件时间
+            "T":1568879465650,				    // 撮合时间
+            "o":{
+                "s":"BTCUSDT",					    // 交易对
+                "c":"TEST",						      // 客户端自定订单ID
+                // 特殊的自定义订单ID:
+                // "autoclose-"开头的字符串: 系统强平订单
+                // "adl_autoclose": ADL自动减仓订单
+                // "settlement_autoclose-": 下架或交割的结算订单
+                "S":"SELL",						      // 订单方向
+                "o":"TRAILING_STOP_MARKET",	// 订单类型
+                "f":"GTC",						      // 有效方式
+                "q":"0.001",					      // 订单原始数量
+                "p":"0",						        // 订单原始价格
+                "ap":"0",						        // 订单平均价格
+                "sp":"7103.04",			        // 条件订单触发价格，对追踪止损单无效
+                "x":"NEW",						      // 本次事件的具体执行类型
+                "X":"NEW",						      // 订单的当前状态
+                "i":8886774,					      // 订单ID
+                "l":"0",						        // 订单末次成交量
+                "z":"0",						        // 订单累计已成交量
+                "L":"0",						        // 订单末次成交价格
+                "N": "USDT",                // 手续费资产类型
+                "n": "0",                   // 手续费数量
+                "T":1568879465650,				  // 成交时间
+                "t":0,							        // 成交ID
+                "b":"0",						        // 买单净值
+                "a":"9.91",						      // 卖单净值
+                "m": false,					        // 该成交是作为挂单成交吗？
+                "R":false	,				          // 是否是只减仓单
+                "wt": "CONTRACT_PRICE",	    // 触发价类型
+                "ot": "TRAILING_STOP_MARKET",	// 原始订单类型
+                "ps":"LONG"						      // 持仓方向
+                "cp":false,						      // 是否为触发平仓单; 仅在条件订单情况下会推送此字段
+                "AP":"7476.89",					    // 追踪止损激活价格, 仅在追踪止损单时会推送此字段
+                "cr":"5.0",						      // 追踪止损回调比例, 仅在追踪止损单时会推送此字段
+                "pP": false,                // 是否开启条件单触发保护
+                "si": 0,                    // 忽略
+                "ss": 0,                    // 忽略
+                "rp":"0",					          // 该交易实现盈亏
+                "V":"EXPIRE_TAKER",         // 自成交防止模式
+                "pm":"OPPONENT",            // 价格匹配模式
+                "gtd":0                     // TIF为GTD的订单自动取消时间
+            }
+            }
+        """
+        var order = Order()
+        var obj = json_obj.get_object_mut("o")
+        order.id = str(obj.get_u64("i"))
+        order.symbol = obj.get_str("s")
+        order.status = obj.get_str("X")
+        order.side = (
+            OrderSide.Buy if obj.get_str("S") == "BUY" else OrderSide.Sell
+        )
+        order.price = Fixed(obj.get_str("p"))
+        order.amount = Fixed(obj.get_str("q"))
+        order.filled = Fixed(obj.get_str("z"))
+        order.remaining = order.amount - order.filled
+        order.timestamp = int(obj.get_i64("T"))
+        order.datetime = str(order.timestamp)
+        order.lastTradeTimestamp = order.timestamp
+        order.lastUpdateTimestamp = order.timestamp
+        order.clientOrderId = obj.get_str("c")
+        order.timeInForce = String(obj.get_str("f"))
+
+        order.fee = None  # TODO:
+        order.trades = List[Trade]()
+        order.reduceOnly = obj.get_bool("R")
+        order.postOnly = obj.get_bool("m")
+        order.stopPrice = Fixed(0)  # TODO:
+        order.takeProfitPrice = Fixed(0)  # TODO:
+        order.stopLossPrice = Fixed(0)  # TODO:
+        order.cost = Fixed(0)  # TODO:
+        order.info = Dict[String, Any]()  # TODO:
+
+        _ = obj^
+
+        self._on_order(self._trading_context, order)
 
     fn __on_ping(self) -> None:
         logd("__on_ping")
@@ -340,98 +479,19 @@ struct Binance(ProExchangeable):
     fn __on_timer(mut self, count: UInt64) -> None:
         logd("__on_timer")
         if self._is_private:
-            var now = now_ms()
-            if now - self._last_renewal_time > 1000 * 60 * 5:
-                try:
-                    var ret = self._client[].extend_listen_key_with_callback()
-                    logd("extend_listen_key ret: " + str(ret))
-                except e:
-                    loge("extend_listen_key error: " + str(e))
-                self._last_renewal_time = now
+            self.__extend_listen_key()
 
-    @always_inline
-    fn __on_ticker(self, json_obj: JsonObject) -> None:
-        # TODO: refactor
-        var event = json_obj.get_str_ref("event")
-        if event == "update":
-            # var result = json_obj.get_object_mut("result")
-            # var symbol = String(result.get_str_ref("s"))
-            # var bid = Fixed(result.get_str_ref("b"))
-            # var ask = Fixed(result.get_str_ref("a"))
-            # var bid_size = result.get_i64("B")
-            # var ask_size = result.get_i64("A")
-            # var ticker = Ticker()
-            # ticker.symbol = symbol
-            # ticker.bid = bid
-            # ticker.ask = ask
-            # ticker.bidVolume = Fixed(bid_size)
-            # ticker.askVolume = Fixed(ask_size)
-            # ticker.timestamp = int(result.get_i64("t"))
-            # ticker.datetime = str(result.get_i64("time"))
-            # self._on_ticker(self._trading_context, ticker)
-            # _ = result^
-            pass
-        elif event == "subscribe":
-            pass
-        else:
-            logi("unknown event: " + str(event))
+    fn __extend_listen_key(mut self):
+        var now = now_ms()
+        if now - self._last_renewal_time <= 1000 * 60 * 5:
+            return
 
-    @always_inline
-    fn __on_orders(self, json_obj: JsonObject) -> None:
-        # TODO: refactor
-        var event = json_obj.get_str_ref("event")
-        if event == "update":
-            # 订单更新
-            var result = json_obj.get_array_mut("result")
-            # assert_true(result.len() > 0)
-            if result.len() == 0:
-                return
-
-            var list_iter = result.iter_mut()
-            var orders = List[Order](capacity=result.len())
-            while True:
-                var value = list_iter.next()
-                if value.is_null():
-                    break
-
-                var order = Order()
-                var obj = value.as_object_mut()
-                order.id = str(obj.get_u64("id"))
-                order.symbol = obj.get_str_ref("contract")
-                order.status = obj.get_str_ref("status")
-                order.side = OrderSide.Buy  # TODO:
-                order.price = Fixed(obj.get_f64("price"))
-                order.amount = Fixed(obj.get_i64("size"))
-                order.remaining = Fixed(obj.get_i64("left"))
-                order.filled = order.amount - order.remaining
-                order.datetime = str(obj.get_i64("create_time"))  # TODO:
-                order.timestamp = int(obj.get_i64("create_time_ms"))
-                order.lastTradeTimestamp = int(obj.get_i64("create_time_ms"))
-                order.lastUpdateTimestamp = order.lastTradeTimestamp
-                order.clientOrderId = obj.get_str_ref("text")
-                order.timeInForce = String(obj.get_str_ref("tif"))
-                order.fee = None  # TODO:
-                order.trades = List[Trade]()  # TODO:
-                order.reduceOnly = False  # TODO:
-                order.postOnly = False  # TODO:
-                order.stopPrice = Fixed(0)  # TODO:
-                order.takeProfitPrice = Fixed(0)  # TODO:
-                order.stopLossPrice = Fixed(0)  # TODO:
-                order.cost = Fixed(0)  # TODO:
-                order.info = Dict[String, Any]()  # TODO:
-                orders.append(order)
-                _ = obj^
-
-            _ = list_iter^
-            _ = result^
-
-            for order in orders:
-                self._on_order(self._trading_context, order[])
-
-        elif event == "subscribe":
-            pass
-        else:
-            logi("unknown event: " + str(event))
+        try:
+            var ret = self._client[].extend_listen_key_with_callback()
+            logd("extend_listen_key ret: " + str(ret))
+        except e:
+            loge("extend_listen_key error: " + str(e))
+        self._last_renewal_time = now
 
     @always_inline
     fn __on_pong(self, json_obj: JsonObject) -> None:
@@ -446,35 +506,28 @@ struct Binance(ProExchangeable):
     fn subscribe_ticker(
         mut self, symbol: String, params: Dict[String, Any]
     ) raises -> None:
-        # TODO: refactor
-        var sub = Dict[String, Any]()
-        sub["type"] = "ticker"
-        sub["symbol"] = symbol
-        self._subscriptions.append(sub)
+        # <symbol>@bookTicker
+        self._ticker_subscriptions.append(symbol)
 
     fn subscribe_tickers(
         mut self, symbols: Strings, params: Dict[String, Any]
     ) raises -> None:
-        pass
+        for symbol in symbols.value():
+            self.subscribe_ticker(symbol[], params)
 
     fn subscribe_order_book(
         mut self, symbol: String, params: Dict[String, Any]
     ) raises -> None:
-        # TODO: refactor
-        var sub = Dict[String, Any]()
-        sub["type"] = "order_book"
-        sub["symbol"] = symbol
-        sub["interval"] = "100ms"
-        self._subscriptions.append(sub)
+        """推送有限档深度信息。levels表示几档买卖单信息, 可选 5/10/20档."""
+        # <symbol>@depth<levels>
+        var levels = params["levels"].int() if "levels" in params else 5
+        var sub = Tuple[String, Int](symbol, levels)
+        self._order_book_subscriptions.append(sub)
 
     fn subscribe_trade(
         mut self, symbol: String, params: Dict[String, Any]
     ) raises -> None:
-        # TODO: refactor
-        var sub = Dict[String, Any]()
-        sub["type"] = "trade"
-        sub["symbol"] = symbol
-        self._subscriptions.append(sub)
+        pass
 
     fn subscribe_balance(mut self, params: Dict[String, Any]) raises -> None:
         pass
@@ -482,65 +535,37 @@ struct Binance(ProExchangeable):
     fn subscribe_order(
         mut self, symbol: String, params: Dict[String, Any]
     ) raises -> None:
-        # TODO: refactor
-        var sub = Dict[String, Any]()
-        sub["type"] = "order"
-        sub["symbol"] = symbol
-        self._subscriptions.append(sub)
+        pass
 
     fn subscribe_my_trades(
         mut self, symbol: String, params: Dict[String, Any]
     ) raises -> None:
         pass
 
-    fn subscribe(
-        self, name: String, owned payload: JsonValue, require_auth: Bool
-    ) raises:
-        # TODO: refactor
-        # var request = WebSocketRequest(
-        #     self._api_key,
-        #     self._api_secret,
-        #     name,
-        #     "subscribe",
-        #     payload^,
-        #     require_auth,
-        # )
-        # var request_text = str(request)
-        # # {"time":1733898511,"channel":"futures.order_book","event":"subscribe","payload":["BTC_USDT","100ms"]}
-        # logd("subscribe: " + request_text)
-        # self.send(request_text)
-        pass
+    fn subscribe(self, streams: List[String]) raises:
+        var id = idgen_next_id()
+        var request = JsonObject()
+        request.insert_str("method", "SUBSCRIBE")
+        var stream_array = JsonArray()
+        for stream in streams:
+            stream_array.push_str(stream[])
+        request.insert_array("params", stream_array)
+        request.insert_i64("id", id)
+        var request_text = str(request)
+        if self._verbose:
+            logd("subscribe: " + request_text)
+        self.send(request_text)
 
-    fn unsubscribe(
-        self, name: String, owned payload: JsonValue, require_auth: Bool
-    ) raises:
-        # TODO: refactor
-        # var request = WebSocketRequest(
-        #     self._api_key,
-        #     self._api_secret,
-        #     name,
-        #     "unsubscribe",
-        #     payload^,
-        #     require_auth,
-        # )
-        # self.send(str(request))
-        pass
-
-    fn login(self, header: String, req_id: String) raises:
-        """
-        Login to the Binance API.
-        """
-        # TODO: refactor
-        # var channel = String.format("{}.login", self._app)
-        # var text = ApiRequest(
-        #     self._api_key,
-        #     self._api_secret,
-        #     channel,
-        #     header,
-        #     req_id,
-        #     JsonValue.from_str("{}"),
-        # ).gen()
-        # logd("login: " + text)
-        # # {"time":1733900436,"channel":"futures.login","event":"api","payload":{"req_header":{"X-Gate-Channel-Id":"header"},"api_key":"10d23703c09150b1bf4c5bb7f0f1dd2e","timestamp":"1733900436","signature":"317580edef0b1bd60b50bd7c618fa5f68dc3c0874e27cc1f9b3f84a747b478b90e99c31f0c1fb9720639ba3281ec1dfa469e1bbff3ecd62f4c8ec047f964e590","req_id":"Be4Ts0I4OZ6r9msg_pFu-","req_param":{}}}
-        # self.send(text)
-        pass
+    fn unsubscribe(self, streams: List[String]) raises:
+        var id = idgen_next_id()
+        var request = JsonObject()
+        request.insert_str("method", "UNSUBSCRIBE")
+        var stream_array = JsonArray()
+        for stream in streams:
+            stream_array.push_str(stream[])
+        request.insert_array("params", stream_array)
+        request.insert_i64("id", id)
+        var request_text = str(request)
+        if self._verbose:
+            logd("subscribe: " + request_text)
+        self.send(request_text)

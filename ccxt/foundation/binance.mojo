@@ -698,7 +698,7 @@ struct Binance(Exchangeable):
 
         var code = doc.get_i64("code")
         if code != 0:
-            var msg = str(doc.get_str_ref("msg"))
+            var msg = doc.get_str("msg")
             raise Error(msg)
 
         var result = OrderBook()
@@ -775,7 +775,7 @@ struct Binance(Exchangeable):
         var doc = JsonObject(text)
         var code = doc.get_i64("code")
         if code != 0:
-            var msg = str(doc.get_str_ref("msg"))
+            var msg = doc.get_str("msg")
             raise Error(msg)
 
         var result = Balances()
@@ -963,7 +963,7 @@ struct Binance(Exchangeable):
         var doc = JsonObject(text)
         var code = doc.get_i64("code")
         if code != 0:
-            var msg = str(doc.get_str_ref("msg"))
+            var msg = doc.get_str("msg")
             raise Error(msg)
 
         # {"orderId":260630021,"symbol":"XRPUSDT","status":"NEW","clientOrderId":"VmySP2fdDzEwT9bSpp0OHr","price":"3.0937","avgPrice":"0.00","origQty":"3.0","executedQty":"0.0","cumQuote":"0.00000","timeInForce":"GTC","type":"LIMIT","reduceOnly":false,"closePosition":false,"side":"BUY","positionSide":"BOTH","stopPrice":"0.0000","workingType":"CONTRACT_PRICE","priceProtect":false,"origType":"LIMIT","priceMatch":"NONE","selfTradePreventionMode":"NONE","goodTillDate":0,"time":1737108984856,"updateTime":1737108984856}
@@ -992,7 +992,7 @@ struct Binance(Exchangeable):
         var doc = JsonObject(text)
         var code = doc.get_i64("code")
         if code != 0:
-            var msg = str(doc.get_str_ref("msg"))
+            var msg = doc.get_str("msg")
             raise Error(msg)
 
         # [{"orderId":260630021,"symbol":"XRPUSDT","status":"NEW","clientOrderId":"VmySP2fdDzEwT9bSpp0OHr","price":"3.0937","avgPrice":"0.00000","origQty":"3","executedQty":"0","cumQuote":"0","timeInForce":"GTC","type":"LIMIT","reduceOnly":false,"closePosition":false,"side":"BUY","positionSide":"BOTH","stopPrice":"0","workingType":"CONTRACT_PRICE","priceMatch":"NONE","selfTradePreventionMode":"NONE","goodTillDate":0,"priceProtect":false,"origType":"LIMIT","time":1737108984856,"updateTime":1737108984856}]
@@ -1028,7 +1028,7 @@ struct Binance(Exchangeable):
         var doc = JsonObject(text)
         var code = doc.get_i64("code")
         if code != 0:
-            var msg = str(doc.get_str_ref("msg"))
+            var msg = doc.get_str("msg")
             raise Error(msg)
 
         # [{"orderId":260630021,"symbol":"XRPUSDT","status":"NEW","clientOrderId":"VmySP2fdDzEwT9bSpp0OHr","price":"3.0937","avgPrice":"0","origQty":"3","executedQty":"0","cumQuote":"0.00000","timeInForce":"GTC","type":"LIMIT","reduceOnly":false,"closePosition":false,"side":"BUY","positionSide":"BOTH","stopPrice":"0","workingType":"CONTRACT_PRICE","priceProtect":false,"origType":"LIMIT","priceMatch":"NONE","selfTradePreventionMode":"NONE","goodTillDate":0,"time":1737108984856,"updateTime":1737108984856}]
@@ -1075,10 +1075,10 @@ struct Binance(Exchangeable):
         var doc = JsonObject(text)
         var code = doc.get_i64("code")
         if code != 0:
-            var msg = str(doc.get_str_ref("msg"))
+            var msg = doc.get_str("msg")
             raise Error(msg)
 
-        var listen_key = str(doc.get_str_ref("listenKey"))
+        var listen_key = doc.get_str("listenKey")
         return listen_key
 
     fn extend_listen_key(self) raises -> Bool:
@@ -1091,7 +1091,7 @@ struct Binance(Exchangeable):
         var doc = JsonObject(text)
         var code = doc.get_i64("code")
         if code != 0:
-            var msg = str(doc.get_str_ref("msg"))
+            var msg = doc.get_str("msg")
             raise Error(msg)
 
         return True
