@@ -94,6 +94,9 @@ def run_mojo(args, mojo_args):
         "env": env,
     }
 
+    # print the full command line
+    print(" ".join(exec_args))
+
     return subprocess.run(exec_args, **exec_kwargs, check=False)
 
 def cli(input_args):

@@ -268,6 +268,8 @@ fn test_ws() raises:
 fn main() raises:
     var logger = init_logger(LogLevel.Debug, "", "")
 
+    logd("Starting")
+
     # run_async_trading_thread()
 
     # test_monoiohttpclient()

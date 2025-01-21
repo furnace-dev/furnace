@@ -124,6 +124,7 @@ struct Binance(ProExchangeable):
         self._is_private = (
             config["is_private"].bool() if "is_private" in config else False
         )
+        logd("is_private: " + str(self._is_private))
         self._verbose = (
             config["verbose"].bool() if "verbose" in config else False
         )
@@ -209,12 +210,18 @@ struct Binance(ProExchangeable):
         var path = String()
 
         var topics = String()
-        topics = "XRPUSDT@bookTicker"
+        topics = "xrpusdt@bookTicker"
         if self._is_private:
             var listen_key = self._client[].generate_listen_key()
             logi("listen_key=" + listen_key)
             path = "/ws/" + listen_key
         else:
+            # https://developers.binance.com/docs/zh-CN/derivatives/usds-margined-futures/websocket-market-streams
+            # 连接样例：
+            # wss://fstream.binance.com/ws/bnbusdt@aggTrade
+            # wss://fstream.binance.com/stream?streams=bnbusdt@aggTrade/btcusdt@markPrice
+            # stream名称中所有交易对均为小写。
+            # 每个链接有效期不超过24小时，请妥善处理断线重连。
             path = "/stream?streams=" + topics
 
         logd(
@@ -332,14 +339,15 @@ struct Binance(ProExchangeable):
 
     fn __on_timer(mut self, count: UInt64) -> None:
         logd("__on_timer")
-        var now = now_ms()
-        if now - self._last_renewal_time > 1000 * 60 * 5:
-            try:
-                var ret = self._client[].extend_listen_key_with_callback()
-                logd("extend_listen_key ret: " + str(ret))
-            except e:
-                loge("extend_listen_key error: " + str(e))
-            self._last_renewal_time = now
+        if self._is_private:
+            var now = now_ms()
+            if now - self._last_renewal_time > 1000 * 60 * 5:
+                try:
+                    var ret = self._client[].extend_listen_key_with_callback()
+                    logd("extend_listen_key ret: " + str(ret))
+                except e:
+                    loge("extend_listen_key error: " + str(e))
+                self._last_renewal_time = now
 
     @always_inline
     fn __on_ticker(self, json_obj: JsonObject) -> None:

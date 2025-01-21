@@ -18,13 +18,13 @@ alias fn_test_log = fn () -> None
 
 alias fn_log_max_level = fn () -> c_uint8
 
-alias fn_log = fn (
+alias fn_logger_log = fn (
     level: c_uint8,
     file: UnsafePointer[c_char],
     line: c_uint32,
     col: c_uint32,
     msg: UnsafePointer[c_char],
-)
+) -> None
 
 var _handle: DLHandle = DLHandle(LIBNAME)
 
@@ -33,7 +33,7 @@ var _destroy_logger = _handle.get_function[fn_destroy_logger]("destroy_logger")
 
 var _test_log = _handle.get_function[fn_test_log]("test_log")
 
-var _log = _handle.get_function[fn_log]("log")
+var _logger_log = _handle.get_function[fn_logger_log]("logger_log")
 var _log_max_level = _handle.get_function[fn_log_max_level]("log_max_level")
 
 
@@ -87,6 +87,6 @@ fn log(
 ) -> None:
     @parameter
     if is_static_build():
-        external_call["log", NoneType](level, file, line, col, msg)
+        external_call["logger_log", NoneType](level, file, line, col, msg)
     else:
-        _log(level, file, line, col, msg)
+        _logger_log(level, file, line, col, msg)
