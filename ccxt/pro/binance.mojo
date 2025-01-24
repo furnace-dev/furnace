@@ -86,7 +86,7 @@ fn empty_on_my_trade(trading_context: TradingContext, trade: Trade) -> None:
     pass
 
 
-struct Binance(ProExchangeable):
+struct Binance(ProExchangeable, Movable):
     var _app: String
     var _settle: String
     var _api_key: String
@@ -117,20 +117,11 @@ struct Binance(ProExchangeable):
     ) raises:
         self._app = "futures"
         self._settle = str(config["settle"]) if "settle" in config else "usdt"
-        self._api_key = str(config["api_key"]) if "api_key" in config else ""
-        self._api_secret = (
-            str(config["api_secret"]) if "api_secret" in config else ""
-        )
-        self._testnet = (
-            config["testnet"].bool() if "testnet" in config else False
-        )
-        self._is_private = (
-            config["is_private"].bool() if "is_private" in config else False
-        )
-        logd("is_private: " + str(self._is_private))
-        self._verbose = (
-            config["verbose"].bool() if "verbose" in config else False
-        )
+        self._api_key = config.get("api_key", String("")).string()
+        self._api_secret = config.get("api_secret", String("")).string()
+        self._testnet = config.get("testnet", False).bool()
+        self._verbose = config.get("verbose", False).bool()
+        self._is_private = config.get("is_private", False).bool()
         self._ws = UnsafePointer[WebSocket].alloc(1)
         self._on_ticker = empty_on_ticker
         self._on_tickers = empty_on_tickers
@@ -365,7 +356,7 @@ struct Binance(ProExchangeable):
         #     "A":"40.66000000"  	// 卖单最优挂单数量
         # }
         var data = json_obj.get_object_mut("data")
-        var symbol = String(data.get_str("s"))
+        var symbol = data.get_str("s")
         var bid = Fixed(data.get_str("b"))
         var ask = Fixed(data.get_str("a"))
         var bid_size = data.get_str("B")

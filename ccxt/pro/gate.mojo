@@ -162,7 +162,7 @@ struct ApiRequest:
         return s
 
 
-struct Gate(ProExchangeable):
+struct Gate(ProExchangeable, Movable):
     var _app: String
     var _settle: String
     var _api_key: String
@@ -184,14 +184,10 @@ struct Gate(ProExchangeable):
         out self, config: Dict[String, Any], trading_context: TradingContext
     ) raises:
         self._app = "futures"  # spot
-        self._settle = str(config["settle"]) if "settle" in config else "usdt"
-        self._api_key = str(config["api_key"]) if "api_key" in config else ""
-        self._api_secret = (
-            str(config["api_secret"]) if "api_secret" in config else ""
-        )
-        self._testnet = (
-            config["testnet"].bool() if "testnet" in config else False
-        )
+        self._settle = config.get("settle", String("usdt")).string()
+        self._api_key = config.get("api_key", String("")).string()
+        self._api_secret = config.get("api_secret", String("")).string()
+        self._testnet = config.get("testnet", False).bool()
         self._ws = UnsafePointer[WebSocket].alloc(1)
         var host = "api.gateio.ws"
         var port = 443

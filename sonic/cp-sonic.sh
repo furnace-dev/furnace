@@ -1,4 +1,4 @@
-# 拷贝 ~/f0cii/sonic-mojo/sonic 目录下所有文件和子目录到当前目录,不是把sonic目录拷贝到当前目录
-cp -r ~/f0cii/sonic-mojo/sonic/internal/* ~/f0cii/atx-pro/sonic/internal/
-cp -r ~/f0cii/sonic-mojo/sonic/* ~/f0cii/atx-pro/sonic/
-cp ~/f0cii/sonic-mojo/libsonic.so ~/f0cii/atx-pro/
+# 拷贝 ~/furnace-dev/sonic-mojo/sonic 目录下所有文件和子目录到当前目录,不是把sonic目录拷贝到当前目录
+cp -r ~/furnace-dev/sonic-mojo/sonic/internal/* ~/furnace-dev/furnace/sonic/internal/
+cp -r ~/furnace-dev/sonic-mojo/sonic/* ~/furnace-dev/furnace/sonic/
+cp ~/furnace-dev/sonic-mojo/libsonic.so ~/furnace-dev/furnace/
