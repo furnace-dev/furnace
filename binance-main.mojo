@@ -39,7 +39,7 @@ from ccxt.foundation.binance import Binance
 from ccxt.pro.binance import Binance as BinancePro
 from ccxt.foundation.gate import Gate
 from ccxt.pro.gate import Gate as GatePro
-from ccxt.foundation.async_trading_operations import (
+from ccxt.foundation._async_trading_operations import (
     run_async_trading_thread,
 )
 

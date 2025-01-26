@@ -90,7 +90,7 @@ struct Bybit(Exchangeable):
     fn id(self) -> ExchangeId:
         return ExchangeId.bybit
 
-    fn set_on_order(mut self: Self, on_order: OnOrder) raises -> None:
+    fn set_on_order(mut self, on_order: OnOrder) raises -> None:
         self._on_order = on_order
 
     @always_inline

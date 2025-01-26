@@ -37,7 +37,7 @@ from ccxt.base.types import (
 )
 from ccxt.foundation.bybit import Bybit
 from ccxt.pro.bybit import Bybit as BybitPro
-from ccxt.foundation.async_trading_operations import (
+from ccxt.foundation._async_trading_operations import (
     run_async_trading_thread,
 )
 

@@ -1,5 +1,8 @@
 from memory import UnsafePointer
-from monoio_connect.fixed import Fixed
+from monoio_connect import (
+    Fixed,
+    MonoioRuntimePtr,
+)
 from ccxt.base.types import (
     ExchangeId,
     Market,
@@ -12,13 +15,21 @@ from ccxt.base.types import (
 )
 
 
-trait Exchangeable:
+trait Exchangeable(Movable):
     """
     Exchangeable trait, which is implemented by all exchanges.
 
     Exchanges implementing this trait are required to provide some
     basic methods for interacting with the exchange.
     """
+
+    fn __init__(
+        out self,
+        config: Dict[String, Any],
+        trading_context: TradingContext,
+        rt: MonoioRuntimePtr,
+    ):
+        ...
 
     fn id(self) -> ExchangeId:
         ...
@@ -67,7 +78,6 @@ trait Exchangeable:
     ) raises -> List[Trade]:
         ...
 
-    # 私有方法
     fn fetch_balance(self, mut params: Dict[String, Any]) raises -> Balances:
         ...
 

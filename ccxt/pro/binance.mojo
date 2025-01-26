@@ -86,7 +86,7 @@ fn empty_on_my_trade(trading_context: TradingContext, trade: Trade) -> None:
     pass
 
 
-struct Binance(ProExchangeable, Movable):
+struct Binance(ProExchangeable):
     var _app: String
     var _settle: String
     var _api_key: String
@@ -114,9 +114,9 @@ struct Binance(ProExchangeable, Movable):
         out self,
         config: Dict[String, Any],
         trading_context: TradingContext,
-    ) raises:
+    ):
         self._app = "futures"
-        self._settle = str(config["settle"]) if "settle" in config else "usdt"
+        self._settle = config.get("settle", String("usdt")).string()
         self._api_key = config.get("api_key", String("")).string()
         self._api_secret = config.get("api_secret", String("")).string()
         self._testnet = config.get("testnet", False).bool()
@@ -163,33 +163,34 @@ struct Binance(ProExchangeable, Movable):
         self._verbose = other._verbose
         self._last_renewal_time = other._last_renewal_time
 
-    fn __del__(owned self: Self):
-        pass
+    fn __del__(owned self):
+        self._client.destroy_pointee()
+        self._client.free()
 
-    fn set_on_ticker(mut self: Self, on_ticker: OnTicker) raises -> None:
+    fn set_on_ticker(mut self, on_ticker: OnTicker) raises -> None:
         self._on_ticker = on_ticker
 
-    fn set_on_tickers(mut self: Self, on_tickers: OnTickers) raises -> None:
+    fn set_on_tickers(mut self, on_tickers: OnTickers) raises -> None:
         self._on_tickers = on_tickers
 
     fn set_on_order_book(
-        mut self: Self, on_order_book: OnOrderBook
+        mut self, on_order_book: OnOrderBook
     ) raises -> None:
         self._on_order_book = on_order_book
 
-    fn set_on_trade(mut self: Self, on_trade: OnTrade) raises -> None:
+    fn set_on_trade(mut self, on_trade: OnTrade) raises -> None:
         self._on_trade = on_trade
 
-    fn set_on_balance(mut self: Self, on_balance: OnBalance) raises -> None:
+    fn set_on_balance(mut self, on_balance: OnBalance) raises -> None:
         self._on_balance = on_balance
 
-    fn set_on_order(mut self: Self, on_order: OnOrder) raises -> None:
+    fn set_on_order(mut self, on_order: OnOrder) raises -> None:
         self._on_order = on_order
 
-    fn set_on_my_trade(mut self: Self, on_my_trade: OnMyTrade) raises -> None:
+    fn set_on_my_trade(mut self, on_my_trade: OnMyTrade) raises -> None:
         self._on_my_trade = on_my_trade
 
-    fn connect(mut self: Self, rt: MonoioRuntimePtr) raises -> None:
+    fn connect(mut self, rt: MonoioRuntimePtr) raises -> None:
         """
         Connect to the Binance API.
         """

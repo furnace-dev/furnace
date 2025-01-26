@@ -1,3 +1,5 @@
+from memory import UnsafePointer
+from monoio_connect import MonoioRuntimePtr
 from .types import (
     OnTicker,
     OnTickers,
@@ -9,10 +11,15 @@ from .types import (
 )
 
 
-trait ProExchangeable:
+trait ProExchangeable(Movable):
     """
     ProExchangeable trait, which is implemented by all exchanges.
     """
+
+    fn __init__(
+        out self, config: Dict[String, Any], trading_context: TradingContext
+    ):
+        ...
 
     fn set_on_ticker(mut self: Self, on_ticker: OnTicker) raises -> None:
         ...
@@ -69,3 +76,26 @@ trait ProExchangeable:
         mut self, symbol: String, params: Dict[String, Any]
     ) raises -> None:
         ...
+
+    fn connect(mut self, rt: MonoioRuntimePtr) raises:
+        ...
+
+
+fn create_pro_exchange_instance[
+    T: ProExchangeable
+](config: Dict[String, Any], trading_context: TradingContext,) -> T:
+    return T(config, trading_context)
+
+
+fn initialize_pro_exchange_instance[
+    T: ProExchangeable
+](
+    mut exchange_pointer: UnsafePointer[T],
+    config: Dict[String, Any],
+    trading_context: TradingContext,
+):
+    if exchange_pointer == UnsafePointer[T]():
+        exchange_pointer = UnsafePointer[T].alloc(1)
+    __get_address_as_uninit_lvalue(exchange_pointer.address) = T(
+        config, trading_context
+    )

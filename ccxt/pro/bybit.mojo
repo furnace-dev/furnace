@@ -83,7 +83,7 @@ fn empty_on_my_trade(trading_context: TradingContext, trade: Trade) -> None:
     pass
 
 
-struct Bybit(ProExchangeable, Movable):
+struct Bybit(ProExchangeable):
     var _api_key: String
     var _api_secret: String
     var _testnet: Bool
@@ -160,7 +160,7 @@ struct Bybit(ProExchangeable, Movable):
     fn set_on_my_trade(mut self, on_my_trade: OnMyTrade) raises -> None:
         self._on_my_trade = on_my_trade
 
-    fn connect(mut self: Self, rt: MonoioRuntimePtr) raises -> None:
+    fn connect(mut self, rt: MonoioRuntimePtr) raises -> None:
         """
         Connect to the Bybit API.
         """
@@ -435,8 +435,9 @@ struct Bybit(ProExchangeable, Movable):
         # {"id":"104183676_wallet_1737725795606","topic":"wallet","creationTime":1737725795605,"data":[{"accountIMRate":"0.0043","accountMMRate":"0.0003","totalEquity":"1001.52819962","totalWalletBalance":"840.11430712","totalMarginBalance":"841.28368768","totalAvailableBalance":"837.6076437","totalPerpUPL":"1.16938055","totalInitialMargin":"3.67604398","totalMaintenanceMargin":"0.30525761","coin":[{"coin":"USDT","equity":"1001.44207561","usdValue":"1001.52819962","walletBalance":"1000.05007561","availableToWithdraw":"","availableToBorrow":"","borrowAmount":"0","accruedInterest":"0","totalOrderIM":"2.55573119","totalPositionIM":"1.11999668","totalPositionMM":"0.08910268","unrealisedPnl":"1.392","cumRealisedPnl":"0.05007561","bonus":"0","collateralSwitch":true,"marginCollateral":true,"locked":"0","spotHedgingQty":"0"}],"accountLTV":"0","accountType":"UNIFIED"}]}
         var data = json_obj.get_array_mut("data")
         for i in range(data.len()):
-            var item = data.get(i)
-            var item_view = JsonValueRefObjectView(item)
+            pass
+            # var item = data.get(i)
+            # var item_view = JsonValueRefObjectView(item)
             """
             {
                 "accountIMRate": "0.0043",
