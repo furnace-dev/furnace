@@ -1,6 +1,6 @@
 from benchmark import Unit, keep, run
 from time import sleep, perf_counter_ns
-from time.time import _gettime_as_nsec_unix
+from time.time import _gettime_as_nsec_unix, _CLOCK_REALTIME
 from monoio_connect import *
 
 
@@ -15,7 +15,7 @@ alias _CLOCK_REALTIME_COARSE = 5
 fn bench_perf_counter_ns5():
     # var result = _gettime_as_nsec_unix(6)
     # var result = time._gettime_as_nsec_unix(time._CLOCK_REALTIME) # ns 更精确
-    var result = time._gettime_as_nsec_unix(_CLOCK_REALTIME_COARSE)  # ns 更快速
+    var result = _gettime_as_nsec_unix(_CLOCK_REALTIME_COARSE)  # ns 更快速
     keep(result)
 
 
@@ -25,7 +25,7 @@ fn bench_tscns_read_nanos():
 
 
 fn main() raises:
-    var ns = time._gettime_as_nsec_unix(time._CLOCK_REALTIME)
+    var ns = _gettime_as_nsec_unix(_CLOCK_REALTIME)
     print(ns)
     var ns_coarse = _gettime_as_nsec_unix(_CLOCK_REALTIME_COARSE)
     print(ns_coarse)
