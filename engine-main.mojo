@@ -1,3 +1,4 @@
+import time
 from memory import UnsafePointer
 from collections import Dict
 from monoio_connect import (
@@ -36,20 +37,8 @@ from ccxt.foundation import (
 from ccxt.pro.gate import Gate as GatePro
 from ccxt import Strategizable
 from ccxt.executor import Executable, Executor
-from ccxt.engine import Engine
+from ccxt.engine import Engine, run_engine
 from mojoenv import load_mojo_env
-
-
-fn test_create_exchange_instance() raises:
-    var rt = create_monoio_runtime()
-    var config = Dict[String, Any]()
-    var trading_context = TradingContext(
-        exchange_id=ExchangeId.bybit, account_id="1", trader_id="1"
-    )
-    var e1 = create_exchange_instance[Bybit](config, trading_context, rt)
-    var e2 = create_exchange_instance[Binance](config, trading_context, rt)
-    var e3 = create_exchange_instance[BitMEX](config, trading_context, rt)
-    var e4 = create_exchange_instance[Gate](config, trading_context, rt)
 
 
 struct MyStrategy[E: Executable](Strategizable):
@@ -72,6 +61,7 @@ struct MyStrategy[E: Executable](Strategizable):
         self.ex = exchange.bitcast[E]()
 
     fn on_init(mut self) raises:
+        logd("on_init")
         var ticker = self.ex[].fetch_ticker("XRP_USDT")
         logd("ticker: " + str(ticker))
 
@@ -126,6 +116,7 @@ fn main() raises:
     var engine = Engine[Gate, GatePro, MyStrategy[Executor[Gate]]](
         config, ExchangeId.gateio, "1", "1"
     )
-    engine.start()
+    engine.init()
+    run_engine(engine)
 
     destroy_logger(logger)

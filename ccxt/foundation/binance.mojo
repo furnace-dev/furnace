@@ -23,7 +23,7 @@ struct Binance(Exchangeable):
     var _base: Exchange
     var _api_key: String
     var _api_secret: String
-    var _on_order: OnOrder
+    var _on_order: UnsafePointer[OnOrderC]
     var _trading_context: TradingContext
     var _host: String
     var _testnet: Bool
@@ -51,7 +51,7 @@ struct Binance(Exchangeable):
         self._base = Exchange(config)
         self._api_key = str(config.get("api_key", String()))
         self._api_secret = str(config.get("api_secret", String()))
-        self._on_order = empty_on_order
+        self._on_order = UnsafePointer[OnOrderC].alloc(1)
         self._trading_context = trading_context
 
     fn __del__(owned self):
@@ -72,11 +72,11 @@ struct Binance(Exchangeable):
         self._testnet = other._testnet
         self._verbose = other._verbose
 
+    fn set_on_order(mut self: Self, on_order: OnOrderC) -> None:
+        self._on_order.init_pointee_move(on_order)
+
     fn id(self) -> ExchangeId:
         return ExchangeId.binance
-
-    fn set_on_order(mut self: Self, on_order: OnOrder) raises -> None:
-        self._on_order = on_order
 
     @always_inline
     fn _request(
@@ -1152,7 +1152,8 @@ struct Binance(Exchangeable):
         _ = async_trading_channel_ptr()[].send(request)
 
     fn on_order(self, order: Order) -> None:
-        self._on_order(self._trading_context, order)
+        if self._on_order != UnsafePointer[OnOrderC]():
+            self._on_order[](self._trading_context, order)
 
     fn keep_alive(self) -> None:
         pass

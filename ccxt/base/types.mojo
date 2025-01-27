@@ -1529,13 +1529,89 @@ struct TradingContext(Stringable):
 
 
 alias OnTicker = fn (trading_context: TradingContext, ticker: Ticker) -> None
+alias OnTickerC = fn (
+    trading_context: TradingContext, ticker: Ticker
+) escaping -> None
+
 alias OnTickers = fn (
     trading_context: TradingContext, tickers: List[Ticker]
 ) -> None
+alias OnTickersC = fn (
+    trading_context: TradingContext, tickers: List[Ticker]
+) escaping -> None
+
 alias OnOrderBook = fn (
     trading_context: TradingContext, order_book: OrderBook
 ) -> None
+alias OnOrderBookC = fn (
+    trading_context: TradingContext, order_book: OrderBook
+) escaping -> None
+
 alias OnTrade = fn (trading_context: TradingContext, trade: Trade) -> None
+alias OnTradeC = fn (
+    trading_context: TradingContext, trade: Trade
+) escaping -> None
+
 alias OnBalance = fn (trading_context: TradingContext, balance: Balance) -> None
+alias OnBalanceC = fn (
+    trading_context: TradingContext, balance: Balance
+) escaping -> None
+
 alias OnOrder = fn (trading_context: TradingContext, order: Order) -> None
+alias OnOrderC = fn (
+    trading_context: TradingContext, order: Order
+) escaping -> None
+
 alias OnMyTrade = fn (trading_context: TradingContext, trade: Trade) -> None
+alias OnMyTradeC = fn (
+    trading_context: TradingContext, trade: Trade
+) escaping -> None
+
+
+fn ticker_decorator(callback: OnTicker) -> OnTickerC:
+    fn wrapper(context: TradingContext, ticker: Ticker):
+        callback(context, ticker)
+
+    return wrapper
+
+
+fn tickers_decorator(callback: OnTickers) -> OnTickersC:
+    fn wrapper(context: TradingContext, tickers: List[Ticker]):
+        callback(context, tickers)
+
+    return wrapper
+
+
+fn orderbook_decorator(callback: OnOrderBook) -> OnOrderBookC:
+    fn wrapper(context: TradingContext, order_book: OrderBook):
+        callback(context, order_book)
+
+    return wrapper
+
+
+fn trade_decorator(callback: OnTrade) -> OnTradeC:
+    fn wrapper(context: TradingContext, trade: Trade):
+        callback(context, trade)
+
+    return wrapper
+
+
+fn balance_decorator(callback: OnBalance) -> OnBalanceC:
+    fn wrapper(context: TradingContext, balance: Balance):
+        callback(context, balance)
+
+    return wrapper
+
+
+fn order_decorator(callback: OnOrder) -> OnOrderC:
+    fn wrapper(context: TradingContext, order: Order):
+        callback(context, order)
+
+    return wrapper
+
+
+fn mytrade_decorator(callback: OnMyTrade) -> OnMyTradeC:
+    fn wrapper(context: TradingContext, trade: Trade):
+        callback(context, trade)
+
+    return wrapper

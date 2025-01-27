@@ -38,49 +38,18 @@ from ccxt.base.types import (
     Balance,
     Order,
     OrderSide,
-    OnTicker,
-    OnTickers,
-    OnOrderBook,
-    OnTrade,
-    OnBalance,
-    OnOrder,
-    OnMyTrade,
+    OnTickerC,
+    OnTickersC,
+    OnOrderBookC,
+    OnTradeC,
+    OnBalanceC,
+    OnOrderC,
+    OnMyTradeC,
     Any,
     Strings,
 )
 from ccxt.base.pro_exchangeable import ProExchangeable
-
-
-fn empty_on_ticker(trading_context: TradingContext, ticker: Ticker) -> None:
-    pass
-
-
-fn empty_on_tickers(
-    trading_context: TradingContext, tickers: List[Ticker]
-) -> None:
-    pass
-
-
-fn empty_on_order_book(
-    trading_context: TradingContext, order_book: OrderBook
-) -> None:
-    pass
-
-
-fn empty_on_trade(trading_context: TradingContext, trade: Trade) -> None:
-    pass
-
-
-fn empty_on_balance(trading_context: TradingContext, balance: Balance) -> None:
-    pass
-
-
-fn empty_on_order(trading_context: TradingContext, order: Order) -> None:
-    pass
-
-
-fn empty_on_my_trade(trading_context: TradingContext, trade: Trade) -> None:
-    pass
+from ._common import *
 
 
 struct Bybit(ProExchangeable):
@@ -88,13 +57,13 @@ struct Bybit(ProExchangeable):
     var _api_secret: String
     var _testnet: Bool
     var _ws: UnsafePointer[WebSocket]
-    var _on_ticker: OnTicker
-    var _on_tickers: OnTickers
-    var _on_order_book: OnOrderBook
-    var _on_trade: OnTrade
-    var _on_balance: OnBalance
-    var _on_order: OnOrder
-    var _on_my_trade: OnMyTrade
+    var _on_ticker: OnTickerC
+    var _on_tickers: OnTickersC
+    var _on_order_book: OnOrderBookC
+    var _on_trade: OnTradeC
+    var _on_balance: OnBalanceC
+    var _on_order: OnOrderC
+    var _on_my_trade: OnMyTradeC
     var _trading_context: TradingContext
     var _is_private: Bool
     var _verbose: Bool
@@ -110,13 +79,13 @@ struct Bybit(ProExchangeable):
         self._is_private = config.get("is_private", False).bool()
         self._verbose = config.get("verbose", False).bool()
         self._ws = UnsafePointer[WebSocket].alloc(1)
-        self._on_ticker = empty_on_ticker
-        self._on_tickers = empty_on_tickers
-        self._on_order_book = empty_on_order_book
-        self._on_trade = empty_on_trade
-        self._on_balance = empty_on_balance
-        self._on_order = empty_on_order
-        self._on_my_trade = empty_on_my_trade
+        self._on_ticker = ticker_decorator(empty_on_ticker)
+        self._on_tickers = tickers_decorator(empty_on_tickers)
+        self._on_order_book = orderbook_decorator(empty_on_order_book)
+        self._on_trade = trade_decorator(empty_on_trade)
+        self._on_balance = balance_decorator(empty_on_balance)
+        self._on_order = order_decorator(empty_on_order)
+        self._on_my_trade = mytrade_decorator(empty_on_my_trade)
         self._trading_context = trading_context
         self._category = "linear"
         self._subscription_topics = List[String]()
@@ -139,25 +108,25 @@ struct Bybit(ProExchangeable):
         self._category = other._category
         self._subscription_topics = other._subscription_topics
 
-    fn set_on_ticker(mut self, on_ticker: OnTicker) raises -> None:
+    fn set_on_ticker(mut self, owned on_ticker: OnTickerC) -> None:
         self._on_ticker = on_ticker
 
-    fn set_on_tickers(mut self, on_tickers: OnTickers) raises -> None:
+    fn set_on_tickers(mut self, owned on_tickers: OnTickersC) -> None:
         self._on_tickers = on_tickers
 
-    fn set_on_order_book(mut self, on_order_book: OnOrderBook) raises -> None:
+    fn set_on_order_book(mut self, owned on_order_book: OnOrderBookC) -> None:
         self._on_order_book = on_order_book
 
-    fn set_on_trade(mut self, on_trade: OnTrade) raises -> None:
+    fn set_on_trade(mut self, owned on_trade: OnTradeC) -> None:
         self._on_trade = on_trade
 
-    fn set_on_balance(mut self, on_balance: OnBalance) raises -> None:
+    fn set_on_balance(mut self, owned on_balance: OnBalanceC) -> None:
         self._on_balance = on_balance
 
-    fn set_on_order(mut self, on_order: OnOrder) raises -> None:
+    fn set_on_order(mut self, owned on_order: OnOrderC) -> None:
         self._on_order = on_order
 
-    fn set_on_my_trade(mut self, on_my_trade: OnMyTrade) raises -> None:
+    fn set_on_my_trade(mut self, owned on_my_trade: OnMyTradeC) -> None:
         self._on_my_trade = on_my_trade
 
     fn connect(mut self, rt: MonoioRuntimePtr) raises -> None:

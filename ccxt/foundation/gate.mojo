@@ -39,7 +39,7 @@ struct Gate(Exchangeable):
     var _base: Exchange
     var _api_key: String
     var _api_secret: String
-    var _on_order: OnOrder
+    var _on_order: UnsafePointer[OnOrderC]
     var _trading_context: TradingContext
     var _host: String
     var _testnet: Bool
@@ -67,7 +67,7 @@ struct Gate(Exchangeable):
         self._base = Exchange(config)
         self._api_key = str(config.get("api_key", String()))
         self._api_secret = str(config.get("api_secret", String()))
-        self._on_order = empty_on_order
+        self._on_order = UnsafePointer[OnOrderC].alloc(1)
         self._trading_context = trading_context
 
     fn __del__(owned self):
@@ -88,11 +88,11 @@ struct Gate(Exchangeable):
         self._testnet = other._testnet
         self._verbose = other._verbose
 
+    fn set_on_order(mut self, on_order: OnOrderC) -> None:
+        self._on_order.init_pointee_move(on_order)
+
     fn id(self) -> ExchangeId:
         return ExchangeId.gateio
-
-    fn set_on_order(mut self, on_order: OnOrder) raises -> None:
-        self._on_order = on_order
 
     @always_inline
     fn _request(
@@ -709,11 +709,10 @@ struct Gate(Exchangeable):
         :param dict [params]: extra parameters specific to the exchange API endpoint
         :returns dict: a `ticker structure <https://docs.ccxt.com/#/?id=ticker-structure>`.
         """
-        var text: String
         var params = Dict[String, Any]()
         params["settle"] = "usdt"
         var query = "contract=" + symbol
-        text = self._request(
+        var text = self._request(
             self._api.futures_get_settle_tickers, params, query, ""
         )
         # logd(text)
@@ -723,7 +722,6 @@ struct Gate(Exchangeable):
         var obj = arr.get(0)
         var obj_view = JsonValueRefObjectView(obj)
         var ticker = self.parse_ticker(obj_view)
-        _ = obj^
         _ = arr^
         _ = doc^
         ticker.timestamp = int(now_ms())
@@ -1287,7 +1285,8 @@ struct Gate(Exchangeable):
         _ = async_trading_channel_ptr()[].send(request)
 
     fn on_order(self, order: Order) -> None:
-        self._on_order(self._trading_context, order)
+        if self._on_order != UnsafePointer[OnOrderC]():
+            self._on_order[](self._trading_context, order)
 
     fn keep_alive(self) -> None:
         pass

@@ -8,6 +8,13 @@ from .types import (
     OnBalance,
     OnOrder,
     OnMyTrade,
+    OnTickerC,
+    OnTickersC,
+    OnOrderBookC,
+    OnTradeC,
+    OnBalanceC,
+    OnOrderC,
+    OnMyTradeC,
 )
 
 
@@ -21,27 +28,27 @@ trait ProExchangeable(Movable):
     ):
         ...
 
-    fn set_on_ticker(mut self: Self, on_ticker: OnTicker) raises -> None:
+    fn set_on_ticker(mut self: Self, owned on_ticker: OnTickerC) -> None:
         ...
 
-    fn set_on_tickers(mut self: Self, on_tickers: OnTickers) raises -> None:
+    fn set_on_tickers(mut self: Self, owned on_tickers: OnTickersC) -> None:
         ...
 
     fn set_on_order_book(
-        mut self: Self, on_order_book: OnOrderBook
-    ) raises -> None:
+        mut self: Self, owned on_order_book: OnOrderBookC
+    ) -> None:
         ...
 
-    fn set_on_trade(mut self: Self, on_trade: OnTrade) raises -> None:
+    fn set_on_trade(mut self: Self, owned on_trade: OnTradeC) -> None:
         ...
 
-    fn set_on_balance(mut self: Self, on_balance: OnBalance) raises -> None:
+    fn set_on_balance(mut self: Self, owned on_balance: OnBalanceC) -> None:
         ...
 
-    fn set_on_order(mut self: Self, on_order: OnOrder) raises -> None:
+    fn set_on_order(mut self: Self, owned on_order: OnOrderC) -> None:
         ...
 
-    fn set_on_my_trade(mut self: Self, on_my_trade: OnMyTrade) raises -> None:
+    fn set_on_my_trade(mut self: Self, owned on_my_trade: OnMyTradeC) -> None:
         ...
 
     fn subscribe_ticker(

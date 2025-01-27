@@ -32,7 +32,7 @@ struct BitMEX(Exchangeable):
     var _api_key: String
     var _api_secret: String
     var _testnet: Bool
-    var _on_order: OnOrder
+    var _on_order: UnsafePointer[OnOrderC]
     var _trading_context: TradingContext
     var _verbose: Bool
 
@@ -50,7 +50,7 @@ struct BitMEX(Exchangeable):
         self._api_secret = str(config.get("api_secret", String()))
         self._testnet = config.get("testnet", False).bool()
         self._verbose = config.get("verbose", False).bool()
-        self._on_order = empty_on_order
+        self._on_order = UnsafePointer[OnOrderC].alloc(1)
         self._trading_context = trading_context
         var base_url = "https://www.bitmex.com" if not self._testnet else "https://testnet.bitmex.com"
         self._host = String(base_url).replace("https://", "")
@@ -77,11 +77,11 @@ struct BitMEX(Exchangeable):
         self._on_order = other._on_order
         self._trading_context = other._trading_context
 
+    fn set_on_order(mut self, on_order: OnOrderC) -> None:
+        self._on_order.init_pointee_move(on_order)
+
     fn id(self) -> ExchangeId:
         return ExchangeId.bitmex
-
-    fn set_on_order(mut self, on_order: OnOrder) raises -> None:
-        self._on_order = on_order
 
     @always_inline
     fn _request(
@@ -310,7 +310,8 @@ struct BitMEX(Exchangeable):
         pass
 
     fn on_order(self, order: Order) -> None:
-        self._on_order(self._trading_context, order)
+        if self._on_order != UnsafePointer[OnOrderC]():
+            self._on_order[](self._trading_context, order)
 
     fn keep_alive(self) -> None:
         pass
