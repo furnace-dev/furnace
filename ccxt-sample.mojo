@@ -33,6 +33,8 @@ from ccxt.base.types import (
     Ticker,
     ExchangeId,
     TradingContext,
+    ticker_decorator,
+    order_decorator,
 )
 from ccxt.foundation.bybit import Bybit
 from ccxt.foundation.binance import Binance
@@ -125,7 +127,7 @@ fn test_binance() raises:
     var binance = Binance(config, trading_context, rt)
     var params = Dict[String, Any]()
 
-    binance.set_on_order(on_order)
+    binance.set_on_order(order_decorator(on_order))
 
     var symbol = "XRPUSDT"
 
@@ -239,8 +241,8 @@ fn test_ws() raises:
     # logd("listen_key: " + listen_key)
 
     var binance_pro = BinancePro(config, trading_context)
-    binance_pro.set_on_ticker(on_ticker)
-    binance_pro.set_on_order(on_order)
+    binance_pro.set_on_ticker(ticker_decorator(on_ticker))
+    binance_pro.set_on_order(order_decorator(on_order))
 
     # Subscribe to order book depth data
     # var params0 = Dict[String, Any]()

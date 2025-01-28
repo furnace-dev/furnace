@@ -1,6 +1,8 @@
 import time
+from collections import Dict
 from collections.optional import _NoneType
-from memory import stack_allocation
+from utils import StringRef
+from memory import stack_allocation, UnsafePointer
 from monoio_connect import (
     logd,
     logi,
@@ -18,18 +20,67 @@ from monoio_connect import (
     http_response_status_code,
     http_response_body,
 )
-from ccxt.base.types import *
-from ccxt.base.exchange import Exchange
-from ccxt.base.exchangeable import (
-    Exchangeable,
+from ccxt.base.types import (
+    TradingContext,
+    Ticker,
+    OrderBook,
+    Trade,
+    Balance,
+    Order,
+    ExchangeId,
+    Market,
+    Currency,
+    MarketInterface,
+    MarketMarginModes,
+    CurrencyInterface,
+    MarketLimits,
+    Any,
+    OnTickerC,
+    OnTickersC,
+    OnOrderBookC,
+    OnTradeC,
+    OnBalanceC,
+    OnOrderC,
+    OnMyTradeC,
+    ticker_decorator,
+    tickers_decorator,
+    orderbook_decorator,
+    trade_decorator,
+    balance_decorator,
+    order_decorator,
+    mytrade_decorator,
+    Entry,
+    ApiType,
+    OrderType,
+    OrderSide,
+    Balances,
+    MinMax,
+    Strings,
+    CurrencyLimits,
+    Limit,
+    IntOpt,
+    Str,
+    OrderbookEntry,
 )
+from ccxt.base.exchange import Exchange
+from ccxt.base.exchangeable import Exchangeable
 from ccxt.abstract.gate import ImplicitAPI
-from sonic import *
-from ._common_utils import *
-
-
-fn empty_on_order(trading_context: TradingContext, order: Order) -> None:
-    pass
+from sonic import (
+    JsonObject,
+    JsonArray,
+    JsonValueRefObjectView,
+    JsonValueRefArrayView,
+    JsonValueArrayView,
+    JsonObjectViewable,
+    c_void,
+)
+from ._common_utils import (
+    CreateOrderRequestData,
+    CancelOrderRequestData,
+    AsyncTradingRequest,
+    async_trading_channel_ptr,
+)
+from ._base import empty_on_order
 
 
 struct Gate(Exchangeable):
@@ -39,7 +90,7 @@ struct Gate(Exchangeable):
     var _base: Exchange
     var _api_key: String
     var _api_secret: String
-    var _on_order: UnsafePointer[OnOrderC]
+    var _on_order: OnOrderC
     var _trading_context: TradingContext
     var _host: String
     var _testnet: Bool
@@ -67,7 +118,7 @@ struct Gate(Exchangeable):
         self._base = Exchange(config)
         self._api_key = str(config.get("api_key", String()))
         self._api_secret = str(config.get("api_secret", String()))
-        self._on_order = UnsafePointer[OnOrderC].alloc(1)
+        self._on_order = order_decorator(empty_on_order)
         self._trading_context = trading_context
 
     fn __del__(owned self):
@@ -88,8 +139,8 @@ struct Gate(Exchangeable):
         self._testnet = other._testnet
         self._verbose = other._verbose
 
-    fn set_on_order(mut self, on_order: OnOrderC) -> None:
-        self._on_order.init_pointee_move(on_order)
+    fn set_on_order(mut self, owned on_order: OnOrderC) -> None:
+        self._on_order = on_order
 
     fn id(self) -> ExchangeId:
         return ExchangeId.gateio
@@ -1285,8 +1336,7 @@ struct Gate(Exchangeable):
         _ = async_trading_channel_ptr()[].send(request)
 
     fn on_order(self, order: Order) -> None:
-        if self._on_order != UnsafePointer[OnOrderC]():
-            self._on_order[](self._trading_context, order)
+        self._on_order(self._trading_context, order)
 
     fn keep_alive(self) -> None:
         pass

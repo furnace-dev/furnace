@@ -160,7 +160,7 @@ trait Exchangeable(Movable):
     ) raises -> None:
         ...
 
-    fn set_on_order(mut self: Self, on_order: OnOrderC) -> None:
+    fn set_on_order(mut self: Self, owned on_order: OnOrderC) -> None:
         ...
 
     fn on_order(self, order: Order) -> None:

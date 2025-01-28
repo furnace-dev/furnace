@@ -26,6 +26,7 @@ from ccxt.base import (
     Exchangeable,
     OrderType,
     OrderSide,
+    Strings,
 )
 from ccxt.foundation.bybit import Bybit
 from ccxt.foundation.gate import Gate
@@ -37,7 +38,10 @@ from ccxt.foundation import (
 from ccxt.pro.gate import Gate as GatePro
 from ccxt import Strategizable
 from ccxt.executor import Executable, Executor
-from ccxt.engine import Engine, run_engine
+from ccxt.engine import (
+    Engine,
+    run_engine,
+)
 from mojoenv import load_mojo_env
 
 
@@ -62,6 +66,31 @@ struct MyStrategy[E: Executable](Strategizable):
 
     fn on_init(mut self) raises:
         logd("on_init")
+        # 订阅ticker
+        self.ex[].subscribe_ticker("XRP_USDT", Dict[String, Any]())
+
+        # 订阅tickers
+        var symbols = List[String]()
+        symbols.append("XRP_USDT")
+        symbols.append("BTC_USDT")
+        self.ex[].subscribe_tickers(symbols, Dict[String, Any]())
+
+        # 订阅order_book
+        self.ex[].subscribe_order_book("XRP_USDT", Dict[String, Any]())
+
+        # 订阅trade
+        self.ex[].subscribe_trade("XRP_USDT", Dict[String, Any]())
+
+        # 订阅balance
+        self.ex[].subscribe_balance(Dict[String, Any]())
+
+        # 订阅order
+        self.ex[].subscribe_order("XRP_USDT", Dict[String, Any]())
+
+        # 订阅my_trades
+        self.ex[].subscribe_my_trades("XRP_USDT", Dict[String, Any]())
+
+        # 获取ticker
         var ticker = self.ex[].fetch_ticker("XRP_USDT")
         logd("ticker: " + str(ticker))
 

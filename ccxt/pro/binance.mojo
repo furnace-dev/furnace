@@ -28,7 +28,12 @@ from monoio_connect import (
     http_response_body,
     idgen_next_id,
 )
-from sonic import *
+from sonic import (
+    JsonObject,
+    JsonArray,
+    JsonValueRefObjectView,
+    JsonValueRefArrayView,
+)
 from ccxt.base.types import (
     TradingContext,
     Ticker,
@@ -56,42 +61,15 @@ from ccxt.base.types import (
 )
 from ccxt.base.pro_exchangeable import ProExchangeable
 from ccxt.foundation.binance import Binance as BinanceClient
-# from ._common import *
-
-fn empty_on_ticker(trading_context: TradingContext, ticker: Ticker) -> None:
-    pass
-
-
-fn empty_on_tickers(
-    trading_context: TradingContext, tickers: List[Ticker]
-) -> None:
-    pass
-
-
-fn empty_on_order_book(
-    trading_context: TradingContext, order_book: OrderBook
-) -> None:
-    pass
-
-
-fn empty_on_trade(trading_context: TradingContext, trade: Trade) -> None:
-    pass
-
-
-fn empty_on_balance(trading_context: TradingContext, balance: Balance) -> None:
-    pass
-
-
-fn empty_on_order(trading_context: TradingContext, order: Order) -> None:
-    pass
-
-
-fn empty_on_my_trade(trading_context: TradingContext, trade: Trade) -> None:
-    pass
-
-
-
-alias WSCallback = fn (msg: String) raises -> None
+from ccxt.foundation._base import (
+    empty_on_ticker,
+    empty_on_tickers,
+    empty_on_order_book,
+    empty_on_trade,
+    empty_on_balance,
+    empty_on_order,
+    empty_on_my_trade,
+)
 
 
 struct Binance(ProExchangeable):
@@ -175,25 +153,25 @@ struct Binance(ProExchangeable):
         self._client.destroy_pointee()
         self._client.free()
 
-    fn set_on_ticker(mut self, owned on_ticker: OnTickerC) -> None:
+    fn set_on_ticker(mut self, on_ticker: OnTickerC) -> None:
         self._on_ticker = on_ticker
 
-    fn set_on_tickers(mut self, owned on_tickers: OnTickersC) -> None:
+    fn set_on_tickers(mut self, on_tickers: OnTickersC) -> None:
         self._on_tickers = on_tickers
 
-    fn set_on_order_book(mut self, owned on_order_book: OnOrderBookC) -> None:
+    fn set_on_order_book(mut self, on_order_book: OnOrderBookC) -> None:
         self._on_order_book = on_order_book
 
-    fn set_on_trade(mut self, owned on_trade: OnTradeC) -> None:
+    fn set_on_trade(mut self, on_trade: OnTradeC) -> None:
         self._on_trade = on_trade
 
-    fn set_on_balance(mut self, owned on_balance: OnBalanceC) -> None:
+    fn set_on_balance(mut self, on_balance: OnBalanceC) -> None:
         self._on_balance = on_balance
 
-    fn set_on_order(mut self, owned on_order: OnOrderC) -> None:
+    fn set_on_order(mut self, on_order: OnOrderC) -> None:
         self._on_order = on_order
 
-    fn set_on_my_trade(mut self, owned on_my_trade: OnMyTradeC) -> None:
+    fn set_on_my_trade(mut self, on_my_trade: OnMyTradeC) -> None:
         self._on_my_trade = on_my_trade
 
     fn connect(mut self, rt: MonoioRuntimePtr) raises -> None:

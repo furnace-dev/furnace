@@ -1,4 +1,12 @@
-from ccxt.base.types import *
+from collections import List
+from ccxt.base.types import (
+    TradingContext,
+    Ticker,
+    OrderBook,
+    Trade,
+    Balance,
+    Order,
+)
 
 
 fn empty_on_ticker(trading_context: TradingContext, ticker: Ticker) -> None:

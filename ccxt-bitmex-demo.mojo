@@ -14,6 +14,7 @@ from ccxt.base.types import (
     Ticker,
     ExchangeId,
     TradingContext,
+    order_decorator,
 )
 from ccxt.foundation.bitmex import BitMEX
 
@@ -49,7 +50,7 @@ fn test_rest(api_key: String, api_secret: String) raises -> None:
     var params = Dict[String, Any]()
 
     print("1000")
-    bm.set_on_order(on_order)
+    bm.set_on_order(order_decorator(on_order))
     print("1001")
 
     var markets = bm.fetch_markets(params)

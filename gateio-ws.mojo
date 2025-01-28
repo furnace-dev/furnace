@@ -27,6 +27,8 @@ from ccxt.base.types import (
     Ticker,
     ExchangeId,
     TradingContext,
+    order_decorator,
+    ticker_decorator,
 )
 from ccxt.foundation.gate import Gate
 from ccxt.pro.gate import Gate as GatePro
@@ -96,7 +98,7 @@ fn init_client() raises:
     __get_address_as_uninit_lvalue(gate_client.address) = Gate(
         config, trading_context
     )
-    gate_client[].set_on_order(on_order)
+    gate_client[].set_on_order(order_decorator(on_order))
 
 
 fn run_ws() raises:
@@ -117,8 +119,8 @@ fn run_ws() raises:
         exchange_id=ExchangeId.gateio, account_id="1", trader_id="1"
     )
     var gate_pro = GatePro(config_pro, trading_context)
-    gate_pro.set_on_ticker(on_ticker)
-    gate_pro.set_on_order(on_order)
+    gate_pro.set_on_ticker(ticker_decorator(on_ticker))
+    gate_pro.set_on_order(order_decorator(on_order))
 
     # Subscribe to order book depth data
     # var params0 = Dict[String, Any]()

@@ -3,6 +3,9 @@ import time
 from memory import UnsafePointer
 from collections import Dict
 from monoio_connect import (
+    Fixed,
+    logd,
+    logi,
     now_ms,
     compute_hmac_sha512_hex,
     WebSocket,
@@ -14,12 +17,54 @@ from monoio_connect import (
     WebSocketCloseCallback,
     WebSocketTimerCallback,
 )
-from sonic import *
-from ccxt.base.types import *
-from ccxt.base.pro_exchangeable import *
-from ._common import *
-
-alias WSCallback = fn (msg: String) raises -> None
+from sonic import (
+    JsonValue,
+    JsonObject,
+    JsonArray,
+    JsonValueArrayView,
+    JsonValueRefObjectView,
+    JsonValueRefArrayView,
+)
+from ccxt.base.types import (
+    TradingContext,
+    Ticker,
+    OrderBook,
+    Trade,
+    Balances,
+    Order,
+    OrderSide,
+    OrderType,
+    OnTickerC,
+    OnTickersC,
+    OnOrderBookC,
+    OnTradeC,
+    OnBalanceC,
+    OnOrderC,
+    OnMyTradeC,
+    Any,
+    Strings,
+    IntOpt,
+    Str,
+    ticker_decorator,
+    tickers_decorator,
+    orderbook_decorator,
+    trade_decorator,
+    balance_decorator,
+    order_decorator,
+    mytrade_decorator,
+)
+from ccxt.base.pro_exchangeable import (
+    ProExchangeable,
+)
+from ccxt.foundation._base import (
+    empty_on_ticker,
+    empty_on_tickers,
+    empty_on_order_book,
+    empty_on_trade,
+    empty_on_balance,
+    empty_on_order,
+    empty_on_my_trade,
+)
 
 
 struct WebSocketRequest:
@@ -200,25 +245,25 @@ struct Gate(ProExchangeable):
     fn __del__(owned self):
         pass
 
-    fn set_on_ticker(mut self, owned on_ticker: OnTickerC) -> None:
+    fn set_on_ticker(mut self, on_ticker: OnTickerC) -> None:
         self._on_ticker = on_ticker
 
-    fn set_on_tickers(mut self, owned on_tickers: OnTickersC) -> None:
+    fn set_on_tickers(mut self, on_tickers: OnTickersC) -> None:
         self._on_tickers = on_tickers
 
-    fn set_on_order_book(mut self, owned on_order_book: OnOrderBookC) -> None:
+    fn set_on_order_book(mut self, on_order_book: OnOrderBookC) -> None:
         self._on_order_book = on_order_book
 
-    fn set_on_trade(mut self, owned on_trade: OnTradeC) -> None:
+    fn set_on_trade(mut self, on_trade: OnTradeC) -> None:
         self._on_trade = on_trade
 
-    fn set_on_balance(mut self, owned on_balance: OnBalanceC) -> None:
+    fn set_on_balance(mut self, on_balance: OnBalanceC) -> None:
         self._on_balance = on_balance
 
-    fn set_on_order(mut self, owned on_order: OnOrderC) -> None:
+    fn set_on_order(mut self, on_order: OnOrderC) -> None:
         self._on_order = on_order
 
-    fn set_on_my_trade(mut self, owned on_my_trade: OnMyTradeC) -> None:
+    fn set_on_my_trade(mut self, on_my_trade: OnMyTradeC) -> None:
         self._on_my_trade = on_my_trade
 
     fn connect(mut self, rt: MonoioRuntimePtr) raises -> None:

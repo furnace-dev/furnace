@@ -1,19 +1,88 @@
 import time
 from collections.optional import _NoneType
+from utils import StringRef
 from memory import stack_allocation
-from monoio_connect import *
-from ccxt.base.types import *
-from ccxt.base.exchange import Exchange
-from ccxt.base.exchangeable import (
-    Exchangeable,
+from monoio_connect import (
+    logt,
+    logd,
+    logi,
+    Method,
+    Headers,
+    MonoioRuntimePtr,
+    HttpResponseCallback,
+    QueryStringBuilder,
+    now_ms,
+    compute_hmac_sha256_hex,
+    HttpClientOptions,
+    HttpClient,
+    HttpResponsePtr,
+    http_response_status_code,
+    http_response_body,
 )
+from ccxt.base.types import (
+    TradingContext,
+    Ticker,
+    OrderBook,
+    Trade,
+    Balance,
+    Order,
+    ExchangeId,
+    Market,
+    Currency,
+    OnOrderC,
+    MarketInterface,
+    MarketMarginModes,
+    CurrencyInterface,
+    MarketLimits,
+    Any,
+    OnTickerC,
+    OnTickersC,
+    OnOrderBookC,
+    OnTradeC,
+    OnBalanceC,
+    OnOrderC,
+    OnMyTradeC,
+    order_decorator,
+    Strings,
+    IntOpt,
+    Str,
+    Any,
+    OnTickerC,
+    OnTickersC,
+    OnOrderBookC,
+    OnTradeC,
+    OnBalanceC,
+    OnOrderC,
+    OnMyTradeC,
+    Entry,
+    ApiType,
+    OrderType,
+    OrderSide,
+    Balances,
+    MinMax,
+    CurrencyLimits,
+    Limit,
+    IntOpt,
+    Str,
+    Any,
+    OrderbookEntry,
+)
+from ccxt.base.exchange import Exchange
+from ccxt.base.exchangeable import Exchangeable
 from ccxt.abstract.binance import ImplicitAPI
-from sonic import *
+from sonic import (
+    JsonValue,
+    JsonObject,
+    JsonArray,
+    JsonValueRefObjectView,
+    JsonValueRefArrayView,
+    JsonValueObjectView,
+    JsonValueArrayView,
+    JsonObjectViewable,
+    c_void,
+)
 from ._common_utils import *
-
-
-fn empty_on_order(trading_context: TradingContext, order: Order) -> None:
-    pass
+from ._base import empty_on_order
 
 
 struct Binance(Exchangeable):
@@ -23,7 +92,7 @@ struct Binance(Exchangeable):
     var _base: Exchange
     var _api_key: String
     var _api_secret: String
-    var _on_order: UnsafePointer[OnOrderC]
+    var _on_order: OnOrderC
     var _trading_context: TradingContext
     var _host: String
     var _testnet: Bool
@@ -51,7 +120,7 @@ struct Binance(Exchangeable):
         self._base = Exchange(config)
         self._api_key = str(config.get("api_key", String()))
         self._api_secret = str(config.get("api_secret", String()))
-        self._on_order = UnsafePointer[OnOrderC].alloc(1)
+        self._on_order = order_decorator(empty_on_order)
         self._trading_context = trading_context
 
     fn __del__(owned self):
@@ -72,8 +141,8 @@ struct Binance(Exchangeable):
         self._testnet = other._testnet
         self._verbose = other._verbose
 
-    fn set_on_order(mut self: Self, on_order: OnOrderC) -> None:
-        self._on_order.init_pointee_move(on_order)
+    fn set_on_order(mut self, owned on_order: OnOrderC) -> None:
+        self._on_order = on_order
 
     fn id(self) -> ExchangeId:
         return ExchangeId.binance
@@ -1152,8 +1221,7 @@ struct Binance(Exchangeable):
         _ = async_trading_channel_ptr()[].send(request)
 
     fn on_order(self, order: Order) -> None:
-        if self._on_order != UnsafePointer[OnOrderC]():
-            self._on_order[](self._trading_context, order)
+        self._on_order(self._trading_context, order)
 
     fn keep_alive(self) -> None:
         pass

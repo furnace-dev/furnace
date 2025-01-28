@@ -1,15 +1,60 @@
+from memory import UnsafePointer
+from collections import Dict
 from collections.optional import _NoneType
 from monoio_connect import logd, logi, Method
 from monoio_connect.httpclient import Headers
 from monoio_connect.fixed import Fixed
-from ccxt.base.types import *
-from ccxt.base.exchange import Exchange
-from ccxt.base.exchangeable import (
-    Exchangeable,
+from ccxt.base.types import (
+    TradingContext,
+    Ticker,
+    OrderBook,
+    Trade,
+    Balance,
+    Order,
+    ExchangeId,
+    Market,
+    Currency,
+    OnOrderC,
+    order_decorator,
+    Entry,
+    ApiType,
+    OrderType,
+    OrderSide,
+    Balances,
+    Strings,
+    IntOpt,
+    Str,
+    Any,
+    OnTickerC,
+    OnTickersC,
+    OnOrderBookC,
+    OnTradeC,
+    OnBalanceC,
+    OnOrderC,
+    OnMyTradeC,
+    ticker_decorator,
+    tickers_decorator,
+    orderbook_decorator,
+    trade_decorator,
+    balance_decorator,
+    order_decorator,
+    mytrade_decorator,
 )
+from ccxt.base.exchange import Exchange
+from ccxt.base.exchangeable import Exchangeable
 from ccxt.abstract.bitmex import ImplicitAPI
 from monoio_connect import now_ms
-from sonic import *
+from sonic import (
+    JsonValue,
+    JsonObject,
+    JsonArray,
+    JsonValueRefObjectView,
+    JsonValueRefArrayView,
+    JsonValueObjectView,
+    JsonValueArrayView,
+    JsonObjectViewable,
+    c_void,
+)
 from monoio_connect import compute_sha512_hex, compute_hmac_sha512_hex
 from monoio_connect import HttpClientOptions, HttpClient, HttpResponsePtr
 from monoio_connect import (
@@ -17,10 +62,7 @@ from monoio_connect import (
     http_response_status_code,
     http_response_body,
 )
-
-
-fn empty_on_order(trading_context: TradingContext, order: Order) -> None:
-    pass
+from ._base import empty_on_order
 
 
 struct BitMEX(Exchangeable):
@@ -32,7 +74,7 @@ struct BitMEX(Exchangeable):
     var _api_key: String
     var _api_secret: String
     var _testnet: Bool
-    var _on_order: UnsafePointer[OnOrderC]
+    var _on_order: OnOrderC
     var _trading_context: TradingContext
     var _verbose: Bool
 
@@ -50,7 +92,7 @@ struct BitMEX(Exchangeable):
         self._api_secret = str(config.get("api_secret", String()))
         self._testnet = config.get("testnet", False).bool()
         self._verbose = config.get("verbose", False).bool()
-        self._on_order = UnsafePointer[OnOrderC].alloc(1)
+        self._on_order = order_decorator(empty_on_order)
         self._trading_context = trading_context
         var base_url = "https://www.bitmex.com" if not self._testnet else "https://testnet.bitmex.com"
         self._host = String(base_url).replace("https://", "")
@@ -77,8 +119,8 @@ struct BitMEX(Exchangeable):
         self._on_order = other._on_order
         self._trading_context = other._trading_context
 
-    fn set_on_order(mut self, on_order: OnOrderC) -> None:
-        self._on_order.init_pointee_move(on_order)
+    fn set_on_order(mut self, owned on_order: OnOrderC) -> None:
+        self._on_order = on_order
 
     fn id(self) -> ExchangeId:
         return ExchangeId.bitmex
@@ -310,8 +352,7 @@ struct BitMEX(Exchangeable):
         pass
 
     fn on_order(self, order: Order) -> None:
-        if self._on_order != UnsafePointer[OnOrderC]():
-            self._on_order[](self._trading_context, order)
+        self._on_order(self._trading_context, order)
 
     fn keep_alive(self) -> None:
         pass

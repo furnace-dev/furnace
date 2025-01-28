@@ -59,7 +59,7 @@ fn run() raises:
     var gate = Gate(config, trading_context, rt)
     var params = Dict[String, Any]()
 
-    gate.set_on_order(on_order)
+    gate.set_on_order(order_decorator(on_order))
 
     # 获取市场
     # var market = gate.fetch_markets(params)

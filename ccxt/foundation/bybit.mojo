@@ -23,12 +23,24 @@ from monoio_connect import (
 from ccxt.base.types import *
 from ccxt.base.exchangeable import Exchangeable
 from ccxt.abstract.bybit import ImplicitAPI
-from sonic import *
-from ._common_utils import *
-
-
-fn empty_on_order(trading_context: TradingContext, order: Order) -> None:
-    pass
+from sonic import (
+    JsonValue,
+    JsonObject,
+    JsonArray,
+    JsonValueRefObjectView,
+    JsonValueRefArrayView,
+    JsonValueObjectView,
+    JsonValueArrayView,
+    JsonObjectViewable,
+    c_void,
+)
+from ._common_utils import (
+    CreateOrderRequestData,
+    CancelOrderRequestData,
+    AsyncTradingRequest,
+    async_trading_channel_ptr,
+)
+from ._base import empty_on_order
 
 
 struct Bybit(Exchangeable):
@@ -36,7 +48,7 @@ struct Bybit(Exchangeable):
     var _api: ImplicitAPI
     var _api_key: String
     var _api_secret: String
-    var _on_order: UnsafePointer[OnOrderC]
+    var _on_order: OnOrderC
     var _trading_context: TradingContext
     var _host: String
     var _testnet: Bool
@@ -67,7 +79,7 @@ struct Bybit(Exchangeable):
         self._api = ImplicitAPI()
         self._api_key = str(config.get("api_key", String()))
         self._api_secret = str(config.get("api_secret", String()))
-        self._on_order = UnsafePointer[OnOrderC].alloc(1)
+        self._on_order = order_decorator(empty_on_order)
         self._category = "linear"
 
     fn __del__(owned self):
@@ -90,8 +102,8 @@ struct Bybit(Exchangeable):
     fn id(self) -> ExchangeId:
         return ExchangeId.bybit
 
-    fn set_on_order(mut self, on_order: OnOrderC) -> None:
-        self._on_order.init_pointee_move(on_order)
+    fn set_on_order(mut self, owned on_order: OnOrderC) -> None:
+        self._on_order = on_order
 
     @always_inline
     fn _request(
@@ -915,8 +927,7 @@ struct Bybit(Exchangeable):
         _ = async_trading_channel_ptr()[].send(request)
 
     fn on_order(self, order: Order) -> None:
-        if self._on_order != UnsafePointer[OnOrderC]():
-            self._on_order[](self._trading_context, order)
+        self._on_order(self._trading_context, order)
 
     fn keep_alive(self) -> None:
         pass

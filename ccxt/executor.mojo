@@ -136,12 +136,61 @@ trait Executable:
     ) raises -> None:
         ...
 
+    fn subscribe_ticker(
+        mut self, symbol: String, params: Dict[String, Any]
+    ) raises -> None:
+        ...
+
+    fn subscribe_tickers(
+        mut self, symbols: Strings, params: Dict[String, Any]
+    ) raises -> None:
+        ...
+
+    fn subscribe_order_book(
+        mut self, symbol: String, params: Dict[String, Any]
+    ) raises -> None:
+        ...
+
+    fn subscribe_trade(
+        mut self, symbol: String, params: Dict[String, Any]
+    ) raises -> None:
+        ...
+
+    fn subscribe_balance(mut self, params: Dict[String, Any]) raises -> None:
+        ...
+
+    fn subscribe_order(
+        mut self, symbol: String, params: Dict[String, Any]
+    ) raises -> None:
+        ...
+
+    fn subscribe_my_trades(
+        mut self, symbol: String, params: Dict[String, Any]
+    ) raises -> None:
+        ...
+
 
 struct Executor[T: Exchangeable](Executable):
     var _exchange: UnsafePointer[T]
+    var _ticker_subscriptions: List[Tuple[String, Dict[String, Any]]]
+    var _tickers_subscriptions: List[Tuple[Strings, Dict[String, Any]]]
+    var _order_book_subscriptions: List[Tuple[String, Dict[String, Any]]]
+    var _trade_subscriptions: List[Tuple[String, Dict[String, Any]]]
+    var _balance_subscriptions: List[Dict[String, Any]]
+    var _order_subscriptions: List[Tuple[String, Dict[String, Any]]]
+    var _my_trade_subscriptions: List[Tuple[String, Dict[String, Any]]]
 
     fn __init__(out self, exchange: UnsafePointer[T]):
         self._exchange = exchange
+        self._ticker_subscriptions = List[Tuple[String, Dict[String, Any]]]()
+        self._tickers_subscriptions = List[Tuple[Strings, Dict[String, Any]]]()
+        self._order_book_subscriptions = List[
+            Tuple[String, Dict[String, Any]]
+        ]()
+        self._trade_subscriptions = List[Tuple[String, Dict[String, Any]]]()
+        self._balance_subscriptions = List[Dict[String, Any]]()
+        self._order_subscriptions = List[Tuple[String, Dict[String, Any]]]()
+        self._my_trade_subscriptions = List[Tuple[String, Dict[String, Any]]]()
 
     fn load_markets(self, mut params: Dict[String, Any]) raises -> List[Market]:
         return self._exchange[].load_markets(params)
@@ -262,3 +311,36 @@ struct Executor[T: Exchangeable](Executable):
         self, id: String, symbol: String, mut params: Dict[String, Any]
     ) raises -> None:
         self._exchange[].cancel_order_async(id, symbol, params)
+
+    fn subscribe_ticker(
+        mut self, symbol: String, params: Dict[String, Any]
+    ) raises -> None:
+        self._ticker_subscriptions.append((symbol, params))
+
+    fn subscribe_tickers(
+        mut self, symbols: Strings, params: Dict[String, Any]
+    ) raises -> None:
+        self._tickers_subscriptions.append((symbols, params))
+
+    fn subscribe_order_book(
+        mut self, symbol: String, params: Dict[String, Any]
+    ) raises -> None:
+        self._order_book_subscriptions.append((symbol, params))
+
+    fn subscribe_trade(
+        mut self, symbol: String, params: Dict[String, Any]
+    ) raises -> None:
+        self._trade_subscriptions.append((symbol, params))
+
+    fn subscribe_balance(mut self, params: Dict[String, Any]) raises -> None:
+        self._balance_subscriptions.append(params)
+
+    fn subscribe_order(
+        mut self, symbol: String, params: Dict[String, Any]
+    ) raises -> None:
+        self._order_subscriptions.append((symbol, params))
+
+    fn subscribe_my_trades(
+        mut self, symbol: String, params: Dict[String, Any]
+    ) raises -> None:
+        self._my_trade_subscriptions.append((symbol, params))
