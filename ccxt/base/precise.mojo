@@ -13,14 +13,14 @@ struct Precise:
         if "e" in number:
             var split = number.split("e")
             number = split[0]
-            modifier = int(split[1])
+            modifier = Int(split[1])
         var decimal_index = number.find(".")
         if decimal_index > -1:
             self.decimals = len(number) - decimal_index - 1
-            self.integer = int(number.replace(".", ""))
+            self.integer = Int(number.replace(".", ""))
         else:
             self.decimals = 0
-            self.integer = int(number)
+            self.integer = Int(number)
         self.decimals = self.decimals - modifier
         self.base = 10
 
@@ -178,7 +178,7 @@ struct Precise:
 
     @always_inline
     fn reduce(self) raises -> Self:
-        var string = str(self.integer)
+        var string = String(self.integer)
         var start = len(string) - 1
         var result = self
         if start == 0:
@@ -195,7 +195,7 @@ struct Precise:
             return result
         result.decimals -= difference
         var integer_string = string[0 : i_ + 1]
-        result.integer = int(integer_string)
+        result.integer = Int(integer_string)
         return result
 
     @always_inline
@@ -216,7 +216,7 @@ struct Precise:
             result += "-"
 
         # Convert integer to string and pad with zeros
-        var integer_str = str(abs(self_reduced.integer))
+        var integer_str = String(abs(self_reduced.integer))
         while len(integer_str) < self_reduced.decimals:
             integer_str = "0" + integer_str
 
@@ -239,10 +239,10 @@ struct Precise:
         return result
 
     fn __repr__(self) raises -> String:
-        return "Precise(" + str(self) + ")"
+        return "Precise(" + String(self) + ")"
 
     fn __float__(self) raises -> Float64:
-        return float(str(self))
+        return float(String(self))
 
     @staticmethod
     fn string_mul(string1: String, string2: String) raises -> Self:
@@ -277,7 +277,7 @@ struct Precise:
 
     @staticmethod
     fn string_or(string1: String, string2: String) raises -> Self:
-        return Self(str(Precise(string1).orn(Precise(string2))))
+        return Self(String(Precise(string1).orn(Precise(string2))))
 
     @staticmethod
     fn string_equals(string1: String, string2: String) raises -> Bool:
@@ -289,11 +289,11 @@ struct Precise:
 
     @staticmethod
     fn string_min(string1: String, string2: String) raises -> Self:
-        return Self(str(Precise(string1).min(Precise(string2))))
+        return Self(String(Precise(string1).min(Precise(string2))))
 
     @staticmethod
     fn string_max(string1: String, string2: String) raises -> Self:
-        return Self(str(Precise(string1).max(Precise(string2))))
+        return Self(String(Precise(string1).max(Precise(string2))))
 
     @staticmethod
     fn string_gt(string1: String, string2: String) raises -> Bool:

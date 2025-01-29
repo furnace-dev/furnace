@@ -16,7 +16,7 @@ fn get_wrapper[
     var function_pointer = UnsafePointer[Fn].alloc(1)
     function_pointer[0] = f
     var c_function = (ctypes.CFUNCTYPE(ctypes.c_void_p)).from_address(
-        int(function_pointer)
+        Int(function_pointer)
     )
 
     var py_obj_argtypes = PythonObject([])
@@ -45,8 +45,8 @@ fn copy_string_to_buffer(s: String, buff: UnsafePointer[ffi.c_char], buff_size: 
     var res_bytes = s.unsafe_ptr().bitcast[ffi.c_char]()
     var res_len = len(s)
     
-    if res_len >= int(buff_size):
-        res_len = int(buff_size) - 1  # Leave space for null terminator
+    if res_len >= Int(buff_size):
+        res_len = Int(buff_size) - 1  # Leave space for null terminator
     
     memcpy(buff, res_bytes, res_len)
     buff[res_len] = 0  # Null terminator

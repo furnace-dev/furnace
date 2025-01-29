@@ -17,7 +17,7 @@ fn test_numpy() raises:
 fn test_pointer_cast() raises:
     var a = 100
     var p = UnsafePointer[Int].address_of(a)
-    # var ptr = int(p)
+    # var ptr = Int(p)
     var p1 = OpaquePointer()
     p1 = p.bitcast[NoneType]()
     var p2 = p1.bitcast[Int]()
@@ -45,12 +45,12 @@ fn test_struct() raises:
     a.print()
 
     var a_ptr = UnsafePointer[A].address_of(a)
-    var a_ptr_int = int(a_ptr)
+    var a_ptr_int = Int(a_ptr)
     print(a_ptr_int)
 
     var a_ptr_int_ptr = OpaquePointer()
     a_ptr_int_ptr = a_ptr.bitcast[NoneType]()
-    var a_ptr_int_ptr_int = int(a_ptr_int_ptr)
+    var a_ptr_int_ptr_int = Int(a_ptr_int_ptr)
     assert_equal(a_ptr_int, a_ptr_int_ptr_int)
 
     var a_ptr_1 = a_ptr_int_ptr.bitcast[A]()

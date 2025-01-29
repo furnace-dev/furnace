@@ -260,8 +260,8 @@ fn jobject_with_capacity(capacity: c_size_t) -> UnsafePointer[JObject]:
     return __wrapper._jobject_with_capacity(capacity)
 
 @always_inline
-fn jobject_from_str(s: DiplomatStringView) -> UnsafePointer[JObject]:
-    return __wrapper._jobject_from_str(s)
+fn jobject_from_String(s: DiplomatStringView) -> UnsafePointer[JObject]:
+    return __wrapper._jobject_from_String(s)
 
 @always_inline
 fn jobject_clone(self: UnsafePointer[JObject]) -> UnsafePointer[JObject]:

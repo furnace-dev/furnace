@@ -15,7 +15,7 @@ struct SliceBoxedUInt8(Stringable):
         memcpy(dest=self.ptr, src=s.unsafe_ptr(), count=len(s))
 
     fn __str__(self) -> String:
-        return String(StringRef(self.ptr, int(self.len)))
+        return String(StringRef(self.ptr, Int(self.len)))
 
 
 alias StrBoxed = SliceBoxedUInt8

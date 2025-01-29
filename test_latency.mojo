@@ -36,7 +36,7 @@ fn calculate_percentiles(
     var results = Dict[Int, Float64]()
     for p in percentiles:
         var k = (len(data) - 1) * (float(p[]) / 100.0)
-        var f = int(k)  # 下标索引
+        var f = Int(k)  # 下标索引
         var c = f + 1  # 上标索引
 
         if c >= len(data):
@@ -83,7 +83,7 @@ fn main() raises:
     var results = List[Float64]()
 
     var rounds = 600
-    logd("rounds: " + str(rounds))
+    logd("rounds: " + String(rounds))
     # 测试下单和撤单延迟
     for i in range(rounds):
         try:
@@ -105,10 +105,10 @@ fn main() raises:
             if i > 0:
                 results.append(elapsed)
 
-            logd("Order " + str(i) + " RTT: " + str(elapsed) + "ms")
+            logd("Order " + String(i) + " RTT: " + String(elapsed) + "ms")
             logd(String(",").join(results))
         except e:
-            logd("Error: " + str(e))
+            logd("Error: " + String(e))
             # try:
             #     _ = api.cancel_all_orders(symbol, params)
             # except:
@@ -124,16 +124,16 @@ fn main() raises:
 
     if len(results) > 0:
         var avg_rtt = total / Float64(len(results))
-        logd("Successfully tested " + str(len(results)) + " orders")
-        logd("Average round-trip time: " + str(avg_rtt) + " milliseconds")
+        logd("Successfully tested " + String(len(results)) + " orders")
+        logd("Average round-trip time: " + String(avg_rtt) + " milliseconds")
 
         # Calculate and print min/max values
         sort(results)
         var max_latency = results[-1]
         var min_latency = results[0]
 
-        logd("Max: " + str(max_latency) + "ms")
-        logd("Min: " + str(min_latency) + "ms")
+        logd("Max: " + String(max_latency) + "ms")
+        logd("Min: " + String(min_latency) + "ms")
 
         var percentiles = List[Int]()
         percentiles.append(5)
@@ -141,7 +141,7 @@ fn main() raises:
         percentiles.append(90)
         var stats = calculate_percentiles(results, percentiles)
         for p in percentiles:
-            logd(str(p[]) + "%: " + str(stats[p[]]) + "ms")
+            logd(String(p[]) + "%: " + String(stats[p[]]) + "ms")
 
     # # 清理所有未完成订单
     # try:

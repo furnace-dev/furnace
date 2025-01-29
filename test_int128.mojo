@@ -7,7 +7,7 @@ fn test_init_from_lower_upper() raises:
     assert_true(num.lower == 10)
     assert_true(num.upper == 20)
 
-# fn test_init_from_int() raises:
+# fn test_init_from_Int() raises:
 #     num = Int128(0x123456789ABCDEF0)
 #     assert_true(num.lower == 0x789ABCDEF0)
 #     assert_true(num.upper == 0x0000000000123456)
@@ -26,7 +26,7 @@ fn test_init_from_invalid_string() raises:
     try:
         _ = Int128("invalid")
     except e:
-        assert_equal(str(e), "String is not convertible to integer with base 10: 'invalid'")
+        assert_equal(String(e), "String is not convertible to integer with base 10: 'invalid'")
 
 fn test_eq() raises:
     num1 = Int128(10, 20)
@@ -61,17 +61,17 @@ fn test_sub() raises:
 fn test_abs() raises:
     num = Int128(10, -20)
     result = abs(num)
-    assert_equal(str(result), "1918446744073709551606")
+    assert_equal(String(result), "1918446744073709551606")
 
-fn test_str() raises:
+fn test_String() raises:
     num = Int128(10, 20)
-    assert_equal(str(num), "2010")
+    assert_equal(String(num), "2010")
 
 fn test_repr() raises:
     num = Int128(10, 20)
     assert_equal(repr(num), "2010")
 
 
-# fn test_from_int() raises:
+# fn test_from_Int() raises:
 #     num = Int128(10)
-#     # assert_equal(str(num), "10")
+#     # assert_equal(String(num), "10")

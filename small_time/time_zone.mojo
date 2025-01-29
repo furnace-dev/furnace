@@ -12,7 +12,7 @@ fn local() -> TimeZone:
         Local timezone.
     """
     var local_t = c.localtime(0)
-    return TimeZone(int(local_t.tm_gmtoff), String("local"))
+    return TimeZone(Int(local_t.tm_gmtoff), String("local"))
 
 
 fn from_utc(utc_str: String) raises -> TimeZone:
@@ -111,4 +111,4 @@ struct TimeZone(Stringable):
             offset_abs = self.offset
         var hh = offset_abs // 3600
         var mm = offset_abs % 3600
-        return sign + str(hh).rjust(2, "0") + sep + str(mm).rjust(2, "0")
+        return sign + String(hh).rjust(2, "0") + sep + String(mm).rjust(2, "0")

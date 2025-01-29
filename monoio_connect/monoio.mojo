@@ -13,5 +13,5 @@ fn sleep_ns(rt: MonoioRuntimePtr, duration_ns: UInt64):
 
 @always_inline
 fn sleep(rt: MonoioRuntimePtr, duration: Float64):
-    var duration_ns = int(duration * 1000000)
+    var duration_ns = Int(duration * 1000000)
     _ = monoio_sleep_ns(rt, duration_ns)

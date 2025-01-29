@@ -18,23 +18,23 @@ from ccxt.foundation._async_trading_operations import (
 
 fn on_order(trading_context: TradingContext, order: Order) -> None:
     logd("on_order start")
-    logd("trading_context: " + str(trading_context))
-    logd("order: " + str(order))
-    logd("exchange_id: " + str(trading_context.exchange_id))
+    logd("trading_context: " + String(trading_context))
+    logd("order: " + String(order))
+    logd("exchange_id: " + String(trading_context.exchange_id))
     logd("account_id: " + trading_context.account_id)
     logd("trader_id: " + trading_context.trader_id)
     logd("=============")
     logd("id: " + order.id)
     logd("symbol: " + order.symbol)
     logd("type: " + order.type)
-    logd("side: " + str(order.side))
-    logd("amount: " + str(order.amount))
-    logd("price: " + str(order.price))
+    logd("side: " + String(order.side))
+    logd("amount: " + String(order.amount))
+    logd("price: " + String(order.price))
     logd("on_order end")
 
 
 fn on_ticker(trading_context: TradingContext, ticker: Ticker) -> None:
-    logi("on_ticker: " + str(trading_context) + " " + str(ticker))
+    logi("on_ticker: " + String(trading_context) + " " + String(ticker))
 
 
 fn run() raises:
@@ -64,39 +64,39 @@ fn run() raises:
     # 获取市场
     # var market = gate.fetch_markets(params)
     # for m in market:
-    #     logd(str(m[].value()))
+    #     logd(String(m[].value()))
 
     # 获取币种
     # var currencies = gate.fetch_currencies(params)
     # for c in currencies:
-    #     logd(str(c[].value()))
+    #     logd(String(c[].value()))
 
     # 获取ticker
     var ticker = gate.fetch_ticker("BTC_USDT")
-    logd(str(ticker))
+    logd(String(ticker))
 
     # 获取tickers
     # var symbols = List[String](capacity=2)
     # symbols.append("BTC_USDT")
     # var tickers = gate.fetch_tickers(symbols, params)
     # for t in tickers:
-    #     logd(str(t[]))
+    #     logd(String(t[]))
 
     # 获取order_book
     # var order_book = gate.fetch_order_book("BTC_USDT", 10, params)
     # for a in order_book.asks:
-    #     logd("a: " + str(a[]))
+    #     logd("a: " + String(a[]))
     # for b in order_book.bids:
-    #     logd("b: " + str(b[]))
+    #     logd("b: " + String(b[]))
 
     # 获取trades
     # var trades = gate.fetch_trades("BTC_USDT", None, None, params)
     # for t in trades:
-    #     logd(str(t[]))
+    #     logd(String(t[]))
 
     # 获取balance
     # var balance = gate.fetch_balance(params)
-    # logd(str(balance))
+    # logd(String(balance))
 
     var ok = gate.create_order_async(
         "BTC_USDT",
@@ -106,7 +106,7 @@ fn run() raises:
         Fixed(93000),
         params,
     )
-    logi("ok: " + str(ok))
+    logi("ok: " + String(ok))
 
     logi("sleep")
 

@@ -44,18 +44,18 @@ from ccxt.foundation._async_trading_operations import (
 
 fn on_order(trading_context: TradingContext, order: Order) -> None:
     logd("on_order start")
-    # logd("trading_context: " + str(trading_context))
-    # logd("order: " + str(order))
-    logd("exchange_id: " + str(trading_context.exchange_id))
+    # logd("trading_context: " + String(trading_context))
+    # logd("order: " + String(order))
+    logd("exchange_id: " + String(trading_context.exchange_id))
     logd("account_id: " + trading_context.account_id)
     logd("trader_id: " + trading_context.trader_id)
     logd("=============")
     logd("id: " + order.id)
     logd("symbol: " + order.symbol)
     logd("type: " + order.type)
-    logd("side: " + str(order.side))
-    logd("amount: " + str(order.amount))
-    logd("price: " + str(order.price))
+    logd("side: " + String(order.side))
+    logd("amount: " + String(order.amount))
+    logd("price: " + String(order.price))
     logd("on_order end")
 
 
@@ -86,46 +86,46 @@ fn test_bybit() raises:
 
     # var markets = bybit.fetch_markets(params)
     # for market in markets:
-    #     logd(str(market[].value()))
+    #     logd(String(market[].value()))
 
     # var currencies = bybit.fetch_currencies(params)
     # for currency in currencies:
-    #     print(str(currency[].value()))
+    #     print(String(currency[].value()))
 
     var ticker = bybit.fetch_ticker(symbol)
-    logd(str(ticker))
+    logd(String(ticker))
 
     # var symbols = List[String](capacity=2)
     # symbols.append(symbol)
     # symbols.append("ETHUSDT")
     # var tickers = bybit.fetch_tickers(symbols, params)
     # for ticker in tickers:
-    #     logd(str(ticker[]))
+    #     logd(String(ticker[]))
 
     # var order_book = bybit.fetch_order_book(symbol, 10, params)
-    # logd(str(order_book))
+    # logd(String(order_book))
 
-    # logd("len(asks)=" + str(len(order_book.asks)))
-    # logd("len(bids)=" + str(len(order_book.bids)))
-    # logd("ask: " + str(order_book.asks[0]))
-    # logd("bid: " + str(order_book.bids[0]))
+    # logd("len(asks)=" + String(len(order_book.asks)))
+    # logd("len(bids)=" + String(len(order_book.bids)))
+    # logd("ask: " + String(order_book.asks[0]))
+    # logd("bid: " + String(order_book.bids[0]))
 
     # var trades = bybit.fetch_trades(symbol, None, None, params)
     # for trade in trades:
-    #     logd(str(trade))
+    #     logd(String(trade))
 
     # var balances = bybit.fetch_balance(params)
-    # logd(str(balances))
+    # logd(String(balances))
     # for k_v in balances.data.items():
     #     logd("key: " + k_v[].key)
-    #     logd("value: " + str(k_v[].value))
+    #     logd("value: " + String(k_v[].value))
 
     # sleep_ms(rt, 10)
 
     var mid_price = (
         (ticker.high + ticker.low) / Fixed(2) * Fixed(0.9)
     ).round_to_fractional(Fixed(0.0001))
-    logd("mid_price: " + str(mid_price))
+    logd("mid_price: " + String(mid_price))
 
     var qty = (Fixed(10.0) / mid_price).round_to_fractional(Fixed(1))
 
@@ -137,31 +137,31 @@ fn test_bybit() raises:
     #     mid_price,
     #     params,
     # )
-    # logd(str(order))
+    # logd(String(order))
 
     # var order_id = order.id
     var order_id = "d7cae7eb-3c98-4116-85a8-b5857c226a8b"
 
     # var order_result = bybit.fetch_order(order_id, String(symbol), params)
-    # logd(str(order_result))
+    # logd(String(order_result))
 
     # var orders = bybit.fetch_orders(String(symbol), None, 5, params)
-    # logd("len(orders)=" + str(len(orders)))
+    # logd("len(orders)=" + String(len(orders)))
     # for order in orders:
-    #     logd(str(order[]))
+    #     logd(String(order[]))
 
     var open_orders = bybit.fetch_open_orders(
         String(symbol), None, None, params
     )
-    logd("len(open_orders)=" + str(len(open_orders)))
+    logd("len(open_orders)=" + String(len(open_orders)))
     for order in open_orders:
-        logd(str(order[]))
+        logd(String(order[]))
 
     # OK
     # var cancel_order = bybit.cancel_order(
     #     order_id, String(symbol), params
     # )
-    # logd(str(cancel_order))
+    # logd(String(cancel_order))
 
     logd("sleep")
 
@@ -171,7 +171,7 @@ fn test_bybit() raises:
 
 
 fn on_ticker(trading_context: TradingContext, ticker: Ticker) -> None:
-    logi("on_ticker: " + str(trading_context) + " " + str(ticker))
+    logi("on_ticker: " + String(trading_context) + " " + String(ticker))
 
 
 # ws

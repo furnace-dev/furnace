@@ -38,22 +38,22 @@ struct EventNotify(Stringable):
 
     fn __str__(self) -> String:
         if len(self.symbol) == 0 and len(self.symbol_api) == 0:
-            return "ExchangeMarket: " + str(self.exchange_market) +
-                ", Event: " + str(self.event) +
-                ", AccountID: " + str(self.account_id)
+            return "ExchangeMarket: " + String(self.exchange_market) +
+                ", Event: " + String(self.event) +
+                ", AccountID: " + String(self.account_id)
         elif len(self.symbol) == 0:
-            return "ExchangeMarket: " + str(self.exchange_market) +
-                ", Event: " + str(self.event) +
+            return "ExchangeMarket: " + String(self.exchange_market) +
+                ", Event: " + String(self.event) +
                 ", SymbolApi: " + self.symbol_api +
-                ", AccountID: " + str(self.account_id)
+                ", AccountID: " + String(self.account_id)
         elif len(self.symbol_api) == 0:
-            return "ExchangeMarket: " + str(self.exchange_market) +
-                ", Event: " + str(self.event) +
+            return "ExchangeMarket: " + String(self.exchange_market) +
+                ", Event: " + String(self.event) +
                 ", Symbol: " + self.symbol +
-                ", AccountID: " + str(self.account_id)
+                ", AccountID: " + String(self.account_id)
         else:
-            return "ExchangeMarket: " + str(self.exchange_market) +
-                ", Event: " + str(self.event) +
+            return "ExchangeMarket: " + String(self.exchange_market) +
+                ", Event: " + String(self.event) +
                 ", Symbol: " + self.symbol +
                 ", SymbolApi: " + self.symbol_api +
-                ", AccountID: " + str(self.account_id)
+                ", AccountID: " + String(self.account_id)

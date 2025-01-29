@@ -11,17 +11,17 @@ struct ExchangeMarket(Stringable):
         return nanoid()
 
     fn to_string(self) -> String:
-        return String.write(str(self.exchange), ".", str(self.market_type))
+        return String.write(String(self.exchange), ".", String(self.market_type))
 
     fn int64(self) -> Int64:
         return Int64(
-            int(self.exchange._value) << 16 + int(self.market_type._value)
+            Int(self.exchange._value) << 16 + Int(self.market_type._value)
         )
 
     fn int32(self) -> Int32:
         return Int32(
-            int(self.exchange._value) << 16 + int(self.market_type._value)
+            Int(self.exchange._value) << 16 + Int(self.market_type._value)
         )
 
     fn __str__(self) -> String:
-        return str(self.exchange) + "." + str(self.market_type)
+        return String(self.exchange) + "." + String(self.market_type)

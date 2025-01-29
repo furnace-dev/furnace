@@ -79,13 +79,13 @@ struct Binance(ProExchangeable):
     var _api_secret: String
     var _testnet: Bool
     var _ws: UnsafePointer[WebSocket]
-    var _on_ticker: OnTickerC
-    var _on_tickers: OnTickersC
-    var _on_order_book: OnOrderBookC
-    var _on_trade: OnTradeC
-    var _on_balance: OnBalanceC
-    var _on_order: OnOrderC
-    var _on_my_trade: OnMyTradeC
+    var _on_ticker: UnsafePointer[OnTickerC, alignment=1]
+    var _on_tickers: UnsafePointer[OnTickersC, alignment=1]
+    var _on_order_book: UnsafePointer[OnOrderBookC, alignment=1]
+    var _on_trade: UnsafePointer[OnTradeC, alignment=1]
+    var _on_balance: UnsafePointer[OnBalanceC, alignment=1]
+    var _on_order: UnsafePointer[OnOrderC, alignment=1]
+    var _on_my_trade: UnsafePointer[OnMyTradeC, alignment=1]
     var _uid: UnsafePointer[String]
     var _trading_context: TradingContext
     var _subscriptions: List[Dict[String, Any]]
@@ -109,13 +109,13 @@ struct Binance(ProExchangeable):
         self._verbose = config.get("verbose", False).bool()
         self._is_private = config.get("is_private", False).bool()
         self._ws = UnsafePointer[WebSocket].alloc(1)
-        self._on_ticker = ticker_decorator(empty_on_ticker)
-        self._on_tickers = tickers_decorator(empty_on_tickers)
-        self._on_order_book = orderbook_decorator(empty_on_order_book)
-        self._on_trade = trade_decorator(empty_on_trade)
-        self._on_balance = balance_decorator(empty_on_balance)
-        self._on_order = order_decorator(empty_on_order)
-        self._on_my_trade = mytrade_decorator(empty_on_my_trade)
+        self._on_ticker = UnsafePointer[OnTickerC, alignment=1].alloc(1)
+        self._on_tickers = UnsafePointer[OnTickersC, alignment=1].alloc(1)
+        self._on_order_book = UnsafePointer[OnOrderBookC, alignment=1].alloc(1)
+        self._on_trade = UnsafePointer[OnTradeC, alignment=1].alloc(1)
+        self._on_balance = UnsafePointer[OnBalanceC, alignment=1].alloc(1)
+        self._on_order = UnsafePointer[OnOrderC, alignment=1].alloc(1)
+        self._on_my_trade = UnsafePointer[OnMyTradeC, alignment=1].alloc(1)
         self._uid = UnsafePointer[String].alloc(1)
         self._trading_context = trading_context
         self._subscriptions = List[Dict[String, Any]]()
@@ -153,26 +153,26 @@ struct Binance(ProExchangeable):
         self._client.destroy_pointee()
         self._client.free()
 
-    fn set_on_ticker(mut self, on_ticker: OnTickerC) -> None:
-        self._on_ticker = on_ticker
+    fn set_on_ticker(self, on_ticker: OnTickerC) -> None:
+        self._on_ticker.init_pointee_move(on_ticker)
 
-    fn set_on_tickers(mut self, on_tickers: OnTickersC) -> None:
-        self._on_tickers = on_tickers
+    fn set_on_tickers(self, on_tickers: OnTickersC) -> None:
+        self._on_tickers.init_pointee_move(on_tickers)
 
-    fn set_on_order_book(mut self, on_order_book: OnOrderBookC) -> None:
-        self._on_order_book = on_order_book
+    fn set_on_order_book(self, on_order_book: OnOrderBookC) -> None:
+        self._on_order_book.init_pointee_move(on_order_book)
 
-    fn set_on_trade(mut self, on_trade: OnTradeC) -> None:
-        self._on_trade = on_trade
+    fn set_on_trade(self, on_trade: OnTradeC) -> None:
+        self._on_trade.init_pointee_move(on_trade)
 
-    fn set_on_balance(mut self, on_balance: OnBalanceC) -> None:
-        self._on_balance = on_balance
+    fn set_on_balance(self, on_balance: OnBalanceC) -> None:
+        self._on_balance.init_pointee_move(on_balance)
 
-    fn set_on_order(mut self, on_order: OnOrderC) -> None:
-        self._on_order = on_order
+    fn set_on_order(self, on_order: OnOrderC) -> None:
+        self._on_order.init_pointee_move(on_order)
 
-    fn set_on_my_trade(mut self, on_my_trade: OnMyTradeC) -> None:
-        self._on_my_trade = on_my_trade
+    fn set_on_my_trade(self, on_my_trade: OnMyTradeC) -> None:
+        self._on_my_trade.init_pointee_move(on_my_trade)
 
     fn connect(mut self, rt: MonoioRuntimePtr) raises -> None:
         """
@@ -212,7 +212,7 @@ struct Binance(ProExchangeable):
             "Connecting to Binance WebSocket at: wss://"
             + host
             + ":"
-            + str(port)
+            + String(port)
             + path
         )
 
@@ -243,7 +243,7 @@ struct Binance(ProExchangeable):
             try:
                 self_ptr[].__on_open()
             except e:
-                logw("__on_open error: " + str(e))
+                logw("__on_open error: " + String(e))
 
         return wrapper
 
@@ -352,9 +352,9 @@ struct Binance(ProExchangeable):
         ticker.ask = ask
         ticker.bidVolume = Fixed(bid_size)
         ticker.askVolume = Fixed(ask_size)
-        ticker.timestamp = int(data.get_i64("E"))
-        ticker.datetime = str(ticker.timestamp)
-        self._on_ticker(self._trading_context, ticker)
+        ticker.timestamp = Int(data.get_i64("E"))
+        ticker.datetime = String(ticker.timestamp)
+        self._on_ticker[](self._trading_context, ticker)
         _ = data^
 
     @always_inline
@@ -412,7 +412,7 @@ struct Binance(ProExchangeable):
         """
         var order = Order()
         var obj = json_obj.get_object_mut("o")
-        order.id = str(obj.get_u64("i"))
+        order.id = String(obj.get_u64("i"))
         order.symbol = obj.get_str("s")
         order.status = obj.get_str("X")
         order.side = (
@@ -422,8 +422,8 @@ struct Binance(ProExchangeable):
         order.amount = Fixed(obj.get_str("q"))
         order.filled = Fixed(obj.get_str("z"))
         order.remaining = order.amount - order.filled
-        order.timestamp = int(obj.get_i64("T"))
-        order.datetime = str(order.timestamp)
+        order.timestamp = Int(obj.get_i64("T"))
+        order.datetime = String(order.timestamp)
         order.lastTradeTimestamp = order.timestamp
         order.lastUpdateTimestamp = order.timestamp
         order.clientOrderId = obj.get_str("c")
@@ -441,7 +441,7 @@ struct Binance(ProExchangeable):
 
         _ = obj^
 
-        self._on_order(self._trading_context, order)
+        self._on_order[](self._trading_context, order)
 
     fn __on_ping(self) -> None:
         logd("__on_ping")
@@ -464,9 +464,9 @@ struct Binance(ProExchangeable):
 
         try:
             var ret = self._client[].extend_listen_key_with_callback()
-            logd("extend_listen_key ret: " + str(ret))
+            logd("extend_listen_key ret: " + String(ret))
         except e:
-            loge("extend_listen_key error: " + str(e))
+            loge("extend_listen_key error: " + String(e))
         self._last_renewal_time = now
 
     @always_inline
@@ -496,7 +496,7 @@ struct Binance(ProExchangeable):
     ) raises -> None:
         """推送有限档深度信息。levels表示几档买卖单信息, 可选 5/10/20档."""
         # <symbol>@depth<levels>
-        var levels = params["levels"].int() if "levels" in params else 5
+        var levels = params["levels"].Int() if "levels" in params else 5
         var sub = Tuple[String, Int](symbol, levels)
         self._order_book_subscriptions.append(sub)
 
@@ -521,13 +521,13 @@ struct Binance(ProExchangeable):
     fn subscribe(self, streams: List[String]) raises:
         var id = idgen_next_id()
         var request = JsonObject()
-        request.insert_str("method", "SUBSCRIBE")
+        request.insert_String("method", "SUBSCRIBE")
         var stream_array = JsonArray()
         for stream in streams:
-            stream_array.push_str(stream[])
+            stream_array.push_String(stream[])
         request.insert_array("params", stream_array)
         request.insert_i64("id", id)
-        var request_text = str(request)
+        var request_text = String(request)
         if self._verbose:
             logd("subscribe: " + request_text)
         self.send(request_text)
@@ -535,13 +535,13 @@ struct Binance(ProExchangeable):
     fn unsubscribe(self, streams: List[String]) raises:
         var id = idgen_next_id()
         var request = JsonObject()
-        request.insert_str("method", "UNSUBSCRIBE")
+        request.insert_String("method", "UNSUBSCRIBE")
         var stream_array = JsonArray()
         for stream in streams:
-            stream_array.push_str(stream[])
+            stream_array.push_String(stream[])
         request.insert_array("params", stream_array)
         request.insert_i64("id", id)
-        var request_text = str(request)
+        var request_text = String(request)
         if self._verbose:
             logd("subscribe: " + request_text)
         self.send(request_text)

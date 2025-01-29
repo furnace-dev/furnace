@@ -185,8 +185,8 @@ fn jvalueref_is_f64(self: UnsafePointer[JValueRef]) -> c_bool:
     return __wrapper._jvalueref_is_f64(self)
 
 @always_inline
-fn jvalueref_is_str(self: UnsafePointer[JValueRef]) -> c_bool:
-    return __wrapper._jvalueref_is_str(self)
+fn jvalueref_is_String(self: UnsafePointer[JValueRef]) -> c_bool:
+    return __wrapper._jvalueref_is_String(self)
 
 @always_inline
 fn jvalueref_is_object(self: UnsafePointer[JValueRef]) -> c_bool:

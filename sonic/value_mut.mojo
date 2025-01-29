@@ -66,8 +66,8 @@ struct JsonValueMut(Stringable):
         return jvaluemut_is_f64(self._value)
 
     @always_inline
-    fn is_str(self) -> Bool:
-        return jvaluemut_is_str(self._value)
+    fn is_String(self) -> Bool:
+        return jvaluemut_is_String(self._value)
 
     @always_inline
     fn is_object(self) -> Bool:
@@ -106,10 +106,10 @@ struct JsonValueMut(Stringable):
         return default
 
     @always_inline
-    fn as_str(self, default: String = "") -> String:
+    fn as_String(self, default: String = "") -> String:
         var default_sref = StringRef(default.unsafe_cstr_ptr(), len(default))
         var out = diplomat_buffer_write_create(1024)
-        jvaluemut_as_str(self._value, default_sref, out)
+        jvaluemut_as_String(self._value, default_sref, out)
         var s_data = diplomat_buffer_write_get_bytes(out)
         var s_len = diplomat_buffer_write_len(out)
         var s = String(StringRef(s_data, s_len))

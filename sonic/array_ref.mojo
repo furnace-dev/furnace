@@ -78,7 +78,7 @@ struct JsonArrayRef(Stringable):
     fn get_str(self, index: Int, default: StringRef = "") -> String:
         var vref = jarrayref_get(self._array, index)
         var out = diplomat_buffer_write_create(1024)
-        jvalueref_as_str(vref, default, out)
+        jvalueref_as_String(vref, default, out)
         var s_data = diplomat_buffer_write_get_bytes(out)
         var s_len = diplomat_buffer_write_len(out)
         var ret_str_ref = StringRef(s_data, s_len)

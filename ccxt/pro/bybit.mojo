@@ -76,13 +76,13 @@ struct Bybit(ProExchangeable):
     var _api_secret: String
     var _testnet: Bool
     var _ws: UnsafePointer[WebSocket]
-    var _on_ticker: OnTickerC
-    var _on_tickers: OnTickersC
-    var _on_order_book: OnOrderBookC
-    var _on_trade: OnTradeC
-    var _on_balance: OnBalanceC
-    var _on_order: OnOrderC
-    var _on_my_trade: OnMyTradeC
+    var _on_ticker: UnsafePointer[OnTickerC, alignment=1]
+    var _on_tickers: UnsafePointer[OnTickersC, alignment=1]
+    var _on_order_book: UnsafePointer[OnOrderBookC, alignment=1]
+    var _on_trade: UnsafePointer[OnTradeC, alignment=1]
+    var _on_balance: UnsafePointer[OnBalanceC, alignment=1]
+    var _on_order: UnsafePointer[OnOrderC, alignment=1]
+    var _on_my_trade: UnsafePointer[OnMyTradeC, alignment=1]
     var _trading_context: TradingContext
     var _is_private: Bool
     var _verbose: Bool
@@ -98,13 +98,13 @@ struct Bybit(ProExchangeable):
         self._is_private = config.get("is_private", False).bool()
         self._verbose = config.get("verbose", False).bool()
         self._ws = UnsafePointer[WebSocket].alloc(1)
-        self._on_ticker = ticker_decorator(empty_on_ticker)
-        self._on_tickers = tickers_decorator(empty_on_tickers)
-        self._on_order_book = orderbook_decorator(empty_on_order_book)
-        self._on_trade = trade_decorator(empty_on_trade)
-        self._on_balance = balance_decorator(empty_on_balance)
-        self._on_order = order_decorator(empty_on_order)
-        self._on_my_trade = mytrade_decorator(empty_on_my_trade)
+        self._on_ticker = UnsafePointer[OnTickerC, alignment=1].alloc(1)
+        self._on_tickers = UnsafePointer[OnTickersC, alignment=1].alloc(1)
+        self._on_order_book = UnsafePointer[OnOrderBookC, alignment=1].alloc(1)
+        self._on_trade = UnsafePointer[OnTradeC, alignment=1].alloc(1)
+        self._on_balance = UnsafePointer[OnBalanceC, alignment=1].alloc(1)
+        self._on_order = UnsafePointer[OnOrderC, alignment=1].alloc(1)
+        self._on_my_trade = UnsafePointer[OnMyTradeC, alignment=1].alloc(1)
         self._trading_context = trading_context
         self._category = "linear"
         self._subscription_topics = List[String]()
@@ -127,26 +127,26 @@ struct Bybit(ProExchangeable):
         self._category = other._category
         self._subscription_topics = other._subscription_topics
 
-    fn set_on_ticker(mut self, on_ticker: OnTickerC) -> None:
-        self._on_ticker = on_ticker
+    fn set_on_ticker(self, on_ticker: OnTickerC) -> None:
+        self._on_ticker.init_pointee_move(on_ticker)
 
-    fn set_on_tickers(mut self, on_tickers: OnTickersC) -> None:
-        self._on_tickers = on_tickers
+    fn set_on_tickers(self, on_tickers: OnTickersC) -> None:
+        self._on_tickers.init_pointee_move(on_tickers)
 
-    fn set_on_order_book(mut self, on_order_book: OnOrderBookC) -> None:
-        self._on_order_book = on_order_book
+    fn set_on_order_book(self, on_order_book: OnOrderBookC) -> None:
+        self._on_order_book.init_pointee_move(on_order_book)
 
-    fn set_on_trade(mut self, on_trade: OnTradeC) -> None:
-        self._on_trade = on_trade
+    fn set_on_trade(self, on_trade: OnTradeC) -> None:
+        self._on_trade.init_pointee_move(on_trade)
 
-    fn set_on_balance(mut self, on_balance: OnBalanceC) -> None:
-        self._on_balance = on_balance
+    fn set_on_balance(self, on_balance: OnBalanceC) -> None:
+        self._on_balance.init_pointee_move(on_balance)
 
-    fn set_on_order(mut self, on_order: OnOrderC) -> None:
-        self._on_order = on_order
+    fn set_on_order(self, on_order: OnOrderC) -> None:
+        self._on_order.init_pointee_move(on_order)
 
-    fn set_on_my_trade(mut self, on_my_trade: OnMyTradeC) -> None:
-        self._on_my_trade = on_my_trade
+    fn set_on_my_trade(self, on_my_trade: OnMyTradeC) -> None:
+        self._on_my_trade.init_pointee_move(on_my_trade)
 
     fn connect(mut self, rt: MonoioRuntimePtr) raises -> None:
         """
@@ -165,7 +165,7 @@ struct Bybit(ProExchangeable):
             "Connecting to Bybit WebSocket at: wss://"
             + host
             + ":"
-            + str(port)
+            + String(port)
             + path
         )
 
@@ -196,7 +196,7 @@ struct Bybit(ProExchangeable):
             try:
                 self_ptr[].__on_open()
             except e:
-                logw("__on_open error: " + str(e))
+                logw("__on_open error: " + String(e))
 
         return wrapper
 
@@ -299,7 +299,7 @@ struct Bybit(ProExchangeable):
             logd("ping")
         elif op == "auth":
             var success = json_obj.get_bool("success")
-            logd("success: " + str(success))
+            logd("success: " + String(success))
             if success:
                 logi("WebSocket authentication successful")
                 self._subscribe()
@@ -334,9 +334,9 @@ struct Bybit(ProExchangeable):
         ticker.ask = ask
         ticker.bidVolume = Fixed(bid_size)
         ticker.askVolume = Fixed(ask_size)
-        ticker.timestamp = int(data.get_i64("E"))
-        ticker.datetime = str(ticker.timestamp)
-        self._on_ticker(self._trading_context, ticker)
+        ticker.timestamp = Int(data.get_i64("E"))
+        ticker.datetime = String(ticker.timestamp)
+        self._on_ticker[](self._trading_context, ticker)
         _ = data^
 
     @always_inline
@@ -409,13 +409,13 @@ struct Bybit(ProExchangeable):
             order.amount = Fixed(item_view.get_str("qty"))
             order.filled = Fixed(item_view.get_str("leavesQty"))
             try:
-                order.timestamp = int(item_view.get_str("createdTime"))
+                order.timestamp = Int(item_view.get_str("createdTime"))
             except e:
-                logw("parse createdTime error: " + str(e))
-            order.datetime = str(order.timestamp)
+                logw("parse createdTime error: " + String(e))
+            order.datetime = String(order.timestamp)
             if self._verbose:
-                logd("order: " + str(order))
-            self._on_order(self._trading_context, order)
+                logd("order: " + String(order))
+            self._on_order[](self._trading_context, order)
         _ = data^
 
     @always_inline
@@ -490,8 +490,8 @@ struct Bybit(ProExchangeable):
         var id = idgen_next_id()
 
         var o = JsonObject()
-        o.insert_str("req_id", str(id))
-        o.insert_str("op", "ping")
+        o.insert_String("req_id", String(id))
+        o.insert_String("op", "ping")
         var body_str = o.to_string()
         if self._verbose:
             logd("send: " + body_str)
@@ -515,7 +515,7 @@ struct Bybit(ProExchangeable):
         mut self, symbol: String, params: Dict[String, Any]
     ) raises -> None:
         # orderbook.{depth}.{symbol} e.g., orderbook.1.BTCUSDT
-        var depth = params.get("depth", 1).int()
+        var depth = params.get("depth", 1).Int()
         var topic = String.format("orderbook.{}.{}", depth, symbol)
         self._subscription_topics.append(topic)
 
@@ -545,29 +545,29 @@ struct Bybit(ProExchangeable):
 
         var id = idgen_next_id()
         var o = JsonObject()
-        o.insert_str("req_id", str(id))
-        o.insert_str("op", "subscribe")
+        o.insert_String("req_id", String(id))
+        o.insert_String("op", "subscribe")
         var args = JsonArray()
         for topic in self._subscription_topics:
-            args.push_str(topic[])
+            args.push_String(topic[])
         o.insert_array("args", args)
         var body_str = o.to_string()
         logd("send: " + body_str)
         _ = self._ws[].send(body_str)
 
     fn generate_auth_payload(self) -> String:
-        var expires = str(int(now_ms() + 5000))
+        var expires = String(Int(now_ms() + 5000))
         var req: String = "GET/realtime" + expires
         var hex_signature = compute_hmac_sha256_hex(req, self._api_secret)
 
         var id = idgen_next_id()
         var o = JsonObject()
-        o.insert_str("req_id", str(id))
-        o.insert_str("op", "auth")
+        o.insert_String("req_id", String(id))
+        o.insert_String("op", "auth")
         var args = JsonArray()
-        args.push_str(self._api_key)
-        args.push_str(expires)
-        args.push_str(hex_signature)
+        args.push_String(self._api_key)
+        args.push_String(expires)
+        args.push_String(hex_signature)
         o.insert_array("args", args)
         var s = o.to_string()
         return s

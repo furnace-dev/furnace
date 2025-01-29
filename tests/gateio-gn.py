@@ -31,7 +31,7 @@ def gen_sign(method, url, query_string=None, payload_string=None):
     hashed_payload = m.hexdigest()
     s = '%s\n%s\n%s\n%s\n%s' % (method, url, query_string or "", hashed_payload, t)
     sign = hmac.new(secret.encode('utf-8'), s.encode('utf-8'), hashlib.sha512).hexdigest()
-    return {'KEY': key, 'Timestamp': str(t), 'SIGN': sign}
+    return {'KEY': key, 'Timestamp': String(t), 'SIGN': sign}
 
 def orders(size, close, symbol, tif, price):
     host = "https://api.gateio.ws"

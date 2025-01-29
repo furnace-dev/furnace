@@ -25,11 +25,11 @@ struct Int128(Stringable, Representable):
     fn __init__(out self, value: String) raises:
         var parts = value.split(".")
         if len(parts) == 1:
-            self.lower = int(parts[0])
+            self.lower = Int(parts[0])
             self.upper = 0
         elif len(parts) == 2:
-            self.lower = int(parts[0])
-            self.upper = int(parts[1])
+            self.lower = Int(parts[0])
+            self.upper = Int(parts[1])
         else:
             raise Error("Invalid string format for Int128")
 
@@ -117,9 +117,9 @@ struct Int128(Stringable, Representable):
         # Convert to string
         var value: String
         if result.upper > 0:
-            value = str(result.upper) + str(result.lower)
+            value = String(result.upper) + String(result.lower)
         else:
-            value = str(result.lower)
+            value = String(result.lower)
 
         # Add negative sign if needed
         if is_negative:
@@ -131,5 +131,5 @@ struct Int128(Stringable, Representable):
         return self.to_string()
 
     fn __repr__(self) -> String:
-        #return "Int128(" + str(self.lower) + ", " + str(self.upper) + ")"
+        #return "Int128(" + String(self.lower) + ", " + String(self.upper) + ")"
         return self.to_string()

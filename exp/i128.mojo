@@ -26,19 +26,19 @@ struct Int128:
         if v < 0:
             hi = UInt64.MAX
         self.hi = hi
-        self.lo = UInt64(int(v))
+        self.lo = UInt64(Int(v))
 
     fn __init__(out self, v: Int32):
-        self.__init__(Int64(int(v)))
+        self.__init__(Int64(Int(v)))
 
     fn __init__(out self, v: Int16):
-        self.__init__(Int64(int(v)))
+        self.__init__(Int64(Int(v)))
 
     fn __init__(out self, v: Int8):
-        self.__init__(Int64(int(v)))
+        self.__init__(Int64(Int(v)))
 
     fn __init__(out self, v: Int):
-        self.__init__(Int64(int(v)))
+        self.__init__(Int64(Int(v)))
 
     fn __init__(out self, v: UInt64):
         self.hi = 0

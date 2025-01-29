@@ -21,18 +21,18 @@ from ccxt.foundation.bitmex import BitMEX
 
 fn on_order(trading_context: TradingContext, order: Order) -> None:
     logd("on_order start")
-    # logd("trading_context: " + str(trading_context))
-    # logd("order: " + str(order))
-    logd("exchange_id: " + str(trading_context.exchange_id))
+    # logd("trading_context: " + String(trading_context))
+    # logd("order: " + String(order))
+    logd("exchange_id: " + String(trading_context.exchange_id))
     logd("account_id: " + trading_context.account_id)
     logd("trader_id: " + trading_context.trader_id)
     logd("=============")
     logd("id: " + order.id)
     logd("symbol: " + order.symbol)
     logd("type: " + order.type)
-    logd("side: " + str(order.side))
-    logd("amount: " + str(order.amount))
-    logd("price: " + str(order.price))
+    logd("side: " + String(order.side))
+    logd("amount: " + String(order.amount))
+    logd("price: " + String(order.price))
     logd("on_order end")
 
 
@@ -56,36 +56,36 @@ fn test_rest(api_key: String, api_secret: String) raises -> None:
     var markets = bm.fetch_markets(params)
     print("1002")
     for market in markets:
-        print(str(market))
+        print(String(market))
     # https://api.gateio.ws/api/v4/spot/currencies
     # var currencies = gate.fetch_currencies(params)
     # for currency in currencies:
-    #     print(str(currency[].value()))
+    #     print(String(currency[].value()))
 
     # var ticker = gate.fetch_ticker("BTC_USDT")
-    # logd(str(ticker))
+    # logd(String(ticker))
 
     # var symbols = List[String](capacity=2)
     # symbols.append("BTC_USDT")
     # symbols.append("ETH_USDT")
     # var tickers = gate.fetch_tickers(symbols, params)
     # for ticker in tickers:
-    #     logd(str(ticker[]))
+    #     logd(String(ticker[]))
 
     # var order_book = gate.fetch_order_book("BTC_USDT", 10, params)
-    # logd(str(order_book))
+    # logd(String(order_book))
 
-    # logd("len(asks)=" + str(len(order_book.asks)))
-    # logd("len(bids)=" + str(len(order_book.bids)))
-    # logd("ask: " + str(order_book.asks[0]))
-    # logd("bid: " + str(order_book.bids[0]))
+    # logd("len(asks)=" + String(len(order_book.asks)))
+    # logd("len(bids)=" + String(len(order_book.bids)))
+    # logd("ask: " + String(order_book.asks[0]))
+    # logd("bid: " + String(order_book.bids[0]))
 
     # var trades = gate.fetch_trades("BTC_USDT", None, None, params)
     # for trade in trades:
-    #     logd(str(trade))
+    #     logd(String(trade))
 
     # var balance = gate.fetch_balance(params)
-    # logd(str(balance))
+    # logd(String(balance))
 
     # logd("create_order")
     # try:
@@ -97,9 +97,9 @@ fn test_rest(api_key: String, api_secret: String) raises -> None:
     #         Fixed(93000),
     #         params,
     #     )
-    #     logd(str(order))
+    #     logd(String(order))
     # except e:
-    #     logd("create_order error: " + str(e))
+    #     logd("create_order error: " + String(e))
     # logd("create_order end")
 
     # _ = bm.create_order_async(
@@ -116,7 +116,7 @@ fn test_rest(api_key: String, api_secret: String) raises -> None:
     # var cancel_order = gate.cancel_order(
     #     String("58828270140601928"), String("BTC_USDT"), params
     # )
-    # logd(str(cancel_order))
+    # logd(String(cancel_order))
     # logd("cancel_order end")
 
     logd("sleep")
@@ -127,7 +127,7 @@ fn test_rest(api_key: String, api_secret: String) raises -> None:
 
 
 fn on_ticker(trading_context: TradingContext, ticker: Ticker) -> None:
-    logi("on_ticker: " + str(trading_context) + " " + str(ticker))
+    logi("on_ticker: " + String(trading_context) + " " + String(ticker))
 
 
 # ws

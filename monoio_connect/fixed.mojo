@@ -34,7 +34,7 @@ struct Fixed(Stringable):
         self._value = FIXED_SCALE_I * v
 
     fn __init__(out self, v: Float64):
-        self._value = Int64(int(v * FIXED_SCALE_F))
+        self._value = Int64(Int(v * FIXED_SCALE_F))
 
     fn __init__(out self, v: String):
         if len(v) == 0:
@@ -63,8 +63,8 @@ struct Fixed(Stringable):
         return self._value
 
     @always_inline
-    fn to_int(self) -> Int:
-        return int(self._value / FIXED_SCALE_I)
+    fn to_Int(self) -> Int:
+        return Int(self._value / FIXED_SCALE_I)
 
     @always_inline
     fn to_float(self) -> Float64:
@@ -76,7 +76,7 @@ struct Fixed(Stringable):
 
     @always_inline
     fn round_to_fractional(self, scale: Self) -> Self:
-        var v = fixed12_round_to_fractional(self._value, int(scale._value))
+        var v = fixed12_round_to_fractional(self._value, Int(scale._value))
         return Self {
             _value: v,
         }
@@ -171,9 +171,9 @@ fn fixed12_new_string(s: String) raises -> Int64:
         if len(fs) > MAX_FRAC_BITS_12:
             var decimalPart = atol(fs[0 : MAX_FRAC_BITS_12 + 1])
             if decimalPart % 10 >= 5:
-                fs = str(decimalPart / 10 + 1)
+                fs = String(decimalPart / 10 + 1)
             else:
-                fs = str(decimalPart / 10)
+                fs = String(decimalPart / 10)
             fs = fs[0:MAX_FRAC_BITS_12]
         else:
             fs += "0" * (MAX_FRAC_BITS_12 - len(fs))
@@ -203,7 +203,7 @@ fn fixed12_to_string(fixed: Int64) -> String:
         result = "0"
     else:
         while intPart > 0:
-            result = chr(int(ord("0") + intPart % 10)) + result
+            result = chr(Int(ord("0") + intPart % 10)) + result
             intPart /= 10
 
     if isNegative:
@@ -212,7 +212,7 @@ fn fixed12_to_string(fixed: Int64) -> String:
     var fracPart_ = fixed12_frac_part(fixed_)
     if fracPart_ > 0:
         result += "."
-        var fracPart = str(fracPart_)
+        var fracPart = String(fracPart_)
         var fracPartLength = len(fracPart)
         var zerosToAdd = MAX_FRAC_BITS_12 - fracPartLength
         if zerosToAdd > 0:
@@ -231,11 +231,11 @@ fn fixed12_to_string(fixed: Int64) -> String:
 @always_inline
 fn fixed12_round_to_fractional(a: Int64, scale: Int) -> Int64:
     """Rounds to a fractional number with a given scale."""
-    return int(round(float(a) / float(scale)) * float(scale))
+    return Int(round(float(a) / float(scale)) * float(scale))
 
 
 @always_inline
 fn fixed12_round(a: Int64, decimalPlaces: Int) -> Int64:
     """Rounds to a given number of decimal places."""
     var scale = pow(10, MAX_FRAC_BITS_12 - decimalPlaces)
-    return int(round(float(a) / float(scale)) * float(scale))
+    return Int(round(float(a) / float(scale)) * float(scale))

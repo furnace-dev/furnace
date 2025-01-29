@@ -13,20 +13,20 @@ struct Decimal(Stringable, Representable):
     fn __str__(self) -> String:
         return (
             "width: "
-            + str(self.width)
+            + String(self.width)
             + ", scale: "
-            + str(self.scale)
+            + String(self.scale)
             + ", value: "
-            + str(self.value)
+            + String(self.value)
         )
 
     fn __repr__(self) -> String:
         return (
             "Decimal("
-            + str(self.width)
+            + String(self.width)
             + ", "
-            + str(self.scale)
+            + String(self.scale)
             + ", "
-            + str(self.value)
+            + String(self.value)
             + ")"
         )

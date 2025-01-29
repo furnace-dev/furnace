@@ -88,8 +88,8 @@ struct BitMEX(Exchangeable):
         self._client = UnsafePointer[HttpClient].alloc(1)
         self._api = ImplicitAPI()
         self._base = Exchange(config)
-        self._api_key = str(config.get("api_key", String()))
-        self._api_secret = str(config.get("api_secret", String()))
+        self._api_key = String(config.get("api_key", String()))
+        self._api_secret = String(config.get("api_secret", String()))
         self._testnet = config.get("testnet", False).bool()
         self._verbose = config.get("verbose", False).bool()
         self._on_order = order_decorator(empty_on_order)
@@ -150,9 +150,9 @@ struct BitMEX(Exchangeable):
     ) raises -> String:
         var entry_path = path
         for key in params:
-            # logi("key: " + key[] + ", value: " + str(params[key[]]))
+            # logi("key: " + key[] + ", value: " + String(params[key[]]))
             var value = params[key[]]
-            entry_path = entry_path.replace("{" + key[] + "}", str(value))
+            entry_path = entry_path.replace("{" + key[] + "}", String(value))
         var path_ = "/api/v1/" + entry_path
         var full_path = path_
         if query != "":
@@ -166,7 +166,7 @@ struct BitMEX(Exchangeable):
 
         if api == ApiType.Private:
             # headers["SIGN"] = self._api_secret
-            var ts = int(now_ms() / 1000)
+            var ts = Int(now_ms() / 1000)
             var method_str = String("")
             if method == Method.METHOD_GET:
                 method_str = "GET"
@@ -175,11 +175,11 @@ struct BitMEX(Exchangeable):
             elif method == Method.METHOD_DELETE:
                 method_str = "DELETE"
             else:
-                raise Error("Invalid method: " + str(method))
+                raise Error("Invalid method: " + String(method))
             # var sign = self._sign_payload(method_str, path_, query, payload, ts)
             # headers["KEY"] = self._api_key
             # headers["SIGN"] = sign
-            # headers["Timestamp"] = str(ts)
+            # headers["Timestamp"] = String(ts)
             # logd("sign: " + sign)
         # logd("payload: " + payload)
 
@@ -187,7 +187,7 @@ struct BitMEX(Exchangeable):
             full_path, method, headers, payload
         )
         if response.status_code == 0:
-            raise Error("HTTP status code: " + str(response.status_code))
+            raise Error("HTTP status code: " + String(response.status_code))
         if response.status_code >= 200 and response.status_code < 300:
             return response.text
         elif response.status_code >= 400 and response.status_code < 500:
@@ -214,7 +214,7 @@ struct BitMEX(Exchangeable):
             body_hash = "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e"
 
         # s = f"{method}\n{path}\n{query_string}\n{body_hash}\n{ts}"
-        # var s = method + "\n" + path + "\n" + query_string + "\n" + body_hash + "\n" + str(
+        # var s = method + "\n" + path + "\n" + query_string + "\n" + body_hash + "\n" + String(
         #     ts
         # )
         var s = String.write(

@@ -39,7 +39,7 @@ fn monoio_test() raises:
     # 启动线程
     var tid: UInt64 = 0
     _ = pthread_create(tid, thread_run)
-    print("tid: " + str(tid))
+    print("tid: " + String(tid))
 
     time.sleep(10.0)
 
@@ -84,15 +84,15 @@ struct TestData(Stringable):
     fn __str__(self) -> String:
         return (
             "TestData(id="
-            + str(self.id)
+            + String(self.id)
             + ", name="
             + self.name
             + ", ts0="
-            + str(self.ts0)
+            + String(self.ts0)
             + ", ts1="
-            + str(self.ts1)
+            + String(self.ts1)
             + ", diff="
-            + str(self.ts1 - self.ts0)
+            + String(self.ts1 - self.ts0)
             + " ns)"
         )
 
@@ -101,7 +101,7 @@ fn recv_task_monoio(arg: TaskEntryArg) -> Int32:
     print("recv_task_monoio")
     bind_to_cpu_set(0)
     var channel: ChannelPtr = arg
-    print(str(channel))
+    print(String(channel))
     while True:
         var data = channel_recv(channel)
         if data == UnsafePointer[c_void]():
@@ -109,7 +109,7 @@ fn recv_task_monoio(arg: TaskEntryArg) -> Int32:
         var data_ptr = data.bitcast[TestData]()
         # data_ptr[].ts1 = time.perf_counter_ns()
         data_ptr[].ts1 = tscns_read_nanos()
-        print(str(data_ptr[]))
+        print(String(data_ptr[]))
         data.free()
     # return 0
 
@@ -126,7 +126,7 @@ fn channel_test2() raises:
     var channel = create_channel(2, 1024)
     var tid: UInt64 = 0
     _ = pthread_create(tid, recv_task, channel)
-    print("tid: " + str(tid))
+    print("tid: " + String(tid))
 
     while True:
         var data = UnsafePointer[TestData].alloc(1)
@@ -162,10 +162,10 @@ fn http_raw_test() raises:
         HttpVersion.HTTP_VERSION_HTTP11,
         payload.unsafe_cstr_ptr(),
     )
-    print(str(req))
+    print(String(req))
     # var rt = create_monoio_runtime()
     # var resp = http_client_request(rt, c, req)
-    # print(str(resp))
+    # print(String(resp))
     # destroy_http_request(req)
     # destroy_http_response(resp)
     # destroy_monoio_runtime(rt)
@@ -188,12 +188,12 @@ fn http_callback(
     source: UnsafePointer[c_void],
     res: HttpResponsePtr,
 ) -> None:
-    print("http_callback req_id: " + str(req_id))
-    print("http_callback status_code: " + str(http_response_status_code(res)))
+    print("http_callback req_id: " + String(req_id))
+    print("http_callback status_code: " + String(http_response_status_code(res)))
     alias buf_size = 1024 * 1000
     var buf = stack_allocation[buf_size, Int8]()
     var body = http_response_body(res, buf, buf_size)
-    print("http_callback text: " + str(String(StringRef(buf, body))))
+    print("http_callback text: " + String(String(StringRef(buf, body))))
     # destroy_http_response(res)
 
 
@@ -217,59 +217,59 @@ fn idgen_test() raises:
     # idgen_set_options(0, 6, 6)
     # idgen_set_worker_id(0)
     var id = idgen_next_id()
-    print("id: " + str(id))
+    print("id: " + String(id))
 
 
 fn ws_on_open(id: Int64, ws: UnsafePointer[c_void]) -> None:
-    print("ws_on_open ws: " + str(ws) + " ws_id: " + str(int(ws)))
+    print("ws_on_open ws: " + String(ws) + " ws_id: " + String(Int(ws)))
 
     # 发送一个消息
     # var text = String("hello")
     # var ret = ws_send_text(MonoioRuntimePtr(), ws, text.unsafe_cstr_ptr())
-    # print("ws_send_text ret: " + str(ret))
+    # print("ws_send_text ret: " + String(ret))
     # assert_equal(ret, 0)
 
-    var ts = int(now_ms() / 1000)
+    var ts = Int(now_ms() / 1000)
     #
     var text = String(
         '{"time": 123456, "channel": "futures.book_ticker", "event":'
         ' "subscribe", "payload": ["XRP_USDT"]}'
     )
     # var text = String('{"time": 123456, "channel": "futures.order_book", "event": "subscribe", "payload": ["BTC_USDT", "20", "0"]}')
-    text = text.replace("123456", str(ts))
-    print("text: " + str(text))
+    text = text.replace("123456", String(ts))
+    print("text: " + String(text))
     var ret = ws_send_text(ws, text.unsafe_cstr_ptr())
-    print("ws_send_text ret: " + str(ret))
+    print("ws_send_text ret: " + String(ret))
 
 
 fn ws_on_message(id: Int64, ws: UnsafePointer[c_void], msg: StrBoxed) -> None:
-    # print("ws_on_message ws: " + str(ws))
+    # print("ws_on_message ws: " + String(ws))
     var s = String(StringRef(msg.ptr, msg.len))
-    # print("s: " + str(s))
+    # print("s: " + String(s))
     free_str(msg)
 
 
 fn ws_on_ping(id: Int64, ws: UnsafePointer[c_void]) -> None:
-    print("ws_on_ping ws: " + str(ws))
+    print("ws_on_ping ws: " + String(ws))
 
 
 fn ws_on_error(id: Int64, ws: UnsafePointer[c_void], err: StrBoxed) -> None:
-    print("ws_on_error ws: " + str(ws))
+    print("ws_on_error ws: " + String(ws))
 
 
 fn ws_on_close(id: Int64, ws: UnsafePointer[c_void]) -> None:
-    print("ws_on_close ws: " + str(ws))
+    print("ws_on_close ws: " + String(ws))
 
 
 fn ws_on_timer(id: Int64, ws: UnsafePointer[c_void], count: UInt64) -> None:
-    print("ws_on_timer ws: " + str(ws) + " count: " + str(count))
+    print("ws_on_timer ws: " + String(ws) + " count: " + String(count))
     # ws.send('{"time" : 123456, "channel" : "futures.ping"}')
     # 发送一个ping消息
     var text = String('{"time": 123456, "channel": "futures.ping"}')
-    var ts = int(now_ms() / 1000)
-    text = text.replace("123456", str(ts))
+    var ts = Int(now_ms() / 1000)
+    text = text.replace("123456", String(ts))
     var ret = ws_send_text(ws, text.unsafe_cstr_ptr())
-    print("ws_send_text ret: " + str(ret))
+    print("ws_send_text ret: " + String(ret))
 
 
 fn ws_test() raises:
@@ -385,15 +385,15 @@ struct WebSocketWrapper:
     fn on_open(mut self: Self) -> None:
         print("on_open")
         # 订阅
-        var ts = int(now_ms() / 1000)
+        var ts = Int(now_ms() / 1000)
         var text = String(
             '{"time": 123456, "channel": "futures.book_ticker", "event":'
             ' "subscribe", "payload": ["XRP_USDT"]}'
         )
-        text = text.replace("123456", str(ts))
-        print("text: " + str(text))
+        text = text.replace("123456", String(ts))
+        print("text: " + String(text))
         var ret = self._ws[].send(text)
-        print("ws_send_text ret: " + str(ret))
+        print("ws_send_text ret: " + String(ret))
 
     fn on_message(mut self: Self, msg: String) -> None:
         print("on_message: " + msg)
@@ -408,12 +408,12 @@ struct WebSocketWrapper:
         print("on_close")
 
     fn on_timer(mut self: Self, count: UInt64) -> None:
-        print("on_timer: " + str(count))
+        print("on_timer: " + String(count))
         var text = String('{"time": 123456, "channel": "futures.ping"}')
-        var ts = int(now_ms() / 1000)
-        text = text.replace("123456", str(ts))
+        var ts = Int(now_ms() / 1000)
+        text = text.replace("123456", String(ts))
         var ret = self._ws[].send(text)
-        print("ws_send_text ret: " + str(ret))
+        print("ws_send_text ret: " + String(ret))
 
     fn run(mut self: Self) -> None:
         var rt = create_monoio_runtime()
@@ -471,7 +471,7 @@ fn tscns_test() raises:
     # tscns_init(INIT_CALIBRATE_NANOS, CALIBRATE_INTERVAL_NANOS)
     # tscns_calibrate()
     var ns = tscns_read_nanos()
-    print("tscns_read_nanos: " + str(ns))
+    print("tscns_read_nanos: " + String(ns))
     assert_true(ns > 1735996711599105344)
 
 
@@ -484,7 +484,7 @@ fn thread_run1(context: UnsafePointer[UInt8]) -> UInt8:
 fn thread_test1() raises:
     var arg = UnsafePointer[UInt8]()
     var tid = start_thread(thread_run1, arg)
-    print("tid: " + str(tid))
+    print("tid: " + String(tid))
 
 
 fn task() raises -> None:
@@ -493,7 +493,7 @@ fn task() raises -> None:
 
 fn thread_test2() raises:
     var tid = start_thread(task)
-    print("tid: " + str(tid))
+    print("tid: " + String(tid))
 
 
 fn main() raises:

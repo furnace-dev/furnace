@@ -46,11 +46,11 @@ fn test_create_order() raises:
     var price = doc.get_str("price")
     var avg_price = doc.get_str("avg_deal_price")
     var datetime = doc.get_str("create_time")
-    var timestamp = int(doc.get_i64("create_time"))
-    var update_timestamp = int(doc.get_i64("update_time"))
+    var timestamp = Int(doc.get_i64("create_time"))
+    var update_timestamp = Int(doc.get_i64("update_time"))
     var time_in_force = doc.get_str("time_in_force")
     var info = Dict[String, Any]()
-    var id_str = str(id)
+    var id_str = String(id)
     var price_fixed = Fixed(price)
     var average_fixed = Fixed(avg_price)
     var amount_fixed = Fixed(amount)
@@ -84,7 +84,7 @@ fn test_create_order() raises:
         fee=None,
     )
     assert_equal(
-        str(result),
+        String(result),
         (
             "Order(id=58828270139457759, symbol=BTC_USDT, type=, side=buy,"
             " amount=0, price=93000)"
@@ -126,7 +126,7 @@ fn test_ws_order() raises:
 
         var order = Order()
         var obj = value.as_object_mut()
-        order.id = str(obj.get_u64("id"))
+        order.id = String(obj.get_u64("id"))
         order.symbol = obj.get_str_ref("contract")
         order.status = obj.get_str_ref("status")
         order.side = OrderSide.Buy  # TODO:
@@ -134,9 +134,9 @@ fn test_ws_order() raises:
         order.amount = Fixed(obj.get_i64("size"))
         order.remaining = Fixed(obj.get_i64("left"))
         order.filled = order.amount - order.remaining
-        order.datetime = str(obj.get_i64("create_time"))  # TODO:
-        order.timestamp = int(obj.get_i64("create_time_ms"))
-        order.lastTradeTimestamp = int(obj.get_i64("create_time_ms"))
+        order.datetime = String(obj.get_i64("create_time"))  # TODO:
+        order.timestamp = Int(obj.get_i64("create_time_ms"))
+        order.lastTradeTimestamp = Int(obj.get_i64("create_time_ms"))
         order.lastUpdateTimestamp = order.lastTradeTimestamp
         order.clientOrderId = obj.get_str_ref("text")
         order.timeInForce = String(obj.get_str_ref("tif"))
@@ -207,7 +207,7 @@ fn test_create_order_parse_2() raises:
     )
     var gate = Gate(Dict[String, Any](), trading_context)
     var result = gate.parse_order(doc)
-    print(str(result))
+    print(String(result))
 
 
 fn test_a() raises:
@@ -243,7 +243,7 @@ fn test_sign() raises:
     config["testnet"] = testnet
     var gate = Gate(config, trading_context)
     var sign_result = gate._sign_payload(
-        method_str, path_, query, payload, str(ts)
+        method_str, path_, query, payload, String(ts)
     )
     assert_equal(sign_result, sign)
 
@@ -297,8 +297,8 @@ fn test_compute_hmac_sha512_hex() raises:
 fn test_subscribe_order() raises:
     var symbol = "BTC_USDT"
     var name = String.format("{}.orders", "futures")
-    var p = JsonValue.from_str("[]")
+    var p = JsonValue.from_String("[]")
     var pv = JsonValueArrayView(p)
-    pv.push_str("1")
-    pv.push_str(symbol)
-    assert_equal(str(p), '["1","BTC_USDT"]')
+    pv.push_String("1")
+    pv.push_String(symbol)
+    assert_equal(String(p), '["1","BTC_USDT"]')

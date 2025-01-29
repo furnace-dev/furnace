@@ -79,7 +79,7 @@ fn test_binance_fetch_balance() raises -> None:
     headers["accept-encoding"] = "gzip, deflate"
     var path = String("/fapi/v3/account")
     var data = ""
-    var ts_str = "recvWindow=5000&timestamp=" + str(now_ms())
+    var ts_str = "recvWindow=5000&timestamp=" + String(now_ms())
     var payload = data + "&" + ts_str if data != "" else ts_str
     var signature = compute_hmac_sha256_hex(payload, api_secret)
     headers["X-MBX-APIKEY"] = api_key
@@ -92,18 +92,18 @@ fn test_binance_fetch_balance() raises -> None:
 
 fn on_order(trading_context: TradingContext, order: Order) -> None:
     logd("on_order start")
-    # logd("trading_context: " + str(trading_context))
-    # logd("order: " + str(order))
-    logd("exchange_id: " + str(trading_context.exchange_id))
+    # logd("trading_context: " + String(trading_context))
+    # logd("order: " + String(order))
+    logd("exchange_id: " + String(trading_context.exchange_id))
     logd("account_id: " + trading_context.account_id)
     logd("trader_id: " + trading_context.trader_id)
     logd("=============")
     logd("id: " + order.id)
     logd("symbol: " + order.symbol)
     logd("type: " + order.type)
-    logd("side: " + str(order.side))
-    logd("amount: " + str(order.amount))
-    logd("price: " + str(order.price))
+    logd("side: " + String(order.side))
+    logd("amount: " + String(order.amount))
+    logd("price: " + String(order.price))
     logd("on_order end")
 
 
@@ -133,43 +133,43 @@ fn test_binance() raises:
 
     # var markets = binance.fetch_markets(params)
     # for market in markets:
-    #     logt(str(market[].value()))
+    #     logt(String(market[].value()))
 
     # var currencies = binance.fetch_currencies(params)
     # for currency in currencies:
-    #     print(str(currency[].value()))
+    #     print(String(currency[].value()))
 
     var ticker = binance.fetch_ticker(symbol)
-    logd(str(ticker))
+    logd(String(ticker))
 
     # var symbols = List[String](capacity=2)
     # symbols.append("BTCUSDT")
     # symbols.append("ETHUSDT")
     # var tickers = binance.fetch_tickers(symbols, params)
     # for ticker in tickers:
-    #     logd(str(ticker[]))
+    #     logd(String(ticker[]))
 
     # var order_book = binance.fetch_order_book(symbol, 10, params)
-    # logd(str(order_book))
+    # logd(String(order_book))
 
-    # logd("len(asks)=" + str(len(order_book.asks)))
-    # logd("len(bids)=" + str(len(order_book.bids)))
-    # logd("ask: " + str(order_book.asks[0]))
-    # logd("bid: " + str(order_book.bids[0]))
+    # logd("len(asks)=" + String(len(order_book.asks)))
+    # logd("len(bids)=" + String(len(order_book.bids)))
+    # logd("ask: " + String(order_book.asks[0]))
+    # logd("bid: " + String(order_book.bids[0]))
 
     # var trades = binance.fetch_trades(symbol, None, None, params)
     # for trade in trades:
-    #     logd(str(trade))
+    #     logd(String(trade))
 
     # var balance = binance.fetch_balance(params)
-    # logd(str(balance))
+    # logd(String(balance))
 
     # sleep_ms(rt, 10)
 
     var mid_price = (
         (ticker.high + ticker.low) / Fixed(2) * Fixed(0.9)
     ).round_to_fractional(Fixed(0.0001))
-    logd("mid_price: " + str(mid_price))
+    logd("mid_price: " + String(mid_price))
 
     var qty = (Fixed(10.0) / mid_price).round_to_fractional(Fixed(1))
 
@@ -181,30 +181,30 @@ fn test_binance() raises:
     #     mid_price,
     #     params,
     # )
-    # logd(str(order))
+    # logd(String(order))
 
     # var order_id = order.id
     var order_id = "260630021"
 
     # var order_result = binance.fetch_order(order_id, String(symbol), params)
-    # logd(str(order_result))
+    # logd(String(order_result))
 
     # var orders = binance.fetch_orders(String(symbol), None, None, params)
-    # logd("len(orders)=" + str(len(orders)))
+    # logd("len(orders)=" + String(len(orders)))
     # for order in orders:
-    #     logd(str(order))
+    #     logd(String(order))
 
     var open_orders = binance.fetch_open_orders(
         String(symbol), None, None, params
     )
-    logd("len(open_orders)=" + str(len(open_orders)))
+    logd("len(open_orders)=" + String(len(open_orders)))
     for order in open_orders:
-        logd(str(order))
+        logd(String(order))
 
     # var cancel_order = binance.cancel_order(
     #     String("4077634200"), String(symbol), params
     # )
-    # logd(str(cancel_order))
+    # logd(String(cancel_order))
 
     logd("sleep")
 
@@ -214,7 +214,7 @@ fn test_binance() raises:
 
 
 fn on_ticker(trading_context: TradingContext, ticker: Ticker) -> None:
-    logi("on_ticker: " + str(trading_context) + " " + str(ticker))
+    logi("on_ticker: " + String(trading_context) + " " + String(ticker))
 
 
 # ws

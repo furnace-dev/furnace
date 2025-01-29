@@ -44,9 +44,9 @@ struct JsonArrayMut(Stringable):
         jarraymut_push_f64(self._array, value)
 
     @always_inline
-    fn push_str(self, value: String) -> None:
+    fn push_String(self, value: String) -> None:
         var s_ref = StringRef(value.unsafe_cstr_ptr(), len(value))
-        jarraymut_push_str(self._array, s_ref)
+        jarraymut_push_String(self._array, s_ref)
 
     @always_inline
     fn push_value(self, value: JsonValue) -> None:
@@ -132,7 +132,7 @@ struct JsonArrayMut(Stringable):
     fn get_str(self, index: Int, default: StringRef = "") -> String:
         var vref = jarraymut_get(self._array, index)
         var out = diplomat_buffer_write_create(1024)
-        jvalueref_as_str(vref, default, out)
+        jvalueref_as_String(vref, default, out)
         var s_data = diplomat_buffer_write_get_bytes(out)
         var s_len = diplomat_buffer_write_len(out)
         var ret_str_ref = StringRef(s_data, s_len)

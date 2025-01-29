@@ -9,12 +9,12 @@ from testing import assert_equal, assert_true
 
 fn test_sonic_rs_internal_sample() raises:
     var s = '{"a":100}'
-    var v = jvalue_from_str(s)
+    var v = jvalue_from_String(s)
 
     var o = v.bitcast[JObject]()
     jobject_insert_i64(o, "b", 101)
-    jobject_insert_str(o, "c", "hello")
-    var a = jvalue_from_str("[1,2,3]")
+    jobject_insert_String(o, "c", "hello")
+    var a = jvalue_from_String("[1,2,3]")
     jobject_insert_value(o, "d", a)
 
     var out = diplomat_buffer_write_create(1024)
@@ -41,7 +41,7 @@ fn test_object() raises:
 
 fn test_object_insert() raises:
     var o2 = JsonObject('{"a":"abc"}')
-    o2.insert_str("b", "def")
+    o2.insert_String("b", "def")
     o2.insert_i64("c", 100)
 
     var v3 = o2.get_str("b")
@@ -68,7 +68,7 @@ fn test_object_get() raises:
 
 fn test_valueref() raises:
     var str = '{"a":100, "b":true, "c": "hello", "f": 100.123}'
-    var v = JsonValue.from_str(str)
+    var v = JsonValue.from_String(str)
     var type_ = v.get_type()
     assert_true(type_ == JsonType.JsonType_Object)
 
@@ -79,7 +79,7 @@ fn test_valueref() raises:
     var a = jvalueref_as_u64(a_ref)
     var b = jvalueref_as_bool(b_ref)
     var out = diplomat_buffer_write_create(1024)
-    jvalueref_as_str(c_ref, "", out)
+    jvalueref_as_String(c_ref, "", out)
     var s_data = diplomat_buffer_write_get_bytes(out)
     var s_len = diplomat_buffer_write_len(out)
     var ret_str_ref = StringRef(s_data, s_len)
@@ -194,7 +194,7 @@ fn test_object_iterator_ref() raises:
     var ret_code = doc.get_i64("retCode")
     var ret_msg = doc.get_str("retMsg")
     if ret_code != 0:
-        raise "error retCode=" + str(ret_code) + ", retMsg=" + ret_msg
+        raise "error retCode=" + String(ret_code) + ", retMsg=" + ret_msg
 
     var result = doc.get_object_ref("result")
     var result_list = result.get_array_ref("list")
@@ -231,7 +231,7 @@ fn test_object_iterator_mut() raises:
     var ret_code = doc.get_i64("retCode")
     var ret_msg = doc.get_str("retMsg")
     if ret_code != 0:
-        raise "error retCode=" + str(ret_code) + ", retMsg=" + ret_msg
+        raise "error retCode=" + String(ret_code) + ", retMsg=" + ret_msg
 
     var result = doc.get_object_mut("result")
     var result_list = result.get_array_mut("list")

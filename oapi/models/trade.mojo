@@ -38,7 +38,7 @@ struct Trade(Stringable):
             " quantity: ",
             self.quantity,
             " side: ",
-            str(self.side),
+            String(self.side),
             " remote_time: ",
             self.remote_time,
             " local_time: ",

@@ -153,17 +153,17 @@ fn log_console(
         var t = now()
         # var tid = gettid()
         var text = t.format("YYYY-MM-DD HH:mm:ss.SSSSSS")
-            + " 0ms " + str(level) #+ " th="
-            # + str(tid)
+            + " 0ms " + String(level) #+ " th="
+            # + String(tid)
             + " ["
             + file_name
             + ":"
-            + str(line)
+            + String(line)
             + "] "
-            + str(s)
+            + String(s)
         print(text)
     except:
-        print(str(level) + " error")
+        print(String(level) + " error")
 
 @always_inline("nodebug")
 fn is_debug_mode() -> Bool:

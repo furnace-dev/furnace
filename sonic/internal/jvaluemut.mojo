@@ -189,8 +189,8 @@ fn jvaluemut_is_number(self: UnsafePointer[JValueMut]) -> c_bool:
     return __wrapper._jvaluemut_is_number(self)
 
 @always_inline
-fn jvaluemut_is_str(self: UnsafePointer[JValueMut]) -> c_bool:
-    return __wrapper._jvaluemut_is_str(self)
+fn jvaluemut_is_String(self: UnsafePointer[JValueMut]) -> c_bool:
+    return __wrapper._jvaluemut_is_String(self)
 
 @always_inline
 fn jvaluemut_is_array(self: UnsafePointer[JValueMut]) -> c_bool:
@@ -229,8 +229,8 @@ fn jvaluemut_as_f64(self: UnsafePointer[JValueMut]) -> OptionF64Result:
     return __wrapper._jvaluemut_as_f64(self)
 
 @always_inline
-fn jvaluemut_as_str(self: UnsafePointer[JValueMut], default: DiplomatStringView, write: UnsafePointer[DiplomatWrite]) -> None:
-    return __wrapper._jvaluemut_as_str(self, default, write)
+fn jvaluemut_as_String(self: UnsafePointer[JValueMut], default: DiplomatStringView, write: UnsafePointer[DiplomatWrite]) -> None:
+    return __wrapper._jvaluemut_as_String(self, default, write)
 
 @always_inline
 fn jvaluemut_as_str_ref(self: UnsafePointer[JValueMut], default: DiplomatStringView) -> DiplomatStringView:

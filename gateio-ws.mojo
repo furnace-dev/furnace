@@ -44,23 +44,23 @@ var flag = False
 
 fn on_order(trading_context: TradingContext, order: Order) -> None:
     logd("on_order start")
-    logd("trading_context: " + str(trading_context))
-    logd("order: " + str(order))
-    logd("exchange_id: " + str(trading_context.exchange_id))
+    logd("trading_context: " + String(trading_context))
+    logd("order: " + String(order))
+    logd("exchange_id: " + String(trading_context.exchange_id))
     logd("account_id: " + trading_context.account_id)
     logd("trader_id: " + trading_context.trader_id)
     logd("=============")
     logd("id: " + order.id)
     logd("symbol: " + order.symbol)
     logd("type: " + order.type)
-    logd("side: " + str(order.side))
-    logd("amount: " + str(order.amount))
-    logd("price: " + str(order.price))
+    logd("side: " + String(order.side))
+    logd("amount: " + String(order.amount))
+    logd("price: " + String(order.price))
     logd("on_order end")
 
 
 fn on_ticker(trading_context: TradingContext, ticker: Ticker) -> None:
-    logi("on_ticker: " + str(trading_context) + " " + str(ticker))
+    logi("on_ticker: " + String(trading_context) + " " + String(ticker))
 
     if not flag:
         flag = True
@@ -74,9 +74,9 @@ fn on_ticker(trading_context: TradingContext, ticker: Ticker) -> None:
                 Fixed(93000),
                 params1,
             )
-            logd("ok: " + str(ok))
+            logd("ok: " + String(ok))
         except e:
-            logd(str(e))
+            logd(String(e))
 
 
 fn init_client() raises:

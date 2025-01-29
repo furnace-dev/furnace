@@ -58,7 +58,7 @@ struct Any:
             return False
 
         if self.isa[Int]() and other.isa[Int]():
-            return self.int() == other.int()
+            return self.Int() == other.Int()
         elif self.isa[Float64]() and other.isa[Float64]():
             return self.float() == other.float()
         elif self.isa[String]() and other.isa[String]():
@@ -76,7 +76,7 @@ struct Any:
     fn get[T: CollectionElement](ref [_]self) -> ref [self._data] T:
         return self._data[T]
 
-    fn int(ref [_]self) -> ref [self._data] Int:
+    fn Int(ref [_]self) -> ref [self._data] Int:
         return self.get[Int]()
 
     fn string(ref [_]self) -> ref [self._data] String:
@@ -90,7 +90,7 @@ struct Any:
 
     fn write_to[W: Writer](self, mut writer: W):
         if self.isa[Int]():
-            self.int().write_to(writer)
+            self.Int().write_to(writer)
         elif self.isa[Float64]():
             self.float().write_to(writer)
         elif self.isa[String]():
@@ -107,7 +107,7 @@ struct Any:
 
     fn min_size_for_string(self) -> Int:
         if self.isa[Int]():
-            return _calc_initial_buffer_size(self.int()) - 1
+            return _calc_initial_buffer_size(self.Int()) - 1
         elif self.isa[Float64]():
             return _calc_initial_buffer_size(self.float()) - 1
         elif self.isa[String]():
@@ -307,19 +307,19 @@ struct Entry:
             var value = doc.get_value(s_ref)
             var v_type = value.get_type()
             if v_type == JsonType.JsonType_String:
-                self.config[key[]] = value.as_str()
+                self.config[key[]] = value.as_String()
             elif v_type == JsonType.JsonType_Boolean:
                 self.config[key[]] = value.as_bool()
             elif v_type == JsonType.JsonType_Number:
                 var f = value.as_f64()
-                if f == float(int(f)):
-                    self.config[key[]] = int(f)
+                if f == Float64(Int(f)):
+                    self.config[key[]] = Int(f)
                 else:
                     self.config[key[]] = f
             elif v_type == JsonType.JsonType_Array:
                 pass
             else:
-                logi("unknown type: " + str(v_type._value))
+                logi("unknown type: " + String(v_type._value))
         # logd("Entry init end")
 
     fn __set_name__(mut self, name: String) -> None:
@@ -414,11 +414,11 @@ struct Balance(Stringable):
     fn __str__(self) -> String:
         return String.write(
             "Balance(free=",
-            str(self.free),
+            String(self.free),
             ", used=",
-            str(self.used),
+            String(self.used),
             ", total=",
-            str(self.total),
+            String(self.total),
             ")",
         )
 
@@ -459,15 +459,15 @@ struct Trade(Stringable):
             "Trade(id=",
             self.id,
             ", symbol=",
-            str(self.symbol),
+            String(self.symbol),
             ", side=",
-            str(self.side),
+            String(self.side),
             ", amount=",
-            str(self.amount),
+            String(self.amount),
             ", price=",
-            str(self.price),
+            String(self.price),
             ", cost=",
-            str(self.cost),
+            String(self.cost),
             ")",
         )
 
@@ -638,11 +638,11 @@ struct Order(Stringable):
             ", type=",
             self.type,
             ", side=",
-            str(self.side),
+            String(self.side),
             ", amount=",
-            str(self.amount),
+            String(self.amount),
             ", price=",
-            str(self.price),
+            String(self.price),
             ")",
         )
 
@@ -686,13 +686,13 @@ struct Balances(Stringable):
         for k_v in self.data.items():
             if n > 0:
                 data += ", "
-            data += String.write(k_v[].key, ": ", str(k_v[].value))
+            data += String.write(k_v[].key, ": ", String(k_v[].value))
             n -= 1
         return String.write(
             "Balances(datetime=",
             self.datetime,
             ", timestamp=",
-            str(self.timestamp),
+            String(self.timestamp),
             ", data=",
             data,
             ")",
@@ -711,9 +711,9 @@ struct OrderbookEntry(Stringable):
     fn __str__(self) -> String:
         return String.write(
             "OrderbookEntry(price=",
-            str(self.price),
+            String(self.price),
             ", amount=",
-            str(self.amount),
+            String(self.amount),
             ")",
         )
 
@@ -740,13 +740,13 @@ struct OrderBook(Stringable):
             "OrderBook(symbol=",
             self.symbol.value() if self.symbol else "",
             ", timestamp=",
-            str(self.timestamp),
+            String(self.timestamp),
             ", datetime=",
             self.datetime.value() if self.datetime else "",
             # ", asks=",
-            # str(self.asks),
+            # String(self.asks),
             # ", bids=",
-            # str(self.bids),
+            # String(self.bids),
             ")",
         )
 
@@ -900,27 +900,27 @@ struct Ticker(Stringable):
             ", datetime=",
             datetime_str,
             ", high=",
-            str(self.high),
+            String(self.high),
             ", low=",
-            str(self.low),
+            String(self.low),
             ", bid=",
-            str(self.bid),
+            String(self.bid),
             ", bidVolume=",
-            str(self.bidVolume),
+            String(self.bidVolume),
             ", ask=",
-            str(self.ask),
+            String(self.ask),
             ", askVolume=",
-            str(self.askVolume),
+            String(self.askVolume),
             ", vwap=",
-            str(self.vwap),
+            String(self.vwap),
             ", open=",
-            str(self.open),
+            String(self.open),
             ", close=",
-            str(self.close),
+            String(self.close),
             ", last=",
-            str(self.last),
+            String(self.last),
             ", previousClose=",
-            str(self.previousClose),
+            String(self.previousClose),
             ")",
         )
 
@@ -1189,9 +1189,9 @@ struct MarketInterface(Stringable):
             "MarketInterface(symbol=",
             symbol_str,
             ", contractSize=",
-            str(self.contractSize),
+            String(self.contractSize),
             ", precision=",
-            str(self.precision),
+            String(self.precision),
             ")",
         )
 
@@ -1253,7 +1253,7 @@ struct CurrencyInterface(Stringable):
             ", numericId=",
             self.numericId,
             ", precision=",
-            str(self.precision),
+            String(self.precision),
             ", type=",
             "" if self.type is None else self.type.value(),
             ", margin=",
@@ -1476,7 +1476,7 @@ struct ExchangeId(Intable, Stringable):
         self._value = value
 
     fn __int__(self) -> Int:
-        return int(self._value)
+        return Int(self._value)
 
     fn __str__(self) -> String:
         if self == ExchangeId.gateio:
@@ -1519,7 +1519,7 @@ struct TradingContext(Stringable):
     fn __str__(self) -> String:
         return (
             "TradingContext(exchange_id="
-            + str(self.exchange_id)
+            + String(self.exchange_id)
             + ", account_id="
             + self.account_id
             + ", trader_id="

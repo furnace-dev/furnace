@@ -83,7 +83,7 @@ struct Channel(Movable):
         Returns:
             An integer status code indicating success (0) or failure.
         """
-        return int(channel_send(self._ptr, data))
+        return Int(channel_send(self._ptr, data))
 
     @always_inline
     fn recv_raw(self) -> UnsafePointer[UInt8]:

@@ -9,7 +9,7 @@ fn test_auth_json_parse() raises:
     assert_equal(op, "auth")
     var s = "success"
     var success = json_obj.get_bool(s)
-    print("success: " + str(success))
+    print("success: " + String(success))
     assert_equal(success, True)
     _ = json_obj^
 

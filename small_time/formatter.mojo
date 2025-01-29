@@ -165,69 +165,69 @@ struct _Formatter:
             if token_count == 1:
                 return "Y"
             if token_count == 2:
-                return str(m.year).rjust(4, "0")[2:4]
+                return String(m.year).rjust(4, "0")[2:4]
             if token_count == 4:
-                return str(m.year).rjust(4, "0")
+                return String(m.year).rjust(4, "0")
         elif token == _M:
             if token_count == 1:
-                return str(m.month)
+                return String(m.month)
             if token_count == 2:
-                return str(m.month).rjust(2, "0")
+                return String(m.month).rjust(2, "0")
             if token_count == 3:
-                return MONTH_ABBREVIATIONS[int(m.month)]
+                return MONTH_ABBREVIATIONS[Int(m.month)]
             if token_count == 4:
-                return MONTH_NAMES[int(m.month)]
+                return MONTH_NAMES[Int(m.month)]
         elif token == _D:
             if token_count == 1:
-                return str(m.day)
+                return String(m.day)
             if token_count == 2:
-                return str(m.day).rjust(2, "0")
+                return String(m.day).rjust(2, "0")
         elif token == _H:
             if token_count == 1:
-                return str(m.hour)
+                return String(m.hour)
             if token_count == 2:
-                return str(m.hour).rjust(2, "0")
+                return String(m.hour).rjust(2, "0")
         elif token == _h:
             var h_12 = m.hour
             if m.hour > 12:
                 h_12 -= 12
             if token_count == 1:
-                return str(h_12)
+                return String(h_12)
             if token_count == 2:
-                return str(h_12).rjust(2, "0")
+                return String(h_12).rjust(2, "0")
         elif token == _m:
             if token_count == 1:
-                return str(m.minute)
+                return String(m.minute)
             if token_count == 2:
-                return str(m.minute).rjust(2, "0")
+                return String(m.minute).rjust(2, "0")
         elif token == _s:
             if token_count == 1:
-                return str(m.second)
+                return String(m.second)
             if token_count == 2:
-                return str(m.second).rjust(2, "0")
+                return String(m.second).rjust(2, "0")
         elif token == _S:
             if token_count == 1:
-                return str(m.microsecond // 100000)
+                return String(m.microsecond // 100000)
             if token_count == 2:
-                return str(m.microsecond // 10000).rjust(2, "0")
+                return String(m.microsecond // 10000).rjust(2, "0")
             if token_count == 3:
-                return str(m.microsecond // 1000).rjust(3, "0")
+                return String(m.microsecond // 1000).rjust(3, "0")
             if token_count == 4:
-                return str(m.microsecond // 100).rjust(4, "0")
+                return String(m.microsecond // 100).rjust(4, "0")
             if token_count == 5:
-                return str(m.microsecond // 10).rjust(5, "0")
+                return String(m.microsecond // 10).rjust(5, "0")
             if token_count == 6:
-                return str(m.microsecond).rjust(6, "0")
+                return String(m.microsecond).rjust(6, "0")
         elif token == _d:
             if token_count == 1:
-                return str(m.iso_weekday())
+                return String(m.iso_weekday())
             if token_count == 3:
                 return DAY_ABBREVIATIONS[m.iso_weekday()]
             if token_count == 4:
                 return DAY_NAMES[m.iso_weekday()]
         elif token == _Z:
             if token_count == 3:
-                return str(UTC_TZ) if not m.tz else str(m.tz)
+                return String(UTC_TZ) if not m.tz else String(m.tz)
             var separator = "" if token_count == 1 else ":"
             if not m.tz:
                 return UTC_TZ.format(separator)

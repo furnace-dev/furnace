@@ -1897,17 +1897,17 @@ fn truncf(x: Float32) -> Float32:
     return external_call["truncf", Float32, Float32](x)
 
 
-fn rint(x: Float64) -> Float64:
+fn rInt(x: Float64) -> Float64:
     """C library <math.h> function `rint`.
 
     Link:
         https://man7.org/linux/man-pages/man3/rint.3.html
 
     Prototype:
-        double rint(double x)
+        double rInt(double x)
 
     Description:
-        Returns the integer closest to x in the direction of the current rounding mode. If the current rounding type is set towards negative infinity, then rint() is identical to floor(). If the current rounding type is set towards positive infinity, then rint() is identical to ceil().
+        Returns the integer closest to x in the direction of the current rounding mode. If the current rounding type is set towards negative infinity, then rInt() is identical to floor(). If the current rounding type is set towards positive infinity, then rInt() is identical to ceil().
 
     Arguments:
         x: The number to be rounded.
@@ -1939,17 +1939,17 @@ fn rintf(x: Float32) -> Float32:
     return external_call["rintf", Float32, Float32](x)
 
 
-fn nearbyint(x: Float64) -> Float64:
+fn nearbyInt(x: Float64) -> Float64:
     """C library <math.h> function `nearbyint`.
 
     Link:
         https://man7.org/linux/man-pages/man3/rint.3.html
 
     Prototype:
-        double nearbyint(double x)
+        double nearbyInt(double x)
 
     Description:
-        Returns the integer closest to x in the direction of the current rounding mode. If the current rounding type is set towards negative infinity, then nearbyint() is identical to floor(). If the current rounding type is set towards positive infinity, then nearbyint() is identical to ceil().
+        Returns the integer closest to x in the direction of the current rounding mode. If the current rounding type is set towards negative infinity, then nearbyInt() is identical to floor(). If the current rounding type is set towards positive infinity, then nearbyInt() is identical to ceil().
 
     Arguments:
         x: The number to be rounded.

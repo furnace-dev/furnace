@@ -8,8 +8,8 @@ fn test_small_time_yymmdd() raises:
     # 2020-07-03 16:00:00
 
     var p1 = from_timestamp(1593763200000)
-    if "08:00" in str(p1):
-        assert_equal(str(p1), "2020-07-03T16:00:00.000000+08:00")
+    if "08:00" in String(p1):
+        assert_equal(String(p1), "2020-07-03T16:00:00.000000+08:00")
     assert_equal(p1.format("YYMMDD"), "200703")
     var p2 = from_timestamp(1593763200)
     assert_equal(p2.format("YYMMDD"), "200703")

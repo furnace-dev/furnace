@@ -14,7 +14,7 @@ fn __do_task(context: UnsafePointer[UInt8]) -> UInt8:
     try:
         task[]()
     except err:
-        loge("Task failed: " + str(err))
+        loge("Task failed: " + String(err))
     task.free()
     return 0
 
@@ -62,7 +62,7 @@ fn __do_task_with_context[T: AnyType](context: UnsafePointer[UInt8]) -> UInt8:
     try:
         thread_context[]()
     except err:
-        loge("Task failed: " + str(err))
+        loge("Task failed: " + String(err))
     thread_context.free()
     return 0
 

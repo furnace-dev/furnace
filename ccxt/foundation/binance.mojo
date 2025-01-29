@@ -108,7 +108,7 @@ struct Binance(Exchangeable):
         self._testnet = config.get("testnet", False).bool()
         self._verbose = config.get("verbose", False).bool()
         var base_url = "https://fapi.binance.com" if not self._testnet else "https://testnet.binancefuture.com"
-        # logd("base_url: " + str(base_url))
+        # logd("base_url: " + String(base_url))
         self._host = String(base_url).replace("https://", "")
         self._default_type = String("future")
         self._client = UnsafePointer[HttpClient].alloc(1)
@@ -118,8 +118,8 @@ struct Binance(Exchangeable):
         )
         self._api = ImplicitAPI()
         self._base = Exchange(config)
-        self._api_key = str(config.get("api_key", String()))
-        self._api_secret = str(config.get("api_secret", String()))
+        self._api_key = String(config.get("api_key", String()))
+        self._api_secret = String(config.get("api_secret", String()))
         self._on_order = order_decorator(empty_on_order)
         self._trading_context = trading_context
 
@@ -170,7 +170,7 @@ struct Binance(Exchangeable):
         payload: String,
         api: ApiType = ApiType.Public,
     ) raises -> String:
-        # logd("entry: " + str(method) + " " + path)
+        # logd("entry: " + String(method) + " " + path)
         var full_path = path
         var headers = Headers()
 
@@ -191,7 +191,7 @@ struct Binance(Exchangeable):
             full_path, method, headers, payload
         )
         if response.status_code == 0:
-            raise Error("HTTP status code: " + str(response.status_code))
+            raise Error("HTTP status code: " + String(response.status_code))
         if response.status_code >= 200 and response.status_code < 300:
             return response.text
         elif response.status_code >= 400 and response.status_code < 500:
@@ -203,7 +203,7 @@ struct Binance(Exchangeable):
                 # raise Error(label + ": " + message)
                 return response.text
             else:
-                # raise Error("HTTP status code: " + str(response.status_code))
+                # raise Error("HTTP status code: " + String(response.status_code))
                 return response.text
         return response.text
 
@@ -263,7 +263,7 @@ struct Binance(Exchangeable):
 
     @always_inline
     fn _sign(self, mut headers: Headers, data: String) raises -> String:
-        var ts_str = "recvWindow=5000&timestamp=" + str(now_ms())
+        var ts_str = "recvWindow=5000&timestamp=" + String(now_ms())
         var payload = data + "&" + ts_str if data != "" else ts_str
         var signature = compute_hmac_sha256_hex(payload, self._api_secret)
         headers["X-MBX-APIKEY"] = self._api_key
@@ -542,19 +542,19 @@ struct Binance(Exchangeable):
             expiryDatetime=self._base.iso8601(expiry),
             strike=_NoneType(),
             optionType=None,
-            precision=int(price_precision),
+            precision=Int(price_precision),
             limits=MarketLimits(
                 market=MinMax(
                     min=_NoneType(),
                     max=_NoneType(),
                 ),
                 leverage=MinMax(
-                    min=float(0),
-                    max=float(0),
+                    min=Float64(0),
+                    max=Float64(0),
                 ),
                 amount=MinMax(
-                    min=int(0),
-                    max=int(0),
+                    min=Int(0),
+                    max=Int(0),
                 ),
                 price=MinMax(
                     min=_NoneType(),
@@ -600,7 +600,7 @@ struct Binance(Exchangeable):
         var obj_view = JsonValueObjectView(doc)
         var ticker = self.parse_ticker(obj_view)
         _ = doc^
-        ticker.timestamp = int(now_ms())
+        ticker.timestamp = Int(now_ms())
         return ticker
 
     fn parse_ticker[T: JsonObjectViewable](self, doc: T) raises -> Ticker:
@@ -644,7 +644,7 @@ struct Binance(Exchangeable):
         return Ticker(
             info=Dict[String, Any](),
             symbol=symbol,
-            timestamp=int(timestamp),
+            timestamp=Int(timestamp),
             datetime=String(""),
             high=Fixed(high),
             low=Fixed(low),
@@ -691,7 +691,7 @@ struct Binance(Exchangeable):
         var arr = JsonValueArrayView(doc)
         var n = arr.len()
         var result = List[Ticker](capacity=n)
-        var timestamp = int(now_ms())
+        var timestamp = Int(now_ms())
         for i in range(0, n):
             var obj = arr.get(i)
             var obj_view = JsonValueRefObjectView(obj)
@@ -771,8 +771,8 @@ struct Binance(Exchangeable):
             raise Error(msg)
 
         var result = OrderBook()
-        var timestamp = int(doc.get_i64("E"))
-        var id = int(doc.get_i64("lastUpdateId"))
+        var timestamp = Int(doc.get_i64("E"))
+        var id = Int(doc.get_i64("lastUpdateId"))
         result.timestamp = timestamp
         result.symbol = symbol
         result.nonce = id
@@ -848,7 +848,7 @@ struct Binance(Exchangeable):
             raise Error(msg)
 
         var result = Balances()
-        result.timestamp = int(doc.get_i64("updateTime"))
+        result.timestamp = Int(doc.get_i64("updateTime"))
         var assets = doc.get_array_mut("assets")
         for i in range(0, assets.len()):
             var asset = assets.get(i)
@@ -931,7 +931,7 @@ struct Binance(Exchangeable):
         # {"code":-1102,"msg":"Mandatory parameter 'timeinforce' was not sent, was empty/null, or malformed."}
         var doc = JsonObject(text)
         var result = self.parse_order(doc)
-        # logt("result: " + str(result))
+        # logt("result: " + String(result))
         result.side = side
         return result
 
@@ -969,23 +969,23 @@ struct Binance(Exchangeable):
 
         # {"orderId":4077634200,"symbol":"BTCUSDT","status":"NEW","clientOrderId":"pRxDtGFyxElEV3emIYz1tb","price":"93000.00","avgPrice":"0.00","origQty":"1.000","executedQty":"0.000","cumQty":"0.000","cumQuote":"0.00000","timeInForce":"GTC","type":"LIMIT","reduceOnly":false,"closePosition":false,"side":"BUY","positionSide":"BOTH","stopPrice":"0.00","workingType":"CONTRACT_PRICE","priceProtect":false,"origType":"LIMIT","priceMatch":"NONE","selfTradePreventionMode":"NONE","goodTillDate":0,"updateTime":1736869853102}
 
-        var symbol_ = str(obj.get_str_ref("symbol"))
+        var symbol_ = String(obj.get_str_ref("symbol"))
         var id = obj.get_u64("orderId")
-        var clientOrderId = str(obj.get_str_ref("clientOrderId"))
-        var status = str(obj.get_str_ref("status"))
-        var type_ = str(obj.get_str_ref("type"))
-        var amount_ = Fixed(str(obj.get_str_ref("origQty")))
-        var filled_amount = Fixed(str(obj.get_str_ref("executedQty")))
+        var clientOrderId = String(obj.get_str_ref("clientOrderId"))
+        var status = String(obj.get_str_ref("status"))
+        var type_ = String(obj.get_str_ref("type"))
+        var amount_ = Fixed(String(obj.get_str_ref("origQty")))
+        var filled_amount = Fixed(String(obj.get_str_ref("executedQty")))
         var left = amount_ - filled_amount
 
-        var price_ = Fixed(str(obj.get_str_ref("price")))
+        var price_ = Fixed(String(obj.get_str_ref("price")))
         # var avg_price = Fixed(0)
-        var timestamp = int(obj.get_i64("updateTime"))
+        var timestamp = Int(obj.get_i64("updateTime"))
         var update_timestamp = timestamp
         var time_in_force = obj.get_str("time_in_force")
         var result = Order(
             info=Dict[String, Any](),
-            id=str(id),
+            id=String(id),
             clientOrderId=clientOrderId,
             datetime="",
             timestamp=timestamp,
@@ -1051,9 +1051,9 @@ struct Binance(Exchangeable):
         if "order_id" in params:
             query_values["orderId"] = params["order_id"].string()
         if since:
-            query_values["startTime"] = str(since.value())
+            query_values["startTime"] = String(since.value())
         if limit:
-            query_values["limit"] = str(limit.value())
+            query_values["limit"] = String(limit.value())
         var query_str = query_values.to_string()
         var text = self._request(
             self._api.fapiprivate_get_allorders, params, query_str, ""
@@ -1233,8 +1233,11 @@ fn _request_callback(
     source: UnsafePointer[c_void],
     res: HttpResponsePtr,
 ) -> None:
-    logd("request_callback req_id: " + str(req_id))
-    logd("request_callback status_code: " + str(http_response_status_code(res)))
+    logd("request_callback req_id: " + String(req_id))
+    logd(
+        "request_callback status_code: "
+        + String(http_response_status_code(res))
+    )
     alias buf_size = 1024 * 1000
     var buf = stack_allocation[buf_size, Int8]()
     var body = http_response_body(res, buf, buf_size)

@@ -37,12 +37,12 @@ struct Exchange:
 
     @staticmethod
     fn iso8601(timestamp: Int) raises -> String:
-        var tm = from_timestamp(float(timestamp))
+        var tm = from_timestamp(Float64(timestamp))
         return tm.isoformat()
 
     @staticmethod
     fn yymmdd(timestamp: Int, infix: String = "") raises -> String:
-        var ts = from_timestamp(float(timestamp))
+        var ts = from_timestamp(Float64(timestamp))
         return ts.format("YYMMDD")
 
     fn safe_currency(self, currencyId: Str, currency: Currency) -> Currency:
@@ -87,5 +87,5 @@ struct Exchange:
                 first = False
             else:
                 s += "&"
-            s += k + "=" + str(v)
+            s += k + "=" + String(v)
         return s

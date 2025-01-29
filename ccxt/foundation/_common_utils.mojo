@@ -112,4 +112,4 @@ fn save_text_to_file(file_name: String, text: String):
         with open(file_name, "w") as f:
             f.write(text)
     except e:
-        print("save_text_to_file error: " + str(e))
+        print("save_text_to_file error: " + String(e))

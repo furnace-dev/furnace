@@ -119,8 +119,8 @@ fn ws_timer_callbacks_ptr() -> UnsafePointer[WebSocketTimerCallbacks]:
 
 
 fn _ws_on_open(id: Int64, ws: UnsafePointer[c_void]) -> None:
-    logt("ws_on_open ws: " + str(ws) + " ws_id: " + str(int(ws)))
-    var id_ = int(id)
+    logt("ws_on_open ws: " + String(ws) + " ws_id: " + String(Int(ws)))
+    var id_ = Int(id)
     try:
         var ws_ = ws_map_ptr()[][id_]
         ws_[]._set_ws(ws)
@@ -130,45 +130,45 @@ fn _ws_on_open(id: Int64, ws: UnsafePointer[c_void]) -> None:
 
 
 fn _ws_on_message(id: Int64, ws: UnsafePointer[c_void], msg: StrBoxed) -> None:
-    logt("ws_on_message ws: " + str(ws))
+    logt("ws_on_message ws: " + String(ws))
     var s = String(StringRef(msg.ptr, msg.len))
     try:
-        ws_message_callbacks_ptr()[][int(id)](s)
+        ws_message_callbacks_ptr()[][Int(id)](s)
     except e:
         pass
     free_str(msg)
 
 
 fn _ws_on_ping(id: Int64, ws: UnsafePointer[c_void]) -> None:
-    logt("ws_on_ping ws: " + str(ws))
+    logt("ws_on_ping ws: " + String(ws))
     try:
-        ws_ping_callbacks_ptr()[][int(id)]()
+        ws_ping_callbacks_ptr()[][Int(id)]()
     except e:
         pass
 
 
 fn _ws_on_error(id: Int64, ws: UnsafePointer[c_void], err: StrBoxed) -> None:
     var s = String(StringRef(err.ptr, err.len))
-    logt("ws_on_error ws: " + str(ws))
+    logt("ws_on_error ws: " + String(ws))
     try:
-        ws_error_callbacks_ptr()[][int(id)](s)
+        ws_error_callbacks_ptr()[][Int(id)](s)
     except e:
         pass
     free_str(err)
 
 
 fn _ws_on_close(id: Int64, ws: UnsafePointer[c_void]) -> None:
-    logt("ws_on_close ws: " + str(ws))
+    logt("ws_on_close ws: " + String(ws))
     try:
-        ws_close_callbacks_ptr()[][int(id)]()
+        ws_close_callbacks_ptr()[][Int(id)]()
     except e:
         pass
 
 
 fn _ws_on_timer(id: Int64, ws: UnsafePointer[c_void], count: UInt64) -> None:
-    logt("ws_on_timer ws: " + str(ws) + " count: " + str(count))
+    logt("ws_on_timer ws: " + String(ws) + " count: " + String(count))
     try:
-        ws_timer_callbacks_ptr()[][int(id)](count)
+        ws_timer_callbacks_ptr()[][Int(id)](count)
     except e:
         pass
 
@@ -181,7 +181,7 @@ struct WebSocket:
     var _path: String
 
     fn __init__(out self, host: String, port: Int, path: String):
-        self._id = int(idgen_next_id())
+        self._id = Int(idgen_next_id())
         self._ws = UnsafePointer[c_void]()
         self._uri = host
         self._port = port
@@ -233,11 +233,11 @@ struct WebSocket:
             _ws_on_close,
             _ws_on_timer,
         )
-        logd("connect_ws ret: " + str(ret))
+        logd("connect_ws ret: " + String(ret))
 
     fn send(self: Self, text: String) -> Int:
         if self._ws == UnsafePointer[c_void]():
             logw("ws is not connected")
             return -1
         var ret = ws_send_text(self._ws, text.unsafe_cstr_ptr())
-        return int(ret)
+        return Int(ret)

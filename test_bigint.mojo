@@ -9,7 +9,7 @@ fn test_init() raises:
     assert_true(num.sign == False)
 
 
-fn test_init_from_int() raises:
+fn test_init_from_Int() raises:
     num = BigInt(1234567890)
     assert_true(num.sign == False)
     assert_equal(num.to_string(), "1234567890")

@@ -35,7 +35,7 @@ fn test_channel_raw() raises:
         var r = c.recv_raw()
         assert_equal(r[], 100)
         var r1 = c.recv_raw()
-        assert_equal(int(r1), 0)
+        assert_equal(Int(r1), 0)
         assert_equal(r1, UnsafePointer[UInt8]())
         r.free()
 

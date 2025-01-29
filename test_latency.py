@@ -13,7 +13,7 @@ def calculate_percentiles(data, percentiles):
     results = {}
     for p in percentiles:
         k = (len(data_sorted) - 1) * (p / 100)
-        f = int(k)  # Floor index
+        f = Int(k)  # Floor index
         c = f + 1  # Ceiling index
         if c >= len(data_sorted):
             results[p] = data_sorted[f]

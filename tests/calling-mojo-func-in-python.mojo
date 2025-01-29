@@ -8,7 +8,7 @@ fn get_wrapper[Fn: AnyTrivialRegType](f: Fn, ret_type: StringLiteral, *args_type
     var ctypes = Python.import_module("ctypes")
     var tmp_ = UnsafePointer[Fn].alloc(1)
     tmp_[0] = f
-    var tmp = (ctypes.CFUNCTYPE(ctypes.c_void_p)).from_address(int(tmp_))
+    var tmp = (ctypes.CFUNCTYPE(ctypes.c_void_p)).from_address(Int(tmp_))
 
     var py_obj_argtypes = PythonObject([])
 

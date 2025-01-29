@@ -215,7 +215,7 @@ struct BigInt:
             s += "-"
         for i in range(self.eindex(), -1, -1):
             var v = self[i]
-            s += chr(ord("0") + int(v))
+            s += chr(ord("0") + Int(v))
         return s
 
     fn print(self):

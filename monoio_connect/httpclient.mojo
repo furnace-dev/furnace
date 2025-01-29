@@ -62,11 +62,11 @@ struct QueryStringBuilder:
     fn debug(mut self) raises:
         for item in self.data.items():
             logi(
-                # str(i)
+                # String(i)
                 # + ": "
-                str(item[].key)
+                String(item[].key)
                 + " = "
-                + str(item[].value)
+                + String(item[].value)
             )
 
 
@@ -97,7 +97,7 @@ struct HttpResponse(Stringable):
     fn __str__(self) -> String:
         return String.write(
             "[",
-            str(self.status_code),
+            self.status_code,
             " ",
             http_status_code_to_string(self.status_code),
             "] ",
@@ -247,7 +247,7 @@ struct HttpClient:
     ) raises -> HttpResponse:
         var url = self._base_url + path
         if self._verbose:
-            logd(String.format("Request: {} {}", str(method), url))
+            logd(String.format("Request: {} {}", String(method), url))
             if len(payload):
                 logd("Request payload:")
                 logd(payload)
@@ -273,14 +273,14 @@ struct HttpClient:
             if ret.status_code != 0:
                 destroy_http_request(req)
                 if self._verbose:
-                    logd("Request succeeded: " + str(ret))
+                    logd("Request succeeded: " + String(ret))
                 return ret
             if self._verbose:
                 logd(
                     "Request failed, status_code: "
-                    + str(ret.status_code)
+                    + String(ret.status_code)
                     + ", retrying "
-                    + str(i)
+                    + String(i)
                     + "/3"
                 )
         destroy_http_request(req)
@@ -293,7 +293,7 @@ struct HttpClient:
         max_body_size: Int = 1024 * 1000
     ](self, req: HttpRequestPtr,) -> HttpResponse:
         var resp = http_client_request(self._rt, self._client, req)
-        var status_code = int(http_response_status_code(resp))
+        var status_code = Int(http_response_status_code(resp))
         var buf = stack_allocation[max_body_size, Int8]()
         var body = http_response_body(resp, buf, max_body_size)
         var ret = HttpResponse(status_code, String(StringRef(buf, body)))
@@ -312,7 +312,7 @@ struct HttpClient:
     ) raises -> None:
         var url = self._base_url + path
         if self._verbose:
-            logd(String.format("Request: {} {}", str(method), url))
+            logd(String.format("Request: {} {}", String(method), url))
             if len(payload):
                 logd("Request payload:")
                 logd(payload)

@@ -75,14 +75,14 @@ struct TimeDelta(Stringable):
         var ss = self.seconds % 60
         var hh = mm // 60
         mm = mm % 60
-        var s = str(hh) + ":" + str(mm).rjust(2, "0") + ":" + str(ss).rjust(2, "0")
+        var s = String(hh) + ":" + String(mm).rjust(2, "0") + ":" + String(ss).rjust(2, "0")
         if self.days:
             if abs(self.days) != 1:
-                s = str(self.days) + " days, " + s
+                s = String(self.days) + " days, " + s
             else:
-                s = str(self.days) + " day, " + s
+                s = String(self.days) + " day, " + s
         if self.microseconds:
-            s = s + str(self.microseconds).rjust(6, "0")
+            s = s + String(self.microseconds).rjust(6, "0")
         return s
 
     fn total_seconds(self) -> Float64:

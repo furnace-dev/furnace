@@ -66,9 +66,9 @@ struct JsonObjectMut(Stringable):
         return jobjectmut_insert_f64(self._object, key, value)
 
     @always_inline
-    fn insert_str(self, key: StringRef, value: String) -> None:
+    fn insert_String(self, key: StringRef, value: String) -> None:
         var value_ref = StringRef(value.unsafe_cstr_ptr(), len(value))
-        return jobjectmut_insert_str(self._object, key, value_ref)
+        return jobjectmut_insert_String(self._object, key, value_ref)
 
     @always_inline
     fn insert_value(self, key: StringRef, value: UnsafePointer[JValue]) -> None:

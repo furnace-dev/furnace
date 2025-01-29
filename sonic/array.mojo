@@ -52,7 +52,7 @@ struct JsonArray(Stringable):
         jarray_push_f64(self._array, value)
 
     @always_inline
-    fn push_str(self, value: String) -> None:
+    fn push_String(self, value: String) -> None:
         var s_ref = StringRef(value.unsafe_cstr_ptr(), len(value))
         jarray_push_str(self._array, s_ref)
 

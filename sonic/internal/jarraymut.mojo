@@ -186,8 +186,8 @@ fn jarraymut_push_f64(self: UnsafePointer[JArrayMut], value: c_double) -> None:
     return __wrapper._jarraymut_push_f64(self, value)
 
 @always_inline
-fn jarraymut_push_str(self: UnsafePointer[JArrayMut], value: DiplomatStringView) -> None:
-    return __wrapper._jarraymut_push_str(self, value)
+fn jarraymut_push_String(self: UnsafePointer[JArrayMut], value: DiplomatStringView) -> None:
+    return __wrapper._jarraymut_push_String(self, value)
 
 @always_inline
 fn jarraymut_push_value(self: UnsafePointer[JArrayMut], value: UnsafePointer[JValue]) -> None:

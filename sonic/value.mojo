@@ -102,7 +102,7 @@ struct JsonValue(JsonContainerTrait, Stringable):
         self._value = other._value
 
     @staticmethod
-    fn from_str(s: String) -> JsonValue:
+    fn from_String(s: String) -> JsonValue:
         var s_view = StringRef(s.unsafe_cstr_ptr(), len(s))
         return JsonValue(jvalue_from_str(s_view))
 
@@ -195,7 +195,7 @@ struct JsonValue(JsonContainerTrait, Stringable):
         return default
 
     @always_inline
-    fn as_str(self, default: String = "") -> String:
+    fn as_String(self, default: String = "") -> String:
         var default_sref = StringRef(default.unsafe_cstr_ptr(), len(default))
         var out = diplomat_buffer_write_create(1024)
         jvalue_as_str(self._value, default_sref, out)

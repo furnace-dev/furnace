@@ -77,8 +77,8 @@ struct Bybit(Exchangeable):
             options, rt, self._verbose
         )
         self._api = ImplicitAPI()
-        self._api_key = str(config.get("api_key", String()))
-        self._api_secret = str(config.get("api_secret", String()))
+        self._api_key = String(config.get("api_key", String()))
+        self._api_secret = String(config.get("api_secret", String()))
         self._on_order = order_decorator(empty_on_order)
         self._category = "linear"
 
@@ -128,7 +128,7 @@ struct Bybit(Exchangeable):
         payload: String,
         api: ApiType = ApiType.Public,
     ) raises -> String:
-        # logd("entry: " + str(method) + " " + path)
+        # logd("entry: " + String(method) + " " + path)
         var full_path = path
         var headers = Headers()
 
@@ -152,7 +152,7 @@ struct Bybit(Exchangeable):
         )
         # {"retCode":10003,"retMsg":"API key is invalid.","result":{},"retExtInfo":{},"time":1737599375944}
         if response.status_code == 0:
-            raise Error("HTTP status code: " + str(response.status_code))
+            raise Error("HTTP status code: " + String(response.status_code))
         if response.status_code >= 200 and response.status_code < 300:
             return response.text
         elif response.status_code >= 400 and response.status_code < 500:
@@ -164,7 +164,7 @@ struct Bybit(Exchangeable):
                 # raise Error(label + ": " + message)
                 return response.text
             else:
-                # raise Error("HTTP status code: " + str(response.status_code))
+                # raise Error("HTTP status code: " + String(response.status_code))
                 return response.text
         return response.text
 
@@ -223,7 +223,7 @@ struct Bybit(Exchangeable):
 
     @always_inline
     fn _sign(self, mut headers: Headers, data: String) raises:
-        var time_ms_str = str(int(now_ms()))
+        var time_ms_str = String(Int(now_ms()))
         # logi("time_ms_str=" + time_ms_str)
         var recv_window_str = "15000"
         # logd("do_sign: " + data)
@@ -472,7 +472,7 @@ struct Bybit(Exchangeable):
         query_values["category"] = self._category
         query_values["symbol"] = symbol
         if limit:
-            query_values["limit"] = str(limit.value())
+            query_values["limit"] = String(limit.value())
         var query_str = query_values.to_string()
         var text = self._request(
             self._api.v5_market_orderbook, params, query_str, ""
@@ -596,30 +596,30 @@ struct Bybit(Exchangeable):
         mut params: Dict[String, Any],
     ) raises -> Order:
         var post_doc = JsonObject()
-        post_doc.insert_str("category", self._category)
-        post_doc.insert_str("symbol", symbol)
-        post_doc.insert_str(
+        post_doc.insert_String("category", self._category)
+        post_doc.insert_String("symbol", symbol)
+        post_doc.insert_String(
             "side", "Buy" if side == OrderSide.Buy else "Sell"
         )  # Buy, Sell
-        post_doc.insert_str(
+        post_doc.insert_String(
             "orderType", "Market" if type == OrderType.Market else "Limit"
         )  # Market, Limit
-        post_doc.insert_str("qty", str(amount))
+        post_doc.insert_String("qty", String(amount))
         if price != Fixed.zero:
-            post_doc.insert_str("price", str(price))
+            post_doc.insert_String("price", String(price))
         var time_in_force = params.get("time_in_force", String("")).string()
         if time_in_force != "":
-            post_doc.insert_str("timeInForce", time_in_force)
-        var position_idx = params.get("position_idx", 0).int()
+            post_doc.insert_String("timeInForce", time_in_force)
+        var position_idx = params.get("position_idx", 0).Int()
         if position_idx != 0:
-            post_doc.insert_str("positionIdx", str(position_idx))
+            post_doc.insert_String("positionIdx", String(position_idx))
         var order_link_id = params.get("client_order_id", String("")).string()
         if order_link_id != "":
-            post_doc.insert_str("orderLinkId", order_link_id)
+            post_doc.insert_String("orderLinkId", order_link_id)
         var reduce_only = params.get("reduce_only", False).bool()
         if reduce_only:
-            post_doc.insert_str("reduceOnly", "true")
-        var is_leverage = params.get("is_leverage", -1).int()
+            post_doc.insert_String("reduceOnly", "true")
+        var is_leverage = params.get("is_leverage", -1).Int()
         if is_leverage != -1:
             post_doc.insert_i64("isLeverage", is_leverage)
         var body_str = post_doc.to_string()
@@ -639,7 +639,7 @@ struct Bybit(Exchangeable):
         res.id = result.get_str("orderId")
         res.clientOrderId = result.get_str("orderLinkId")
         res.side = side
-        res.type = str(type)
+        res.type = String(type)
         res.status = "New"
         _ = result^
         _ = doc^
@@ -652,9 +652,9 @@ struct Bybit(Exchangeable):
             raise Error("param error")
 
         var post_doc = JsonObject()
-        post_doc.insert_str("category", self._category)
-        post_doc.insert_str("symbol", symbol.value())
-        post_doc.insert_str("orderId", id)
+        post_doc.insert_String("category", self._category)
+        post_doc.insert_String("symbol", symbol.value())
+        post_doc.insert_String("orderId", id)
         var body_str = post_doc.to_string()
         var text = self._request(
             self._api.v5_order_cancel, params, "", body_str
@@ -805,9 +805,9 @@ struct Bybit(Exchangeable):
         # limit
         # cursor
         if since:
-            query_values["startTime"] = str(since.value())  # 毫秒
+            query_values["startTime"] = String(since.value())  # 毫秒
         if limit:
-            query_values["limit"] = str(limit.value())
+            query_values["limit"] = String(limit.value())
         var query_str = query_values.to_string()
         var text = self._request(
             self._api.v5_order_history, params, query_str, ""
@@ -939,8 +939,8 @@ fn _request_callback(
     source: UnsafePointer[c_void],
     res: HttpResponsePtr,
 ) -> None:
-    logd("request_callback req_id: " + str(req_id))
-    logd("request_callback status_code: " + str(http_response_status_code(res)))
+    logd("request_callback req_id: " + String(req_id))
+    logd("request_callback status_code: " + String(http_response_status_code(res)))
     alias buf_size = 1024 * 1000
     var buf = stack_allocation[buf_size, Int8]()
     var body = http_response_body(res, buf, buf_size)

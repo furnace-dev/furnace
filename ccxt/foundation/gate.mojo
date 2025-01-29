@@ -116,8 +116,8 @@ struct Gate(Exchangeable):
         )
         self._api = ImplicitAPI()
         self._base = Exchange(config)
-        self._api_key = str(config.get("api_key", String()))
-        self._api_secret = str(config.get("api_secret", String()))
+        self._api_key = String(config.get("api_key", String()))
+        self._api_secret = String(config.get("api_secret", String()))
         self._on_order = order_decorator(empty_on_order)
         self._trading_context = trading_context
 
@@ -171,9 +171,9 @@ struct Gate(Exchangeable):
         # logd("entry: " + entry.path)
         var entry_path = path
         for key in params:
-            # logi("key: " + key[] + ", value: " + str(params[key[]]))
+            # logi("key: " + key[] + ", value: " + String(params[key[]]))
             var value = params[key[]]
-            entry_path = entry_path.replace("{" + key[] + "}", str(value))
+            entry_path = entry_path.replace("{" + key[] + "}", String(value))
         var path_ = "/api/v4/" + entry_path
         var full_path = path_
         if query != "":
@@ -192,7 +192,7 @@ struct Gate(Exchangeable):
         if api == ApiType.Private:
             var sign = String("")
             var method_str = String("")
-            var ts = str(int(now_ms() / 1000))
+            var ts = String(Int(now_ms() / 1000))
             # headers["SIGN"] = self._api_secret
             if method == Method.METHOD_GET:
                 method_str = "GET"
@@ -201,14 +201,14 @@ struct Gate(Exchangeable):
             elif method == Method.METHOD_DELETE:
                 method_str = "DELETE"
             else:
-                raise Error("Invalid method: " + str(method))
+                raise Error("Invalid method: " + String(method))
             # log_nothing("method_str: " + method_str)
             # log_nothing("path_: " + path_)
             # log_nothing("query: " + query)
 
             # TODO: This line is necessary, without it there seems to be a Mojo language bug
             # logd("payload: " + payload)
-            # log_nothing("ts: " + str(ts))
+            # log_nothing("ts: " + String(ts))
             var payload_ = payload
             sign = self._sign_payload(method_str, path_, query, payload_, ts)
             # logd("sign: " + sign)
@@ -221,7 +221,7 @@ struct Gate(Exchangeable):
             full_path, method, headers, payload
         )
         if response.status_code == 0:
-            raise Error("HTTP status code: " + str(response.status_code))
+            raise Error("HTTP status code: " + String(response.status_code))
         if response.status_code >= 200 and response.status_code < 300:
             return response.text
         elif response.status_code >= 400 and response.status_code < 500:
@@ -234,7 +234,7 @@ struct Gate(Exchangeable):
                 # raise Error(label + ": " + message)
                 return response.text
             else:
-                # raise Error("HTTP status code: " + str(response.status_code))
+                # raise Error("HTTP status code: " + String(response.status_code))
                 return response.text
         return response.text
 
@@ -252,9 +252,9 @@ struct Gate(Exchangeable):
     #     # logd("entry: " + entry.path)
     #     var entry_path = path
     #     for key in params:
-    #         # logi("key: " + key[] + ", value: " + str(params[key[]]))
+    #         # logi("key: " + key[] + ", value: " + String(params[key[]]))
     #         var value = params[key[]]
-    #         entry_path = entry_path.replace("{" + key[] + "}", str(value))
+    #         entry_path = entry_path.replace("{" + key[] + "}", String(value))
     #     var path_ = "/api/v4/" + entry_path
     #     # if self._debug:
     #     #     path_ = entry_path
@@ -271,7 +271,7 @@ struct Gate(Exchangeable):
 
     #     if api == ApiType.Private:
     #         # headers["SIGN"] = self._api_secret
-    #         var ts = str(int(now_ms() / 1000))
+    #         var ts = String(Int(now_ms() / 1000))
     #         var method_str = String("")
     #         if method == Method.METHOD_GET:
     #             method_str = "GET"
@@ -280,7 +280,7 @@ struct Gate(Exchangeable):
     #         elif method == Method.METHOD_DELETE:
     #             method_str = "DELETE"
     #         else:
-    #             raise Error("Invalid method: " + str(method))
+    #             raise Error("Invalid method: " + String(method))
     #         # logd("method_str: " + method_str)
     #         # logd("path_: " + path_)
     #         # logd("query: " + query)
@@ -298,8 +298,8 @@ struct Gate(Exchangeable):
     #         # headers["X-Gate-Channel-Id"] = "daniugege"
 
     #     # logd("body: " + payload)
-    #     # logd("body_len: " + str(len(payload)))
-    #     # headers["Content-Length"] = str(len(payload))
+    #     # logd("body_len: " + String(len(payload)))
+    #     # headers["Content-Length"] = String(len(payload))
     #     self._client[].request_with_callback(
     #         full_path, method, headers, payload, 0, callback
     #     )
@@ -326,7 +326,7 @@ struct Gate(Exchangeable):
             body_hash = "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e"
 
         # s = f"{method}\n{path}\n{query_string}\n{body_hash}\n{ts}"
-        # var s = method + "\n" + path + "\n" + query_string + "\n" + body_hash + "\n" + str(
+        # var s = method + "\n" + path + "\n" + query_string + "\n" + body_hash + "\n" + String(
         #     ts
         # )
         var s = String.write(
@@ -532,7 +532,7 @@ struct Gate(Exchangeable):
         var quote = self._base.safe_currency_code(quoteId)
         var settle = self._base.safe_currency_code(settleId)
         # var expiry = self._base.safe_timestamp(market, 'expire_time')
-        var expiry = int(market.get_i64("expire_time", 0))
+        var expiry = Int(market.get_i64("expire_time", 0))
         var symbol = String()
         var market_type = "swap"
         if date != "":
@@ -611,12 +611,12 @@ struct Gate(Exchangeable):
                     max=_NoneType(),
                 ),
                 leverage=MinMax(
-                    min=float(market.get_str("leverage_min")),
-                    max=float(market.get_str("leverage_max")),
+                    min=Float64(market.get_str("leverage_min")),
+                    max=Float64(market.get_str("leverage_max")),
                 ),
                 amount=MinMax(
-                    min=int(market.get_i64("order_size_min")),
-                    max=int(market.get_i64("order_size_max")),
+                    min=Int(market.get_i64("order_size_min")),
+                    max=Int(market.get_i64("order_size_max")),
                 ),
                 price=MinMax(
                     min=min_price.to_float(),
@@ -718,7 +718,7 @@ struct Gate(Exchangeable):
             currency.deposit = depositEnabled
             currency.withdraw = withdrawEnabled
             currency.fee = Fixed.zero
-            currency.precision = Fixed(StringRef("0.0001"))
+            currency.precision = Fixed(String("0.0001"))
             currency.limits = CurrencyLimits(
                 Limit(min=_NoneType(), max=_NoneType()),
                 Limit(min=_NoneType(), max=_NoneType()),
@@ -775,7 +775,7 @@ struct Gate(Exchangeable):
         var ticker = self.parse_ticker(obj_view)
         _ = arr^
         _ = doc^
-        ticker.timestamp = int(now_ms())
+        ticker.timestamp = Int(now_ms())
         return ticker
 
     fn parse_ticker(self, obj_view: JsonValueRefObjectView) raises -> Ticker:
@@ -859,7 +859,7 @@ struct Gate(Exchangeable):
         var low = Fixed(obj_view.get_str("low_24h"))
         var bidVolume = Fixed(obj_view.get_str("B"))
         var askVolume = Fixed(obj_view.get_str("A"))
-        var timestamp = int(obj_view.get_i64("t"))
+        var timestamp = Int(obj_view.get_i64("t"))
         var base_volume = obj_view.get_str("base_volume")
         var baseVolume = Fixed(base_volume) if base_volume != "" else Fixed.zero
         var quote_volume = obj_view.get_str("quote_volume")
@@ -904,7 +904,7 @@ struct Gate(Exchangeable):
         var arr = JsonValueArrayView(doc)
         var n = arr.len()
         var result = List[Ticker](capacity=n)
-        var timestamp = int(now_ms())
+        var timestamp = Int(now_ms())
         for i in range(0, n):
             var obj = arr.get(i)
             var obj_view = JsonValueRefObjectView(obj)
@@ -1031,8 +1031,8 @@ struct Gate(Exchangeable):
         #
         var result = OrderBook()
         var doc = JsonObject(text)
-        var timestamp = int(doc.get_f64("current") * 1000.0)
-        var id = int(doc.get_i64("id"))
+        var timestamp = Int(doc.get_f64("current") * 1000.0)
+        var id = Int(doc.get_i64("id"))
         result.timestamp = timestamp
         result.symbol = symbol
         result.nonce = id
@@ -1094,7 +1094,7 @@ struct Gate(Exchangeable):
         var total = Fixed(doc.get_str("total"))
         var available = Fixed(doc.get_str("available"))
         var result = Balances()
-        result.timestamp = int(doc.get_i64("update_time"))
+        result.timestamp = Int(doc.get_i64("update_time"))
         result.data["USDT"] = Balance(
             free=available,
             used=unrealised_pnl,
@@ -1112,35 +1112,35 @@ struct Gate(Exchangeable):
         mut params: Dict[String, Any],
     ) raises -> Order:
         var data = JsonObject()
-        data.insert_str("contract", symbol)
-        data.insert_i64("size", amount.to_int())
+        data.insert_String("contract", symbol)
+        data.insert_i64("size", amount.to_Int())
         # if iceberg >= 0:
         #     data.insert_i64("iceberg", iceberg)
         if type == OrderType.Market:
-            data.insert_str("price", "0")
+            data.insert_String("price", "0")
         else:
             # price_to_precision
-            data.insert_str("price", price.to_string())
+            data.insert_String("price", price.to_string())
 
         if "reduce_only" in params:
             data.insert_bool("reduce_only", params["reduce_only"].bool())
         if "tif" in params:
-            data.insert_str("tif", params["tif"].string())
+            data.insert_String("tif", params["tif"].string())
         if "text" in params:
-            data.insert_str("text", params["text"].string())
+            data.insert_String("text", params["text"].string())
         if "auto_size" in params:
-            data.insert_str("auto_size", params["auto_size"].string())
+            data.insert_String("auto_size", params["auto_size"].string())
         # if close:
         #     data.insert_bool("close", close)
         # if reduce_only:
         #     data.insert_bool("reduce_only", reduce_only)
         # if len(tif):
-        #     data.insert_str("tif", tif)
-        data.insert_str("tif", "gtc")
+        #     data.insert_String("tif", tif)
+        data.insert_String("tif", "gtc")
         # if len(text) > 0:
-        #     data.insert_str("text", text)
+        #     data.insert_String("text", text)
         # if len(auto_size) > 0:
-        #     data.insert_str("auto_size", auto_size)
+        #     data.insert_String("auto_size", auto_size)
         var payload = data.to_string()
 
         # logd(payload)
@@ -1162,7 +1162,7 @@ struct Gate(Exchangeable):
         # {"refu":0,"tkfr":"0.0005","mkfr":"0.0002","contract":"BTC_USDT","id":58828270140785044,"price":"93000","tif":"gtc","iceberg":0,"text":"api","user":541811,"is_reduce_only":false,"is_close":false,"is_liq":false,"fill_price":"0","create_time":1734784811.983,"update_time":1734784811.983,"status":"open","left":1,"refr":"0","size":1,"biz_info":"ch:daniugege,dual","amend_text":"-","stp_act":"-","stp_id":0,"update_id":1,"pnl":"0","pnl_margin":"0"}
         var doc = JsonObject(text)
         var result = self.parse_order(doc)
-        # logd("result: " + str(result))
+        # logd("result: " + String(result))
         result.side = side
         return result
 
@@ -1196,7 +1196,7 @@ struct Gate(Exchangeable):
                 raise Error("ORDER_NOT_FOUND")
             raise Error(label)
         var result = self.parse_order(doc)
-        # logd(str(result))
+        # logd(String(result))
         return result
 
     @staticmethod
@@ -1220,14 +1220,14 @@ struct Gate(Exchangeable):
         # var fee = doc.get_str("fee")
         # var cost = doc.get_str("cost")
         var datetime = doc.get_str("create_time")
-        var timestamp = int(doc.get_i64("create_time"))
-        var update_timestamp = int(doc.get_i64("update_time"))
-        # var create_time_ms = int(doc.get_i64("create_time_ms"))
-        # var update_time_ms = int(doc.get_i64("update_time_ms"))
+        var timestamp = Int(doc.get_i64("create_time"))
+        var update_timestamp = Int(doc.get_i64("update_time"))
+        # var create_time_ms = Int(doc.get_i64("create_time_ms"))
+        # var update_time_ms = Int(doc.get_i64("update_time_ms"))
         var time_in_force = doc.get_str("time_in_force")
         var result = Order(
             info=Dict[String, Any](),
-            id=str(id),
+            id=String(id),
             clientOrderId=clientOrderId,
             datetime=datetime,
             timestamp=timestamp,
@@ -1256,9 +1256,9 @@ struct Gate(Exchangeable):
         # logd("id: " + result.id)
         # logd("symbol: " + result.symbol)
         # logd("type: " + result.type)
-        # logd("side: " + str(result.side))
-        # logd("amount: " + str(result.amount))
-        # logd("price: " + str(result.price))
+        # logd("side: " + String(result.side))
+        # logd("amount: " + String(result.amount))
+        # logd("price: " + String(result.price))
         # logd("==============")
         return result
 

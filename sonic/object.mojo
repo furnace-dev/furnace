@@ -96,7 +96,7 @@ struct JsonObject(JsonContainerTrait, JsonObjectViewable, Stringable):
         return jobject_insert_f64(self._object, key, value)
 
     @always_inline
-    fn insert_str(self, key: StringRef, value: String) -> None:
+    fn insert_String(self, key: StringRef, value: String) -> None:
         var value_ref = StringRef(value.unsafe_cstr_ptr(), len(value))
         return jobject_insert_str(self._object, key, value_ref)
 

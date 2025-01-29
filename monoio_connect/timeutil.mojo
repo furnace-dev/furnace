@@ -8,4 +8,4 @@ fn now_ns() -> Int:
 
 @always_inline
 fn now_ms() -> Int:
-    return int(now_ns() / 1_000_000)
+    return Int(now_ns() / 1_000_000)

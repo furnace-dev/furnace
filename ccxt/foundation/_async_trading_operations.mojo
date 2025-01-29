@@ -47,7 +47,7 @@ fn _create_order_internal[
         price,
         params,
     )
-    logt("order: " + str(order))
+    logt("order: " + String(order))
     # trigger callback
     exchange[].on_order(order)
 
@@ -65,9 +65,9 @@ fn _create_order(request: UnsafePointer[AsyncTradingRequest]):
         elif exchange_id == ExchangeId.bitmex:
             _create_order_internal[BitMEX](request)
         else:
-            logw("unknown exchange_id: " + str(exchange_id))
+            logw("unknown exchange_id: " + String(exchange_id))
     except e:
-        loge("create_order error: " + str(e))
+        loge("create_order error: " + String(e))
 
 
 @always_inline
@@ -80,7 +80,7 @@ fn _cancel_order_internal[
     var order_id = req.order_id
     var params = Dict[String, Any]()
     var order = exchange[].cancel_order(symbol, order_id, params)
-    logt("order: " + str(order))
+    logt("order: " + String(order))
     # trigger callback
     exchange[].on_order(order)
 
@@ -98,9 +98,9 @@ fn _cancel_order(request: UnsafePointer[AsyncTradingRequest]):
         elif exchange_id == ExchangeId.bitmex:
             _cancel_order_internal[BitMEX](request)
         else:
-            logw("unknown exchange_id: " + str(exchange_id))
+            logw("unknown exchange_id: " + String(exchange_id))
     except e:
-        loge("cancel_order error: " + str(e))
+        loge("cancel_order error: " + String(e))
 
 
 fn _async_trading_backend() raises -> None:
@@ -135,4 +135,4 @@ fn run_async_trading_thread() raises:
     Start the asynchronous trading thread.
     """
     var tid = start_thread(_async_trading_backend)
-    logd("tid: " + str(tid))
+    logd("tid: " + String(tid))

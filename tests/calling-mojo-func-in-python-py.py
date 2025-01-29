@@ -1,7 +1,7 @@
 import numpy as np
 
 def call_mojo_print(mojo_print, a: int):
-    print('a: ' + str(a))
+    print('a: ' + String(a))
     res = mojo_print(123)
     for i in range(10):
         res = mojo_print(res)
