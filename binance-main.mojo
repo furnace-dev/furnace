@@ -88,21 +88,21 @@ fn test_binance_fetch_balance() raises -> None:
     print(resp.text)
 
 
-fn on_order(trading_context: TradingContext, order: Order) -> None:
-    logd("on_order start")
-    # logd("trading_context: " + str(trading_context))
-    # logd("order: " + str(order))
-    logd("exchange_id: " + str(trading_context.exchange_id))
-    logd("account_id: " + trading_context.account_id)
-    logd("trader_id: " + trading_context.trader_id)
-    logd("=============")
-    logd("id: " + order.id)
-    logd("symbol: " + order.symbol)
-    logd("type: " + order.type)
-    logd("side: " + str(order.side))
-    logd("amount: " + str(order.amount))
-    logd("price: " + str(order.price))
-    logd("on_order end")
+# fn on_order(trading_context: TradingContext, order: Order) -> None:
+#     logd("on_order start")
+#     # logd("trading_context: " + str(trading_context))
+#     # logd("order: " + str(order))
+#     logd("exchange_id: " + str(trading_context.exchange_id))
+#     logd("account_id: " + trading_context.account_id)
+#     logd("trader_id: " + trading_context.trader_id)
+#     logd("=============")
+#     logd("id: " + order.id)
+#     logd("symbol: " + order.symbol)
+#     logd("type: " + order.type)
+#     logd("side: " + str(order.side))
+#     logd("amount: " + str(order.amount))
+#     logd("price: " + str(order.price))
+#     logd("on_order end")
 
 
 fn test_binance() raises:
@@ -124,6 +124,12 @@ fn test_binance() raises:
     )
     var binance = Binance(config, trading_context, rt)
     var params = Dict[String, Any]()
+
+    fn on_order(trading_context: TradingContext, order: Order) escaping -> None:
+        logd("on_order start")
+        logd("trading_context: " + str(trading_context))
+        logd("order: " + str(order))
+        logd("on_order end")
 
     binance.set_on_order(on_order)
 
