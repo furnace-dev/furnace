@@ -182,16 +182,17 @@ struct Gate(ProExchangeable):
     var _api_secret: String
     var _testnet: Bool
     var _ws: UnsafePointer[WebSocket]
-    var _on_ticker: OnTickerC
-    var _on_tickers: OnTickersC
-    var _on_order_book: OnOrderBookC
-    var _on_trade: OnTradeC
-    var _on_balance: OnBalanceC
-    var _on_order: OnOrderC
-    var _on_my_trade: OnMyTradeC
+    var _on_ticker: UnsafePointer[OnTickerC, alignment=1]
+    var _on_tickers: UnsafePointer[OnTickersC, alignment=1]
+    var _on_order_book: UnsafePointer[OnOrderBookC, alignment=1]
+    var _on_trade: UnsafePointer[OnTradeC, alignment=1]
+    var _on_balance: UnsafePointer[OnBalanceC, alignment=1]
+    var _on_order: UnsafePointer[OnOrderC, alignment=1]
+    var _on_my_trade: UnsafePointer[OnMyTradeC, alignment=1]
     var _uid: UnsafePointer[String]
     var _trading_context: TradingContext
     var _subscriptions: List[Dict[String, Any]]
+    var _verbose: Bool
 
     fn __init__(
         out self, config: Dict[String, Any], trading_context: TradingContext
@@ -201,6 +202,7 @@ struct Gate(ProExchangeable):
         self._api_key = config.get("api_key", String("")).string()
         self._api_secret = config.get("api_secret", String("")).string()
         self._testnet = config.get("testnet", False).bool()
+        self._verbose = config.get("verbose", False).bool()
         self._ws = UnsafePointer[WebSocket].alloc(1)
         var host = "api.gateio.ws"
         var port = 443
@@ -213,13 +215,13 @@ struct Gate(ProExchangeable):
         __get_address_as_uninit_lvalue(self._ws.address) = WebSocket(
             host=host, port=port, path=path
         )
-        self._on_ticker = ticker_decorator(empty_on_ticker)
-        self._on_tickers = tickers_decorator(empty_on_tickers)
-        self._on_order_book = orderbook_decorator(empty_on_order_book)
-        self._on_trade = trade_decorator(empty_on_trade)
-        self._on_balance = balance_decorator(empty_on_balance)
-        self._on_order = order_decorator(empty_on_order)
-        self._on_my_trade = mytrade_decorator(empty_on_my_trade)
+        self._on_ticker = UnsafePointer[OnTickerC, alignment=1].alloc(1)
+        self._on_tickers = UnsafePointer[OnTickersC, alignment=1].alloc(1)
+        self._on_order_book = UnsafePointer[OnOrderBookC, alignment=1].alloc(1)
+        self._on_trade = UnsafePointer[OnTradeC, alignment=1].alloc(1)
+        self._on_balance = UnsafePointer[OnBalanceC, alignment=1].alloc(1)
+        self._on_order = UnsafePointer[OnOrderC, alignment=1].alloc(1)
+        self._on_my_trade = UnsafePointer[OnMyTradeC, alignment=1].alloc(1)
         self._uid = UnsafePointer[String].alloc(1)
         self._trading_context = trading_context
         self._subscriptions = List[Dict[String, Any]]()
@@ -241,30 +243,31 @@ struct Gate(ProExchangeable):
         self._uid = other._uid
         self._trading_context = other._trading_context
         self._subscriptions = other._subscriptions
+        self._verbose = other._verbose
 
     fn __del__(owned self):
         pass
 
-    fn set_on_ticker(mut self, on_ticker: OnTickerC) -> None:
-        self._on_ticker = on_ticker
+    fn set_on_ticker(self, on_ticker: OnTickerC) -> None:
+        self._on_ticker.init_pointee_move(on_ticker)
 
-    fn set_on_tickers(mut self, on_tickers: OnTickersC) -> None:
-        self._on_tickers = on_tickers
+    fn set_on_tickers(self, on_tickers: OnTickersC) -> None:
+        self._on_tickers.init_pointee_move(on_tickers)
 
-    fn set_on_order_book(mut self, on_order_book: OnOrderBookC) -> None:
-        self._on_order_book = on_order_book
+    fn set_on_order_book(self, on_order_book: OnOrderBookC) -> None:
+        self._on_order_book.init_pointee_move(on_order_book)
 
-    fn set_on_trade(mut self, on_trade: OnTradeC) -> None:
-        self._on_trade = on_trade
+    fn set_on_trade(self, on_trade: OnTradeC) -> None:
+        self._on_trade.init_pointee_move(on_trade)
 
-    fn set_on_balance(mut self, on_balance: OnBalanceC) -> None:
-        self._on_balance = on_balance
+    fn set_on_balance(self, on_balance: OnBalanceC) -> None:
+        self._on_balance.init_pointee_move(on_balance)
 
-    fn set_on_order(mut self, on_order: OnOrderC) -> None:
-        self._on_order = on_order
+    fn set_on_order(self, on_order: OnOrderC) -> None:
+        self._on_order.init_pointee_move(on_order)
 
-    fn set_on_my_trade(mut self, on_my_trade: OnMyTradeC) -> None:
-        self._on_my_trade = on_my_trade
+    fn set_on_my_trade(self, on_my_trade: OnMyTradeC) -> None:
+        self._on_my_trade.init_pointee_move(on_my_trade)
 
     fn connect(mut self, rt: MonoioRuntimePtr) raises -> None:
         """
@@ -365,7 +368,8 @@ struct Gate(ProExchangeable):
     @always_inline
     fn __on_message(mut self, message: String) -> None:
         """Handler for parsing WS messages."""
-        logd("message: " + message)
+        if self._verbose:
+            logd("message: " + message)
         # 心跳返回:
         # {"time":1733818191,"time_ms":1733818191416,"conn_id":"ef7c8be54338b11b","channel":"futures.pong","event":"","result":null}
 
@@ -386,7 +390,7 @@ struct Gate(ProExchangeable):
 
         var json_obj = JsonObject(message)
 
-        var channel = json_obj.get_str_ref("channel")
+        var channel = json_obj.get_str("channel")
         # logd("channel: " + str(channel))
         if channel == "futures.book_ticker":
             self.__on_ticker(json_obj)
@@ -426,16 +430,16 @@ struct Gate(ProExchangeable):
     @always_inline
     fn __on_ticker(self, json_obj: JsonObject) -> None:
         # {"time":1733972740,"channel":"futures.book_ticker","event":"subscribe","payload":["BTC_USDT"]}
-        var event = json_obj.get_str_ref("event")
+        var event = json_obj.get_str("event")
         if event == "update":
             # {"time":1733972741,"time_ms":1733972741782,"channel":"futures.book_ticker","event":"update","result":{"t":1733972741772,"u":562921416,"s":"BTC_USDT","b":"101114","B":3357,"a":"101114.1","A":25805}}
             # {"time":1733972746,"time_ms":1733972746796,"channel":"futures.book_ticker","event":"update","result":{"t":1733972746784,"u":562921417,"s":"BTC_USDT","b":"101114","B":3357,"a":"101114.1","A":24816}}
             # {"time":1733972746,"time_ms":1733972746955,"channel":"futures.book_ticker","event":"update","result":{"t":1733972746951,"u":562921419,"s":"BTC_USDT","b":"101114","B":3357,"a":"101114.1","A":8851}}
             # {"time":1733972746,"time_ms":1733972746962,"channel":"futures.book_ticker","event":"update","result":{"t":1733972746956,"u":562921421,"s":"BTC_USDT","b":"101114","B":3357,"a":"101119.1","A":7415}}
             var result = json_obj.get_object_mut("result")
-            var symbol = String(result.get_str_ref("s"))
-            var bid = Fixed(result.get_str_ref("b"))
-            var ask = Fixed(result.get_str_ref("a"))
+            var symbol = String(result.get_str("s"))
+            var bid = Fixed(result.get_str("b"))
+            var ask = Fixed(result.get_str("a"))
             var bid_size = result.get_i64("B")
             var ask_size = result.get_i64("A")
             var ticker = Ticker()
@@ -446,7 +450,7 @@ struct Gate(ProExchangeable):
             ticker.askVolume = Fixed(ask_size)
             ticker.timestamp = int(result.get_i64("t"))
             ticker.datetime = str(result.get_i64("time"))
-            self._on_ticker(self._trading_context, ticker)
+            self._on_ticker[](self._trading_context, ticker)
             _ = result^
         elif event == "subscribe":
             pass
@@ -455,7 +459,7 @@ struct Gate(ProExchangeable):
 
     @always_inline
     fn __on_order_book_update(self, json_obj: JsonObject) -> None:
-        var event = json_obj.get_str_ref("event")
+        var event = json_obj.get_str("event")
         if event == "update":
             pass
         elif event == "subscribe":
@@ -466,7 +470,7 @@ struct Gate(ProExchangeable):
     @always_inline
     fn __on_orders(self, json_obj: JsonObject) -> None:
         # {"time":1733968288,"time_ms":1733968288265,"channel":"futures.orders","event":"update","result":[{"tkfr":0.0005,"text":"api","user":"16792411","stp_act":"-","id":58828270140012048,"refr":0,"is_reduce_only":false,"mkfr":0.0002,"stop_loss_price":"","is_liq":false,"fill_price":0,"finish_as":"_new","size":1,"contract":"BTC_USDT","stop_profit_price":"","create_time_ms":1733968288255,"status":"open","price":93000,"biz_info":"ch:daniugege","is_close":false,"left":1,"tif":"gtc","finish_time_ms":1733968288255,"stp_id":"0","update_id":1,"iceberg":0,"refu":0,"finish_time":1733968288,"amend_text":"-","create_time":1733968288}]}
-        var event = json_obj.get_str_ref("event")
+        var event = json_obj.get_str("event")
         if event == "update":
             # 订单更新
             var result = json_obj.get_array_mut("result")
@@ -484,8 +488,8 @@ struct Gate(ProExchangeable):
                 var order = Order()
                 var obj = value.as_object_mut()
                 order.id = str(obj.get_u64("id"))
-                order.symbol = obj.get_str_ref("contract")
-                order.status = obj.get_str_ref("status")
+                order.symbol = obj.get_str("contract")
+                order.status = obj.get_str("status")
                 order.side = OrderSide.Buy  # TODO:
                 order.price = Fixed(obj.get_f64("price"))
                 order.amount = Fixed(obj.get_i64("size"))
@@ -495,8 +499,8 @@ struct Gate(ProExchangeable):
                 order.timestamp = int(obj.get_i64("create_time_ms"))
                 order.lastTradeTimestamp = int(obj.get_i64("create_time_ms"))
                 order.lastUpdateTimestamp = order.lastTradeTimestamp
-                order.clientOrderId = obj.get_str_ref("text")
-                order.timeInForce = String(obj.get_str_ref("tif"))
+                order.clientOrderId = obj.get_str("text")
+                order.timeInForce = String(obj.get_str("tif"))
                 order.fee = None  # TODO:
                 order.trades = List[Trade]()  # TODO:
                 order.reduceOnly = False  # TODO:
@@ -513,7 +517,7 @@ struct Gate(ProExchangeable):
             _ = result^
 
             for order in orders:
-                self._on_order(self._trading_context, order[])
+                self._on_order[](self._trading_context, order[])
 
         elif event == "subscribe":
             pass

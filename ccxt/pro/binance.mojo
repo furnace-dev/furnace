@@ -79,13 +79,13 @@ struct Binance(ProExchangeable):
     var _api_secret: String
     var _testnet: Bool
     var _ws: UnsafePointer[WebSocket]
-    var _on_ticker: OnTickerC
-    var _on_tickers: OnTickersC
-    var _on_order_book: OnOrderBookC
-    var _on_trade: OnTradeC
-    var _on_balance: OnBalanceC
-    var _on_order: OnOrderC
-    var _on_my_trade: OnMyTradeC
+    var _on_ticker: UnsafePointer[OnTickerC, alignment=1]
+    var _on_tickers: UnsafePointer[OnTickersC, alignment=1]
+    var _on_order_book: UnsafePointer[OnOrderBookC, alignment=1]
+    var _on_trade: UnsafePointer[OnTradeC, alignment=1]
+    var _on_balance: UnsafePointer[OnBalanceC, alignment=1]
+    var _on_order: UnsafePointer[OnOrderC, alignment=1]
+    var _on_my_trade: UnsafePointer[OnMyTradeC, alignment=1]
     var _uid: UnsafePointer[String]
     var _trading_context: TradingContext
     var _subscriptions: List[Dict[String, Any]]
@@ -109,13 +109,13 @@ struct Binance(ProExchangeable):
         self._verbose = config.get("verbose", False).bool()
         self._is_private = config.get("is_private", False).bool()
         self._ws = UnsafePointer[WebSocket].alloc(1)
-        self._on_ticker = ticker_decorator(empty_on_ticker)
-        self._on_tickers = tickers_decorator(empty_on_tickers)
-        self._on_order_book = orderbook_decorator(empty_on_order_book)
-        self._on_trade = trade_decorator(empty_on_trade)
-        self._on_balance = balance_decorator(empty_on_balance)
-        self._on_order = order_decorator(empty_on_order)
-        self._on_my_trade = mytrade_decorator(empty_on_my_trade)
+        self._on_ticker = UnsafePointer[OnTickerC, alignment=1].alloc(1)
+        self._on_tickers = UnsafePointer[OnTickersC, alignment=1].alloc(1)
+        self._on_order_book = UnsafePointer[OnOrderBookC, alignment=1].alloc(1)
+        self._on_trade = UnsafePointer[OnTradeC, alignment=1].alloc(1)
+        self._on_balance = UnsafePointer[OnBalanceC, alignment=1].alloc(1)
+        self._on_order = UnsafePointer[OnOrderC, alignment=1].alloc(1)
+        self._on_my_trade = UnsafePointer[OnMyTradeC, alignment=1].alloc(1)
         self._uid = UnsafePointer[String].alloc(1)
         self._trading_context = trading_context
         self._subscriptions = List[Dict[String, Any]]()
@@ -153,26 +153,26 @@ struct Binance(ProExchangeable):
         self._client.destroy_pointee()
         self._client.free()
 
-    fn set_on_ticker(mut self, on_ticker: OnTickerC) -> None:
-        self._on_ticker = on_ticker
+    fn set_on_ticker(self, on_ticker: OnTickerC) -> None:
+        self._on_ticker.init_pointee_move(on_ticker)
 
-    fn set_on_tickers(mut self, on_tickers: OnTickersC) -> None:
-        self._on_tickers = on_tickers
+    fn set_on_tickers(self, on_tickers: OnTickersC) -> None:
+        self._on_tickers.init_pointee_move(on_tickers)
 
-    fn set_on_order_book(mut self, on_order_book: OnOrderBookC) -> None:
-        self._on_order_book = on_order_book
+    fn set_on_order_book(self, on_order_book: OnOrderBookC) -> None:
+        self._on_order_book.init_pointee_move(on_order_book)
 
-    fn set_on_trade(mut self, on_trade: OnTradeC) -> None:
-        self._on_trade = on_trade
+    fn set_on_trade(self, on_trade: OnTradeC) -> None:
+        self._on_trade.init_pointee_move(on_trade)
 
-    fn set_on_balance(mut self, on_balance: OnBalanceC) -> None:
-        self._on_balance = on_balance
+    fn set_on_balance(self, on_balance: OnBalanceC) -> None:
+        self._on_balance.init_pointee_move(on_balance)
 
-    fn set_on_order(mut self, on_order: OnOrderC) -> None:
-        self._on_order = on_order
+    fn set_on_order(self, on_order: OnOrderC) -> None:
+        self._on_order.init_pointee_move(on_order)
 
-    fn set_on_my_trade(mut self, on_my_trade: OnMyTradeC) -> None:
-        self._on_my_trade = on_my_trade
+    fn set_on_my_trade(self, on_my_trade: OnMyTradeC) -> None:
+        self._on_my_trade.init_pointee_move(on_my_trade)
 
     fn connect(mut self, rt: MonoioRuntimePtr) raises -> None:
         """
@@ -354,7 +354,7 @@ struct Binance(ProExchangeable):
         ticker.askVolume = Fixed(ask_size)
         ticker.timestamp = int(data.get_i64("E"))
         ticker.datetime = str(ticker.timestamp)
-        self._on_ticker(self._trading_context, ticker)
+        self._on_ticker[](self._trading_context, ticker)
         _ = data^
 
     @always_inline
@@ -441,7 +441,7 @@ struct Binance(ProExchangeable):
 
         _ = obj^
 
-        self._on_order(self._trading_context, order)
+        self._on_order[](self._trading_context, order)
 
     fn __on_ping(self) -> None:
         logd("__on_ping")

@@ -8,14 +8,11 @@ from ccxt.base import (
     Trade,
     Exchangeable,
 )
-from .executor import Executable
+from .executor import Executable, Executor
 
 
-trait Strategizable:
-    fn __init__(out self):
-        ...
-
-    fn setup[E: Executable](mut self, ex: UnsafePointer[E]):
+trait Strategizable(Movable):
+    fn __init__[E: Exchangeable](out self, ex: UnsafePointer[Executor[E]]):
         ...
 
     fn on_init(mut self) raises:

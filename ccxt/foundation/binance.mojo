@@ -969,16 +969,16 @@ struct Binance(Exchangeable):
 
         # {"orderId":4077634200,"symbol":"BTCUSDT","status":"NEW","clientOrderId":"pRxDtGFyxElEV3emIYz1tb","price":"93000.00","avgPrice":"0.00","origQty":"1.000","executedQty":"0.000","cumQty":"0.000","cumQuote":"0.00000","timeInForce":"GTC","type":"LIMIT","reduceOnly":false,"closePosition":false,"side":"BUY","positionSide":"BOTH","stopPrice":"0.00","workingType":"CONTRACT_PRICE","priceProtect":false,"origType":"LIMIT","priceMatch":"NONE","selfTradePreventionMode":"NONE","goodTillDate":0,"updateTime":1736869853102}
 
-        var symbol_ = str(obj.get_str_ref("symbol"))
+        var symbol_ = obj.get_str("symbol")
         var id = obj.get_u64("orderId")
-        var clientOrderId = str(obj.get_str_ref("clientOrderId"))
-        var status = str(obj.get_str_ref("status"))
-        var type_ = str(obj.get_str_ref("type"))
-        var amount_ = Fixed(str(obj.get_str_ref("origQty")))
-        var filled_amount = Fixed(str(obj.get_str_ref("executedQty")))
+        var clientOrderId = obj.get_str("clientOrderId")
+        var status = obj.get_str("status")
+        var type_ = obj.get_str("type")
+        var amount_ = Fixed(obj.get_str("origQty"))
+        var filled_amount = Fixed(obj.get_str("executedQty"))
         var left = amount_ - filled_amount
 
-        var price_ = Fixed(str(obj.get_str_ref("price")))
+        var price_ = Fixed(obj.get_str("price"))
         # var avg_price = Fixed(0)
         var timestamp = int(obj.get_i64("updateTime"))
         var update_timestamp = timestamp

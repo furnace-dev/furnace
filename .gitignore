@@ -10,14 +10,14 @@ __pycache__
 *.dylib
 .idea
 
-ccxt-bitmex-demo
-ccxt-gateio-demo
+bitmex-demo
+gateio-demo
 gateio-main-async
 gateio-main
 gateio-ws
 memory_leak
 monoio-connect-demo
-ccxt-sample
+sample
 test_latency
 bybit-main
 engine-main

@@ -40,29 +40,26 @@ from ccxt import Strategizable
 from ccxt.executor import Executable, Executor
 from ccxt.engine import (
     Engine,
-    run_engine,
+    run,
 )
 from mojoenv import load_mojo_env
 
 
-struct MyStrategy[E: Executable](Strategizable):
-    var ex: UnsafePointer[E]
+struct MyStrategy[E: Exchangeable](Strategizable):
+    var ex: UnsafePointer[Executor[E]]
     var signal: Bool
 
-    fn __init__(out self):
-        self.ex = UnsafePointer[E]()
+    fn __init__[E_: Exchangeable](out self, ex: UnsafePointer[Executor[E_]]):
+        self.ex = ex.bitcast[Executor[E]]()
         self.signal = False
 
     fn __moveinit__(out self, owned existing: Self):
         self.ex = existing.ex
-        existing.ex = UnsafePointer[E]()
+        existing.ex = UnsafePointer[Executor[E]]()
         self.signal = existing.signal
 
     fn __del__(owned self):
         pass
-
-    fn setup[E_: Executable](mut self, exchange: UnsafePointer[E_]):
-        self.ex = exchange.bitcast[E]()
 
     fn on_init(mut self) raises:
         logd("on_init")
@@ -95,9 +92,10 @@ struct MyStrategy[E: Executable](Strategizable):
         logd("ticker: " + str(ticker))
 
     fn on_deinit(mut self) raises:
-        pass
+        logd("on_deinit")
 
     fn on_ticker(mut self, ticker: Ticker) raises:
+        logd("on_ticker")
         if not self.signal:
             # 异步下单
             var params = Dict[String, Any]()
@@ -112,19 +110,19 @@ struct MyStrategy[E: Executable](Strategizable):
             self.signal = True
 
     fn on_order_book(mut self, order_book: OrderBook) raises:
-        pass
+        logd("on_order_book")
 
     fn on_trade(mut self, trade: Trade) raises:
-        pass
+        logd("on_order_book")
 
     fn on_balance(mut self, balance: Balance) raises:
-        pass
+        logd("on_balance")
 
     fn on_order(mut self, order: Order) raises:
-        pass
+        logd("on_order")
 
     fn on_my_trade(mut self, trade: Trade) raises:
-        pass
+        logd("on_my_trade")
 
 
 fn main() raises:
@@ -142,10 +140,13 @@ fn main() raises:
     config["testnet"] = testnet
     config["verbose"] = True
 
-    var engine = Engine[Gate, GatePro, MyStrategy[Executor[Gate]]](
+    var engine = Engine[Gate, GatePro, MyStrategy[Gate]](
         config, ExchangeId.gateio, "1", "1"
     )
-    engine.init()
-    run_engine(engine)
+    engine.start()
+
+    # run[Gate, GatePro, MyStrategy[Gate]](
+    #     config, ExchangeId.gateio, "1", "1"
+    # )
 
     destroy_logger(logger)

@@ -1,6 +1,10 @@
 from memory import UnsafePointer
 from collections import Dict
 from monoio_connect import (
+    logd,
+    logi,
+    logw,
+    loge,
     Fixed,
 )
 from ccxt.base.types import (
@@ -12,11 +16,20 @@ from ccxt.base.types import (
     Ticker,
     OrderBook,
     Trade,
+    Balance,
     Balances,
     Order,
     Strings,
     IntOpt,
     Str,
+    OnTickerC,
+    OnTickersC,
+    OnOrderBookC,
+    OnTradeC,
+    OnBalanceC,
+    OnOrderC,
+    OnMyTradeC,
+    TradingContext,
 )
 from ccxt.base import Exchangeable
 
@@ -191,6 +204,51 @@ struct Executor[T: Exchangeable](Executable):
         self._balance_subscriptions = List[Dict[String, Any]]()
         self._order_subscriptions = List[Tuple[String, Dict[String, Any]]]()
         self._my_trade_subscriptions = List[Tuple[String, Dict[String, Any]]]()
+
+    fn __del__(owned self):
+        pass
+
+    fn on_ticker(
+        mut self, trading_context: TradingContext, ticker: Ticker
+    ) -> None:
+        logd("on_ticker")
+        # self._strategy[].on_ticker(ticker)
+
+    fn on_tickers(
+        mut self, trading_context: TradingContext, tickers: List[Ticker]
+    ) -> None:
+        logd("on_tickers")
+        # self._strategy[].on_tickers(tickers)
+
+    fn on_order_book(
+        mut self, trading_context: TradingContext, order_book: OrderBook
+    ) -> None:
+        logd("on_order_book")
+        # self._strategy[].on_order_book(order_book)
+
+    fn on_trade(
+        mut self, trading_context: TradingContext, trade: Trade
+    ) -> None:
+        logd("on_trade")
+        # self._strategy[].on_trade(trade)
+
+    fn on_balance(
+        mut self, trading_context: TradingContext, balance: Balance
+    ) -> None:
+        logd("on_balance")
+        # self._strategy[].on_balance(balance)
+
+    fn on_order(
+        mut self, trading_context: TradingContext, order: Order
+    ) -> None:
+        logd("on_order")
+        # self._strategy[].on_order(order)
+
+    fn on_my_trade(
+        mut self, trading_context: TradingContext, trade: Trade
+    ) -> None:
+        logd("on_my_trade")
+        # self._strategy[].on_my_trade(trade)
 
     fn load_markets(self, mut params: Dict[String, Any]) raises -> List[Market]:
         return self._exchange[].load_markets(params)

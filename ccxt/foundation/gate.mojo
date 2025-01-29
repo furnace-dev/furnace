@@ -718,7 +718,7 @@ struct Gate(Exchangeable):
             currency.deposit = depositEnabled
             currency.withdraw = withdrawEnabled
             currency.fee = Fixed.zero
-            currency.precision = Fixed(StringRef("0.0001"))
+            currency.precision = Fixed(String("0.0001"))
             currency.limits = CurrencyLimits(
                 Limit(min=_NoneType(), max=_NoneType()),
                 Limit(min=_NoneType(), max=_NoneType()),
