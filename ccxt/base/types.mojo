@@ -441,7 +441,7 @@ struct Account:
 @value
 struct Trade(Stringable):
     var info: Dict[String, Any]
-    var amount: Fixed
+    var amount: Float64
     var datetime: Str
     var id: String
     var order: Str
@@ -453,6 +453,21 @@ struct Trade(Stringable):
     var takerOrMaker: Str
     var cost: Fixed
     var fee: Fee
+
+    fn __init__(out self):
+        self.info = Dict[String, Any]()
+        self.amount = 0.0
+        self.datetime = String("")
+        self.id = ""
+        self.order = None
+        self.price = Fixed.zero
+        self.timestamp = 0
+        self.type = String("")
+        self.side = String("")
+        self.symbol = String("")
+        self.takerOrMaker = String("")
+        self.cost = Fixed.zero
+        self.fee = None
 
     fn __str__(self) -> String:
         return String.write(
@@ -702,9 +717,13 @@ struct Balances(Stringable):
 @value
 struct OrderbookEntry(Stringable):
     var price: Fixed
-    var amount: Fixed
+    var amount: Float64
 
-    fn __init__(out self, price: Fixed, amount: Fixed):
+    fn __init__(out self):
+        self.price = Fixed.zero
+        self.amount = 0.0
+
+    fn __init__(out self, price: Fixed, amount: Float64):
         self.price = price
         self.amount = amount
 

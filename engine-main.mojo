@@ -36,6 +36,8 @@ from ccxt.foundation import (
     create_exchange_instance,
 )
 from ccxt.pro.gate import Gate as GatePro
+from ccxt.pro.binance import Binance as BinancePro
+from ccxt.pro.bybit import Bybit as BybitPro
 from ccxt import Strategizable
 from ccxt.executor import Executable, Executor
 from ccxt.engine import (
@@ -144,6 +146,16 @@ fn main() raises:
         config, ExchangeId.gateio, "1", "1"
     )
     engine.start()
+
+    # var engine1 = Engine[Binance, BinancePro, MyStrategy[Binance]](
+    #     config, ExchangeId.binance, "1", "1"
+    # )
+    # engine1.start()
+
+    # var engine2 = Engine[Bybit, BybitPro, MyStrategy[Bybit]](
+    #     config, ExchangeId.bybit, "1", "1"
+    # )
+    # engine2.start()
 
     # run[Gate, GatePro, MyStrategy[Gate]](
     #     config, ExchangeId.gateio, "1", "1"

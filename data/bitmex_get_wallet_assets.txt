@@ -1,0 +1,1331 @@
+[
+    {
+        "asset": "MATIC",
+        "currency": "MATIc",
+        "majorCurrency": "MATIC",
+        "name": "Matic",
+        "currencyType": "Crypto",
+        "scale": 8,
+        "enabled": true,
+        "isMarginCurrency": false,
+        "minDepositAmount": 700000000,
+        "minWithdrawalAmount": 700000000,
+        "maxWithdrawalAmount": 7000000000000000,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "ropsten",
+                "tokenAddress": "0xDA1628b5Ad369448c79C212d4350e6125D920863",
+                "depositEnabled": false,
+                "withdrawalEnabled": false,
+                "withdrawalFee": 1600000000,
+                "minFee": 1600000000,
+                "maxFee": 1600000000
+            }
+        ]
+    },
+    {
+        "asset": "SHIB",
+        "currency": "SHIb",
+        "majorCurrency": "SHIB",
+        "name": "Shiba Inu",
+        "currencyType": "Crypto",
+        "scale": 5,
+        "enabled": true,
+        "isMarginCurrency": false,
+        "minDepositAmount": 80000000000,
+        "minWithdrawalAmount": 80000000000,
+        "maxWithdrawalAmount": 100000000000000000,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "goerli",
+                "tokenAddress": "0x70FB6a16ffbf374c9ef3D18D589138aB66b8ED14",
+                "depositEnabled": true,
+                "withdrawalEnabled": true,
+                "withdrawalFee": 80000000000,
+                "minFee": 80000000000,
+                "maxFee": 80000000000
+            },
+            {
+                "asset": "ropsten",
+                "tokenAddress": "0xC357c8135752508a91af0740984292611761C83f",
+                "depositEnabled": false,
+                "withdrawalEnabled": false,
+                "withdrawalFee": 80000000000,
+                "minFee": 80000000000,
+                "maxFee": 80000000000
+            }
+        ]
+    },
+    {
+        "asset": "DOGE",
+        "currency": "DOGe",
+        "majorCurrency": "DOGE",
+        "name": "Dogecoin",
+        "currencyType": "Crypto",
+        "scale": 6,
+        "enabled": true,
+        "isMarginCurrency": false,
+        "minDepositAmount": 8000000,
+        "minWithdrawalAmount": 8000000,
+        "maxWithdrawalAmount": 800000000000000,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "tdoge",
+                "depositEnabled": true,
+                "withdrawalEnabled": true,
+                "withdrawalFee": 8000000,
+                "minFee": 8000000,
+                "maxFee": 8000000
+            }
+        ]
+    },
+    {
+        "asset": "USDT",
+        "currency": "USDt",
+        "majorCurrency": "USDT",
+        "name": "USD Tether",
+        "currencyType": "Crypto",
+        "scale": 6,
+        "enabled": true,
+        "isMarginCurrency": true,
+        "minDepositAmount": 1000000,
+        "minWithdrawalAmount": 1000000,
+        "maxWithdrawalAmount": 100000000000000,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "ttron",
+                "tokenAddress": "TRWgP8NMVB7kUw7QXcAug2XGxH4Q3NHfxo",
+                "depositEnabled": true,
+                "withdrawalEnabled": true,
+                "withdrawalFee": 1000000,
+                "minFee": 1000000,
+                "maxFee": 1000000
+            },
+            {
+                "asset": "tsol",
+                "tokenAddress": "8PPqvHmwwuWa4fc6YhZhueoBiaxX8r1yQnXX4MZGwjcN",
+                "depositEnabled": true,
+                "withdrawalEnabled": true,
+                "withdrawalFee": 1000000,
+                "minFee": 1000000,
+                "maxFee": 1000000
+            },
+            {
+                "asset": "ropsten",
+                "tokenAddress": "0x6E55704E0371231E1C40fC3fdeF2a97d123B1E8C",
+                "depositEnabled": false,
+                "withdrawalEnabled": false,
+                "withdrawalFee": 25000000,
+                "minFee": 25000000,
+                "maxFee": 25000000
+            }
+        ]
+    },
+    {
+        "asset": "NEAR",
+        "currency": "NEAr",
+        "majorCurrency": "NEAR",
+        "name": "NEAR Protocol",
+        "currencyType": "Crypto",
+        "scale": 8,
+        "enabled": true,
+        "isMarginCurrency": false,
+        "minDepositAmount": 30000000,
+        "minWithdrawalAmount": 30000000,
+        "maxWithdrawalAmount": 3000000000000000,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "tnear",
+                "depositEnabled": true,
+                "withdrawalEnabled": true,
+                "withdrawalFee": 30000000,
+                "minFee": 30000000,
+                "maxFee": 30000000
+            }
+        ]
+    },
+    {
+        "asset": "STLS",
+        "currency": "STLs",
+        "majorCurrency": "STLS",
+        "name": "STELSI",
+        "currencyType": "Crypto",
+        "scale": 8,
+        "enabled": true,
+        "isMarginCurrency": false,
+        "minDepositAmount": 1500000000,
+        "minWithdrawalAmount": 1500000000,
+        "maxWithdrawalAmount": 1500000000000000,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "sepolia",
+                "tokenAddress": "0x99673c58b8961dA03B9EfFFA473f764715E5030C",
+                "depositEnabled": true,
+                "withdrawalEnabled": true,
+                "withdrawalFee": 1250000000,
+                "minFee": 1250000000,
+                "maxFee": 1250000000
+            }
+        ]
+    },
+    {
+        "asset": "USYC",
+        "currency": "USYc",
+        "majorCurrency": "USYC",
+        "name": "Hashnote USYC",
+        "currencyType": "Crypto",
+        "scale": 6,
+        "enabled": true,
+        "isMarginCurrency": false,
+        "minDepositAmount": 10000000,
+        "minWithdrawalAmount": 10000000,
+        "maxWithdrawalAmount": 10000000000000,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "sepolia",
+                "tokenAddress": "0xBaD18f311F2650FB803F3C6d283814910b57b5A7",
+                "depositEnabled": true,
+                "withdrawalEnabled": true,
+                "withdrawalFee": 10000000,
+                "minFee": 10000000,
+                "maxFee": 10000000
+            }
+        ]
+    },
+    {
+        "asset": "MAMUSD",
+        "currency": "MAMUSd",
+        "majorCurrency": "MAMUSD",
+        "name": "Multi Asset Margin USD",
+        "currencyType": "Synthetic",
+        "scale": 6,
+        "enabled": true,
+        "isMarginCurrency": false,
+        "minDepositAmount": null,
+        "minWithdrawalAmount": null,
+        "maxWithdrawalAmount": null,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "bitmex",
+                "depositEnabled": false,
+                "withdrawalEnabled": false,
+                "withdrawalFee": null,
+                "minFee": null,
+                "maxFee": null
+            }
+        ]
+    },
+    {
+        "asset": "XRP",
+        "currency": "XRp",
+        "majorCurrency": "XRP",
+        "name": "XRP Test",
+        "currencyType": "Crypto",
+        "scale": 6,
+        "enabled": true,
+        "isMarginCurrency": false,
+        "minDepositAmount": 5000000,
+        "minWithdrawalAmount": 5000000,
+        "maxWithdrawalAmount": 5000000000000,
+        "memoRequired": true,
+        "networks": [
+            {
+                "asset": "txrp",
+                "depositEnabled": true,
+                "withdrawalEnabled": true,
+                "withdrawalFee": 200000,
+                "minFee": 200000,
+                "maxFee": 200000
+            }
+        ]
+    },
+    {
+        "asset": "BBX",
+        "currency": "BBx",
+        "majorCurrency": "BBX",
+        "name": "BBX",
+        "currencyType": "Crypto",
+        "scale": 5,
+        "enabled": true,
+        "isMarginCurrency": true,
+        "minDepositAmount": 500000000,
+        "minWithdrawalAmount": 500000000,
+        "maxWithdrawalAmount": 500000000000000,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "tsol",
+                "tokenAddress": "21V5UBa4s2rBNMPpns6SEsB4PTzdUaDRM3bCarjtYs6x",
+                "depositEnabled": true,
+                "withdrawalEnabled": true,
+                "withdrawalFee": 100000000,
+                "minFee": 100000000,
+                "maxFee": 100000000
+            }
+        ]
+    },
+    {
+        "asset": "TRX",
+        "currency": "TRx",
+        "majorCurrency": "TRX",
+        "name": "Tron",
+        "currencyType": "Crypto",
+        "scale": 6,
+        "enabled": true,
+        "isMarginCurrency": false,
+        "minDepositAmount": 1000000,
+        "minWithdrawalAmount": 2000000,
+        "maxWithdrawalAmount": 200000000000000000,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "ttron",
+                "depositEnabled": true,
+                "withdrawalEnabled": true,
+                "withdrawalFee": 1000000,
+                "minFee": 1000000,
+                "maxFee": 1000000
+            }
+        ]
+    },
+    {
+        "asset": "BMEX",
+        "currency": "BMEx",
+        "majorCurrency": "BMEX",
+        "name": "BitMEX Test Token",
+        "currencyType": "Crypto",
+        "scale": 6,
+        "enabled": true,
+        "isMarginCurrency": false,
+        "minDepositAmount": 10000000,
+        "minWithdrawalAmount": 10000000,
+        "maxWithdrawalAmount": 100000000000000,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "ropsten",
+                "tokenAddress": "0x391C198e787A3bd2e362F97869e5084874bD6314",
+                "depositEnabled": false,
+                "withdrawalEnabled": false,
+                "withdrawalFee": 10000000,
+                "minFee": 10000000,
+                "maxFee": 10000000
+            },
+            {
+                "asset": "goerli",
+                "tokenAddress": "0x88927004F004Bd552C26359e1701351120e2ebC9",
+                "depositEnabled": true,
+                "withdrawalEnabled": true,
+                "withdrawalFee": 10000000,
+                "minFee": 10000000,
+                "maxFee": 10000000
+            }
+        ]
+    },
+    {
+        "asset": "SAND",
+        "currency": "SANd",
+        "majorCurrency": "SAND",
+        "name": "Sand",
+        "currencyType": "Crypto",
+        "scale": 8,
+        "enabled": true,
+        "isMarginCurrency": false,
+        "minDepositAmount": 1000000000,
+        "minWithdrawalAmount": 1000000000,
+        "maxWithdrawalAmount": 1000000000000000,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "ropsten",
+                "tokenAddress": "0xec9D791f9CE8853C3030e61782489ffa68575C1F",
+                "depositEnabled": false,
+                "withdrawalEnabled": false,
+                "withdrawalFee": 1000000000,
+                "minFee": 1000000000,
+                "maxFee": 1000000000
+            }
+        ]
+    },
+    {
+        "asset": "GEMS",
+        "currency": "GEMs",
+        "majorCurrency": "GEMS",
+        "name": "Gems",
+        "currencyType": "Crypto",
+        "scale": 8,
+        "enabled": true,
+        "isMarginCurrency": false,
+        "minDepositAmount": 3000000000,
+        "minWithdrawalAmount": 3000000000,
+        "maxWithdrawalAmount": 3000000000000000,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "sepolia",
+                "tokenAddress": "0xb0AA09A8FEC0AdF669acd5F632743DAA8a180dCE",
+                "depositEnabled": true,
+                "withdrawalEnabled": true,
+                "withdrawalFee": 3000000000,
+                "minFee": 3000000000,
+                "maxFee": 3000000000
+            }
+        ]
+    },
+    {
+        "asset": "BCH",
+        "currency": "BCh",
+        "majorCurrency": "BCH",
+        "name": "Bitcoin Cash",
+        "currencyType": "Crypto",
+        "scale": 8,
+        "enabled": true,
+        "isMarginCurrency": false,
+        "minDepositAmount": 350000,
+        "minWithdrawalAmount": 350000,
+        "maxWithdrawalAmount": 35000000000000,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "tbch",
+                "depositEnabled": true,
+                "withdrawalEnabled": true,
+                "withdrawalFee": 350000,
+                "minFee": 350000,
+                "maxFee": 350000
+            }
+        ]
+    },
+    {
+        "asset": "DOT",
+        "currency": "DOt",
+        "majorCurrency": "DOT",
+        "name": "Polkadot",
+        "currencyType": "Crypto",
+        "scale": 8,
+        "enabled": true,
+        "isMarginCurrency": false,
+        "minDepositAmount": 15000000,
+        "minWithdrawalAmount": 15000000,
+        "maxWithdrawalAmount": 1500000000000000,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "tdot",
+                "depositEnabled": true,
+                "withdrawalEnabled": true,
+                "withdrawalFee": 15000000,
+                "minFee": 15000000,
+                "maxFee": 15000000
+            }
+        ]
+    },
+    {
+        "asset": "XBT",
+        "currency": "XBt",
+        "majorCurrency": "XBT",
+        "name": "Bitcoin",
+        "currencyType": "Crypto",
+        "scale": 8,
+        "enabled": true,
+        "isMarginCurrency": true,
+        "minDepositAmount": 10000,
+        "minWithdrawalAmount": 1000,
+        "maxWithdrawalAmount": 100000000000000,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "btc",
+                "depositEnabled": true,
+                "withdrawalEnabled": true,
+                "withdrawalFee": 1000,
+                "minFee": 20000,
+                "maxFee": 10000000
+            }
+        ]
+    },
+    {
+        "asset": "POL",
+        "currency": "POl",
+        "majorCurrency": "POL",
+        "name": "POL (Sepolia)",
+        "currencyType": "Crypto",
+        "scale": 9,
+        "enabled": true,
+        "isMarginCurrency": false,
+        "minDepositAmount": 10000000000,
+        "minWithdrawalAmount": 10000000000,
+        "maxWithdrawalAmount": 10000000000000000,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "sepolia",
+                "tokenAddress": "0x27205DcaDE538Ee7Fe48b169ca460435A4392841",
+                "depositEnabled": true,
+                "withdrawalEnabled": true,
+                "withdrawalFee": 10000000000,
+                "minFee": 10000000000,
+                "maxFee": 10000000000
+            },
+            {
+                "asset": "tpolygon",
+                "depositEnabled": true,
+                "withdrawalEnabled": true,
+                "withdrawalFee": 80000000,
+                "minFee": 80000000,
+                "maxFee": 80000000
+            }
+        ]
+    },
+    {
+        "asset": "PYUSD",
+        "currency": "PYUSd",
+        "majorCurrency": "PYUSD",
+        "name": "PayPal USD",
+        "currencyType": "Crypto",
+        "scale": 6,
+        "enabled": true,
+        "isMarginCurrency": false,
+        "minDepositAmount": 10000000,
+        "minWithdrawalAmount": 10000000,
+        "maxWithdrawalAmount": 10000000000000,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "sepolia",
+                "tokenAddress": "0xe5DA81879e5d46e40A499f8F6AD4F00deE268066",
+                "depositEnabled": true,
+                "withdrawalEnabled": true,
+                "withdrawalFee": 10000000,
+                "minFee": 10000000,
+                "maxFee": 10000000
+            }
+        ]
+    },
+    {
+        "asset": "AVAX",
+        "currency": "AVAx",
+        "majorCurrency": "AVAX",
+        "name": "Avalanche (C-Chain)",
+        "currencyType": "Crypto",
+        "scale": 8,
+        "enabled": true,
+        "isMarginCurrency": false,
+        "minDepositAmount": 7000000,
+        "minWithdrawalAmount": 7000000,
+        "maxWithdrawalAmount": 70000000000000,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "tavax",
+                "depositEnabled": true,
+                "withdrawalEnabled": true,
+                "withdrawalFee": 7000000,
+                "minFee": 7000000,
+                "maxFee": 7000000
+            }
+        ]
+    },
+    {
+        "asset": "USDC",
+        "currency": "USDc",
+        "majorCurrency": "USDC",
+        "name": "USD Coin",
+        "currencyType": "Crypto",
+        "scale": 6,
+        "enabled": true,
+        "isMarginCurrency": false,
+        "minDepositAmount": 1000000,
+        "minWithdrawalAmount": 1000000,
+        "maxWithdrawalAmount": 100000000000000,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "sepolia",
+                "tokenAddress": "0x8ae1dab582D9ecF6Ff42Dc78eB619E1cfd2E5D14",
+                "depositEnabled": true,
+                "withdrawalEnabled": true,
+                "withdrawalFee": 1000000,
+                "minFee": 1000000,
+                "maxFee": 1000000
+            },
+            {
+                "asset": "ropsten",
+                "tokenAddress": "0x07865c6E87B9F70255377e024ace6630C1Eaa37F",
+                "depositEnabled": false,
+                "withdrawalEnabled": false,
+                "withdrawalFee": 25000000,
+                "minFee": 25000000,
+                "maxFee": 25000000
+            }
+        ]
+    },
+    {
+        "asset": "GOAT",
+        "currency": "GOAt",
+        "majorCurrency": "GOAT",
+        "name": "Goatseus Maximus",
+        "currencyType": "Crypto",
+        "scale": 8,
+        "enabled": true,
+        "isMarginCurrency": false,
+        "minDepositAmount": 3333333333,
+        "minWithdrawalAmount": 3333333333,
+        "maxWithdrawalAmount": 333333333333333,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "tsol",
+                "tokenAddress": "7fT4B7kCWwymXFA7Xrpy2NMpfrDgg9Ko12zcEEbThfHQ",
+                "depositEnabled": true,
+                "withdrawalEnabled": true,
+                "withdrawalFee": 333333333,
+                "minFee": 333333333,
+                "maxFee": 333333333
+            }
+        ]
+    },
+    {
+        "asset": "LTC",
+        "currency": "LTc",
+        "majorCurrency": "LTC",
+        "name": "Litecoin",
+        "currencyType": "Crypto",
+        "scale": 8,
+        "enabled": true,
+        "isMarginCurrency": false,
+        "minDepositAmount": 800000,
+        "minWithdrawalAmount": 800000,
+        "maxWithdrawalAmount": 80000000000000,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "tltc",
+                "depositEnabled": true,
+                "withdrawalEnabled": true,
+                "withdrawalFee": 800000,
+                "minFee": 800000,
+                "maxFee": 800000
+            }
+        ]
+    },
+    {
+        "asset": "TRUMP",
+        "currency": "TRUMp",
+        "majorCurrency": "TRUMP",
+        "name": "MAGA (Trump)",
+        "currencyType": "Crypto",
+        "scale": 8,
+        "enabled": true,
+        "isMarginCurrency": false,
+        "minDepositAmount": 100000000,
+        "minWithdrawalAmount": 100000000,
+        "maxWithdrawalAmount": 100000000000000,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "sepolia",
+                "tokenAddress": "0xd1Afe37C2e2ee4FDF8B65c8e230bF6a0d3cAc25E",
+                "depositEnabled": true,
+                "withdrawalEnabled": true,
+                "withdrawalFee": 100000000,
+                "minFee": 100000000,
+                "maxFee": 100000000
+            }
+        ]
+    },
+    {
+        "asset": "FTM",
+        "currency": "FTm",
+        "majorCurrency": "FTM",
+        "name": "Fantom",
+        "currencyType": "Crypto",
+        "scale": 8,
+        "enabled": true,
+        "isMarginCurrency": false,
+        "minDepositAmount": 4000000000,
+        "minWithdrawalAmount": 4000000000,
+        "maxWithdrawalAmount": 10000000000000000,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "ropsten",
+                "tokenAddress": "0x8EE90A1eB5f08862D1239EF5C41a27463879bCf3",
+                "depositEnabled": false,
+                "withdrawalEnabled": false,
+                "withdrawalFee": 4000000000,
+                "minFee": 4000000000,
+                "maxFee": 4000000000
+            }
+        ]
+    },
+    {
+        "asset": "CRO",
+        "currency": "CRo",
+        "majorCurrency": "CRO",
+        "name": "Cronos",
+        "currencyType": "Crypto",
+        "scale": 6,
+        "enabled": true,
+        "isMarginCurrency": false,
+        "minDepositAmount": 90000000,
+        "minWithdrawalAmount": 90000000,
+        "maxWithdrawalAmount": 100000000000000,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "ropsten",
+                "tokenAddress": "0x219fF2A3521dd2690592EDA84213eDd6f3fae8d7",
+                "depositEnabled": false,
+                "withdrawalEnabled": false,
+                "withdrawalFee": 90000000,
+                "minFee": 90000000,
+                "maxFee": 90000000
+            },
+            {
+                "asset": "goerli",
+                "tokenAddress": "0xC357c8135752508a91af0740984292611761C83f",
+                "depositEnabled": true,
+                "withdrawalEnabled": true,
+                "withdrawalFee": 90000000,
+                "minFee": 90000000,
+                "maxFee": 90000000
+            }
+        ]
+    },
+    {
+        "asset": "WEN",
+        "currency": "WEn",
+        "majorCurrency": "WEN",
+        "name": "Wen",
+        "currencyType": "Crypto",
+        "scale": 5,
+        "enabled": true,
+        "isMarginCurrency": false,
+        "minDepositAmount": 10000000000,
+        "minWithdrawalAmount": 10000000000,
+        "maxWithdrawalAmount": 10000000000000000,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "tsol",
+                "tokenAddress": "A89BeVPMqrshbtffgx2bdfVDm3hpRrAbao7rKRBVSQe2",
+                "depositEnabled": true,
+                "withdrawalEnabled": true,
+                "withdrawalFee": 500000000,
+                "minFee": 500000000,
+                "maxFee": 500000000
+            }
+        ]
+    },
+    {
+        "asset": "FTR",
+        "currency": "FTr",
+        "majorCurrency": "FTR",
+        "name": "Fautor",
+        "currencyType": "Crypto",
+        "scale": 5,
+        "enabled": true,
+        "isMarginCurrency": false,
+        "minDepositAmount": 40000000,
+        "minWithdrawalAmount": 40000000,
+        "maxWithdrawalAmount": 40000000000000,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "sepolia",
+                "tokenAddress": "0xfF65932401A1BE6a58af549D142af93E8faBa4A6",
+                "depositEnabled": true,
+                "withdrawalEnabled": true,
+                "withdrawalFee": 40000000,
+                "minFee": 40000000,
+                "maxFee": 40000000
+            }
+        ]
+    },
+    {
+        "asset": "FTT",
+        "currency": "FTt",
+        "majorCurrency": "FTT",
+        "name": "FTX Token",
+        "currencyType": "Crypto",
+        "scale": 8,
+        "enabled": true,
+        "isMarginCurrency": false,
+        "minDepositAmount": 37000000,
+        "minWithdrawalAmount": 37000000,
+        "maxWithdrawalAmount": 100000000000000,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "ropsten",
+                "tokenAddress": "0xB39e5aaEf5963228fC6f9Cb094D06bf3b6264C87",
+                "depositEnabled": false,
+                "withdrawalEnabled": false,
+                "withdrawalFee": 37000000,
+                "minFee": 37000000,
+                "maxFee": 37000000
+            }
+        ]
+    },
+    {
+        "asset": "KAMA",
+        "currency": "KAMa",
+        "majorCurrency": "KAMA",
+        "name": "Kamala Horris",
+        "currencyType": "Crypto",
+        "scale": 5,
+        "enabled": true,
+        "isMarginCurrency": false,
+        "minDepositAmount": 20000000,
+        "minWithdrawalAmount": 20000000,
+        "maxWithdrawalAmount": 20000000000000,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "tsol",
+                "tokenAddress": "ZmHEgUvpgjPvjyZ2nUKd4CuPgXqg48CeJcSd86WuaKs",
+                "depositEnabled": true,
+                "withdrawalEnabled": true,
+                "withdrawalFee": 4300000,
+                "minFee": 4300000,
+                "maxFee": 4300000
+            }
+        ]
+    },
+    {
+        "asset": "SUSHI",
+        "currency": "SUSHi",
+        "majorCurrency": "SUSHI",
+        "name": "SushiToken",
+        "currencyType": "Crypto",
+        "scale": 8,
+        "enabled": true,
+        "isMarginCurrency": false,
+        "minDepositAmount": 300000000,
+        "minWithdrawalAmount": 300000000,
+        "maxWithdrawalAmount": 3000000000000000,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "ropsten",
+                "tokenAddress": "0x37F4F306f1bD07c42Cb90D82a792183807B17222",
+                "depositEnabled": false,
+                "withdrawalEnabled": false,
+                "withdrawalFee": 700000000,
+                "minFee": 700000000,
+                "maxFee": 700000000
+            }
+        ]
+    },
+    {
+        "asset": "HAIYEZ",
+        "currency": "HAIYEz",
+        "majorCurrency": "HAIYEZ",
+        "name": "Yahtzee DAO",
+        "currencyType": "Crypto",
+        "scale": 5,
+        "enabled": true,
+        "isMarginCurrency": false,
+        "minDepositAmount": 100000000,
+        "minWithdrawalAmount": 100000000,
+        "maxWithdrawalAmount": 100000000000000,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "tsol",
+                "tokenAddress": "Db8quDV7fC5bx9pkYGiydX7cwhNHc9aXaRZyYu3zjFZf",
+                "depositEnabled": true,
+                "withdrawalEnabled": true,
+                "withdrawalFee": 20000000,
+                "minFee": 20000000,
+                "maxFee": 20000000
+            }
+        ]
+    },
+    {
+        "asset": "ATOM",
+        "currency": "ATOm",
+        "majorCurrency": "ATOM",
+        "name": "Cosmos Test",
+        "currencyType": "Crypto",
+        "scale": 6,
+        "enabled": true,
+        "isMarginCurrency": false,
+        "minDepositAmount": 40000,
+        "minWithdrawalAmount": 40000,
+        "maxWithdrawalAmount": 400000000000,
+        "memoRequired": true,
+        "networks": [
+            {
+                "asset": "tcosmos",
+                "depositEnabled": true,
+                "withdrawalEnabled": true,
+                "withdrawalFee": 20000,
+                "minFee": 20000,
+                "maxFee": 20000
+            }
+        ]
+    },
+    {
+        "asset": "UNI",
+        "currency": "UNi",
+        "majorCurrency": "UNI",
+        "name": "Uniswap",
+        "currencyType": "Crypto",
+        "scale": 8,
+        "enabled": true,
+        "isMarginCurrency": false,
+        "minDepositAmount": 100000000,
+        "minWithdrawalAmount": 100000000,
+        "maxWithdrawalAmount": 1000000000000000,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "ropsten",
+                "tokenAddress": "0x43b64fF65ccba1e39459F689f9ad36EdF4fb334c",
+                "depositEnabled": false,
+                "withdrawalEnabled": false,
+                "withdrawalFee": 250000000,
+                "minFee": 250000000,
+                "maxFee": 250000000
+            }
+        ]
+    },
+    {
+        "asset": "AAVE",
+        "currency": "AAVe",
+        "majorCurrency": "AAVE",
+        "name": "Aave",
+        "currencyType": "Crypto",
+        "scale": 8,
+        "enabled": true,
+        "isMarginCurrency": false,
+        "minDepositAmount": 30000000,
+        "minWithdrawalAmount": 30000000,
+        "maxWithdrawalAmount": 100000000000000,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "ropsten",
+                "tokenAddress": "0x06d07Aa4831841859c6661D830B36bbE75154126",
+                "depositEnabled": false,
+                "withdrawalEnabled": false,
+                "withdrawalFee": 30000000,
+                "minFee": 30000000,
+                "maxFee": 30000000
+            }
+        ]
+    },
+    {
+        "asset": "WBTC",
+        "currency": "WBTc",
+        "majorCurrency": "WBTC",
+        "name": "Wrapped BTC",
+        "currencyType": "Crypto",
+        "scale": 8,
+        "enabled": true,
+        "isMarginCurrency": false,
+        "minDepositAmount": 40000,
+        "minWithdrawalAmount": 40000,
+        "maxWithdrawalAmount": 100000000000,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "goerli",
+                "tokenAddress": "0xec9D791f9CE8853C3030e61782489ffa68575C1F",
+                "depositEnabled": false,
+                "withdrawalEnabled": false,
+                "withdrawalFee": 400000,
+                "minFee": 400000,
+                "maxFee": 400000
+            },
+            {
+                "asset": "ropsten",
+                "tokenAddress": "0x60233221A06Dd1eB6DaF51b26517b315533A584D",
+                "depositEnabled": false,
+                "withdrawalEnabled": false,
+                "withdrawalFee": 40000,
+                "minFee": 40000,
+                "maxFee": 40000
+            }
+        ]
+    },
+    {
+        "asset": "S",
+        "currency": "s",
+        "majorCurrency": "S",
+        "name": "Sonic",
+        "currencyType": "Crypto",
+        "scale": 8,
+        "enabled": true,
+        "isMarginCurrency": false,
+        "minDepositAmount": 1000000000,
+        "minWithdrawalAmount": 1000000000,
+        "maxWithdrawalAmount": 1000000000000000,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "tsonic",
+                "depositEnabled": true,
+                "withdrawalEnabled": true,
+                "withdrawalFee": 500000,
+                "minFee": 500000,
+                "maxFee": 500000
+            }
+        ]
+    },
+    {
+        "asset": "BONK",
+        "currency": "BONk",
+        "majorCurrency": "BONK",
+        "name": "Bonk",
+        "currencyType": "Crypto",
+        "scale": 5,
+        "enabled": true,
+        "isMarginCurrency": false,
+        "minDepositAmount": 10000000000,
+        "minWithdrawalAmount": 10000000000,
+        "maxWithdrawalAmount": 10000000000000000,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "tsol",
+                "tokenAddress": "C4AjA6f5drHXbvzb6zVvV5AK3bH9BF39HHK9779E73pE",
+                "depositEnabled": false,
+                "withdrawalEnabled": false,
+                "withdrawalFee": 4500000000,
+                "minFee": 4500000000,
+                "maxFee": 4500000000
+            }
+        ]
+    },
+    {
+        "asset": "LINK",
+        "currency": "LINk",
+        "majorCurrency": "LINK",
+        "name": "Chainlink",
+        "currencyType": "Crypto",
+        "scale": 8,
+        "enabled": true,
+        "isMarginCurrency": false,
+        "minDepositAmount": 100000000,
+        "minWithdrawalAmount": 100000000,
+        "maxWithdrawalAmount": 1000000000000000,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "ropsten",
+                "tokenAddress": "0xed9657D496F82a30a5F8fec971353aC054be7124",
+                "depositEnabled": false,
+                "withdrawalEnabled": false,
+                "withdrawalFee": 160000000,
+                "minFee": 160000000,
+                "maxFee": 160000000
+            }
+        ]
+    },
+    {
+        "asset": "XTZ",
+        "currency": "XTz",
+        "majorCurrency": "XTZ",
+        "name": "Tezos",
+        "currencyType": "Crypto",
+        "scale": 8,
+        "enabled": true,
+        "isMarginCurrency": false,
+        "minDepositAmount": 67000000,
+        "minWithdrawalAmount": 67000000,
+        "maxWithdrawalAmount": 6700000000000000,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "txtz",
+                "depositEnabled": true,
+                "withdrawalEnabled": true,
+                "withdrawalFee": 67000000,
+                "minFee": 67000000,
+                "maxFee": 67000000
+            }
+        ]
+    },
+    {
+        "asset": "MANA",
+        "currency": "MANa",
+        "majorCurrency": "MANA",
+        "name": "Decentraland",
+        "currencyType": "Crypto",
+        "scale": 8,
+        "enabled": true,
+        "isMarginCurrency": false,
+        "minDepositAmount": 1000000000,
+        "minWithdrawalAmount": 1000000000,
+        "maxWithdrawalAmount": 1000000000000000,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "ropsten",
+                "tokenAddress": "0xa8DA40409caFE2710a3d1C7c9E41492D9edaADbA",
+                "depositEnabled": false,
+                "withdrawalEnabled": false,
+                "withdrawalFee": 1000000000,
+                "minFee": 1000000000,
+                "maxFee": 1000000000
+            }
+        ]
+    },
+    {
+        "asset": "OKB",
+        "currency": "OKb",
+        "majorCurrency": "OKB",
+        "name": "OKB",
+        "currencyType": "Crypto",
+        "scale": 8,
+        "enabled": true,
+        "isMarginCurrency": false,
+        "minDepositAmount": 65000000,
+        "minWithdrawalAmount": 65000000,
+        "maxWithdrawalAmount": 100000000000000,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "ropsten",
+                "tokenAddress": "0x59CB570A4733f48B0062f5A4b215Ab879DE7F88a",
+                "depositEnabled": false,
+                "withdrawalEnabled": false,
+                "withdrawalFee": 65000000,
+                "minFee": 65000000,
+                "maxFee": 65000000
+            }
+        ]
+    },
+    {
+        "asset": "DAI",
+        "currency": "DAi",
+        "majorCurrency": "DAI",
+        "name": "Dai",
+        "currencyType": "Crypto",
+        "scale": 6,
+        "enabled": true,
+        "isMarginCurrency": false,
+        "minDepositAmount": 10000000,
+        "minWithdrawalAmount": 10000000,
+        "maxWithdrawalAmount": 100000000000000,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "ropsten",
+                "tokenAddress": "0x6e844AD4b3c67587dbC5954b96D80Ce6d5A09310",
+                "depositEnabled": false,
+                "withdrawalEnabled": false,
+                "withdrawalFee": 10000000,
+                "minFee": 10000000,
+                "maxFee": 10000000
+            }
+        ]
+    },
+    {
+        "asset": "SOL",
+        "currency": "LAMp",
+        "majorCurrency": "SOL",
+        "name": "Solana",
+        "currencyType": "Crypto",
+        "scale": 9,
+        "enabled": true,
+        "isMarginCurrency": false,
+        "minDepositAmount": 10000000,
+        "minWithdrawalAmount": 20000000,
+        "maxWithdrawalAmount": 1000000000000000,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "tsol",
+                "depositEnabled": true,
+                "withdrawalEnabled": true,
+                "withdrawalFee": 20000000,
+                "minFee": 20000000,
+                "maxFee": 20000000
+            }
+        ]
+    },
+    {
+        "asset": "APE",
+        "currency": "APe",
+        "majorCurrency": "APE",
+        "name": "Ape Coin",
+        "currencyType": "Crypto",
+        "scale": 8,
+        "enabled": true,
+        "isMarginCurrency": false,
+        "minDepositAmount": 100000000,
+        "minWithdrawalAmount": 100000000,
+        "maxWithdrawalAmount": 1000000000000000,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "ropsten",
+                "tokenAddress": "0xeE7f8163C67bF28e9aABB9F231B2a8c972B705ba",
+                "depositEnabled": false,
+                "withdrawalEnabled": false,
+                "withdrawalFee": 200000000,
+                "minFee": 200000000,
+                "maxFee": 200000000
+            }
+        ]
+    },
+    {
+        "asset": "BNB",
+        "currency": "BNb",
+        "majorCurrency": "BNB",
+        "name": "Binance BSC",
+        "currencyType": "Crypto",
+        "scale": 8,
+        "enabled": true,
+        "isMarginCurrency": false,
+        "minDepositAmount": 4000000,
+        "minWithdrawalAmount": 4000000,
+        "maxWithdrawalAmount": 40000000000000,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "tbsc",
+                "depositEnabled": true,
+                "withdrawalEnabled": true,
+                "withdrawalFee": 4000000,
+                "minFee": 4000000,
+                "maxFee": 4000000
+            }
+        ]
+    },
+    {
+        "asset": "ETH",
+        "currency": "Gwei",
+        "majorCurrency": "ETH",
+        "name": "Ethereum",
+        "currencyType": "Crypto",
+        "scale": 9,
+        "enabled": true,
+        "isMarginCurrency": false,
+        "minDepositAmount": 3000000,
+        "minWithdrawalAmount": 3000000,
+        "maxWithdrawalAmount": 30000000000000,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "ropsten",
+                "depositEnabled": false,
+                "withdrawalEnabled": false,
+                "withdrawalFee": 5000000,
+                "minFee": 5000000,
+                "maxFee": 5000000
+            },
+            {
+                "asset": "goerli",
+                "depositEnabled": false,
+                "withdrawalEnabled": false,
+                "withdrawalFee": 5000000,
+                "minFee": 5000000,
+                "maxFee": 5000000
+            },
+            {
+                "asset": "sepolia",
+                "depositEnabled": false,
+                "withdrawalEnabled": true,
+                "withdrawalFee": 5000000,
+                "minFee": 5000000,
+                "maxFee": 5000000
+            }
+        ]
+    },
+    {
+        "asset": "BUSD",
+        "currency": "BUSd",
+        "majorCurrency": "BUSD",
+        "name": "Binance USD",
+        "currencyType": "Crypto",
+        "scale": 6,
+        "enabled": true,
+        "isMarginCurrency": false,
+        "minDepositAmount": 10000000,
+        "minWithdrawalAmount": 10000000,
+        "maxWithdrawalAmount": 100000000000000,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "tbsc",
+                "tokenAddress": "0xeD24FC36d5Ee211Ea25A80239Fb8C4Cfd80f12Ee",
+                "depositEnabled": true,
+                "withdrawalEnabled": true,
+                "withdrawalFee": 10000000,
+                "minFee": 10000000,
+                "maxFee": 10000000
+            },
+            {
+                "asset": "ropsten",
+                "tokenAddress": "0x21862a0889a24E0EC211e21Ea5Ae96157BBC87Aa",
+                "depositEnabled": false,
+                "withdrawalEnabled": false,
+                "withdrawalFee": 10000000,
+                "minFee": 10000000,
+                "maxFee": 10000000
+            }
+        ]
+    },
+    {
+        "asset": "AXS",
+        "currency": "AXs",
+        "majorCurrency": "AXS",
+        "name": "Axie Infinity Shard",
+        "currencyType": "Crypto",
+        "scale": 8,
+        "enabled": true,
+        "isMarginCurrency": false,
+        "minDepositAmount": 20000000,
+        "minWithdrawalAmount": 20000000,
+        "maxWithdrawalAmount": 200000000000000,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "ropsten",
+                "tokenAddress": "0x8DcABC5051D1941844b02dD07313AdD7ce9b82D8",
+                "depositEnabled": false,
+                "withdrawalEnabled": false,
+                "withdrawalFee": 50000000,
+                "minFee": 50000000,
+                "maxFee": 50000000
+            }
+        ]
+    },
+    {
+        "asset": "ADA",
+        "currency": "ADa",
+        "majorCurrency": "ADA",
+        "name": "Cardano",
+        "currencyType": "Crypto",
+        "scale": 8,
+        "enabled": true,
+        "isMarginCurrency": false,
+        "minDepositAmount": 200000000,
+        "minWithdrawalAmount": 200000000,
+        "maxWithdrawalAmount": 20000000000000000,
+        "memoRequired": false,
+        "networks": [
+            {
+                "asset": "tada",
+                "depositEnabled": true,
+                "withdrawalEnabled": true,
+                "withdrawalFee": 200000000,
+                "minFee": 200000000,
+                "maxFee": 200000000
+            }
+        ]
+    }
+]

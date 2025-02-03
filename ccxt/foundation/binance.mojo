@@ -783,7 +783,7 @@ struct Binance(Exchangeable):
             var p = ask_view.get_str(0, "0")
             var s = ask_view.get_str(1, "0")
             var price = Fixed(p)
-            var amount = Fixed(s)
+            var amount = float(s)
             result.asks.append(OrderbookEntry(price, amount))
         var bid_arr = doc.get_array_mut("bids")
         for i in range(0, bid_arr.len()):
@@ -792,7 +792,7 @@ struct Binance(Exchangeable):
             var p = bid_view.get_str(0, "0")
             var s = bid_view.get_str(1, "0")
             var price = Fixed(p)
-            var amount = Fixed(s)
+            var amount = float(s)
             result.bids.append(OrderbookEntry(price, amount))
         _ = doc^
         return result

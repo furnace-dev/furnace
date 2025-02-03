@@ -294,11 +294,20 @@ struct HttpClient:
     ](self, req: HttpRequestPtr,) -> HttpResponse:
         var resp = http_client_request(self._rt, self._client, req)
         var status_code = int(http_response_status_code(resp))
-        var buf = stack_allocation[max_body_size, Int8]()
-        var body = http_response_body(resp, buf, max_body_size)
-        var ret = HttpResponse(status_code, String(StringRef(buf, body)))
-        destroy_http_response(resp)
-        return ret
+        @parameter
+        if max_body_size > 1024 * 1000:
+            var buf = UnsafePointer[Int8].alloc(max_body_size)
+            var body = http_response_body(resp, buf, max_body_size)
+            var ret = HttpResponse(status_code, String(StringRef(buf, body)))
+            buf.free()
+            destroy_http_response(resp)
+            return ret
+        else:
+            var buf = stack_allocation[max_body_size, Int8]()
+            var body = http_response_body(resp, buf, max_body_size)
+            var ret = HttpResponse(status_code, String(StringRef(buf, body)))
+            destroy_http_response(resp)
+            return ret
 
     @always_inline
     fn request_with_callback(

@@ -494,14 +494,14 @@ struct Bybit(Exchangeable):
             var row = b.get(i)
             var row_view = JsonValueRefArrayView(row)
             var bid = Fixed(row_view.get_str(0, "0"))
-            var bid_size = Fixed(row_view.get_str(1, "0"))
+            var bid_size = float(row_view.get_str(1, "0"))
             res.bids.append(OrderbookEntry(bid, bid_size))
         var a = result.get_array_mut("a")
         for i in range(a.len()):
             var row = a.get(i)
             var row_view = JsonValueRefArrayView(row)
             var ask = Fixed(row_view.get_str(0, "0"))
-            var ask_size = Fixed(row_view.get_str(1, "0"))
+            var ask_size = float(row_view.get_str(1, "0"))
             res.asks.append(OrderbookEntry(ask, ask_size))
         _ = result^
         _ = doc^
