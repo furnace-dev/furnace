@@ -33,6 +33,8 @@ from ccxt.base.types import (
     Ticker,
     ExchangeId,
     TradingContext,
+    ticker_decorator,
+    order_decorator,
 )
 from ccxt.foundation.bybit import Bybit
 from ccxt.foundation.binance import Binance
@@ -88,21 +90,21 @@ fn test_binance_fetch_balance() raises -> None:
     print(resp.text)
 
 
-# fn on_order(trading_context: TradingContext, order: Order) -> None:
-#     logd("on_order start")
-#     # logd("trading_context: " + str(trading_context))
-#     # logd("order: " + str(order))
-#     logd("exchange_id: " + str(trading_context.exchange_id))
-#     logd("account_id: " + trading_context.account_id)
-#     logd("trader_id: " + trading_context.trader_id)
-#     logd("=============")
-#     logd("id: " + order.id)
-#     logd("symbol: " + order.symbol)
-#     logd("type: " + order.type)
-#     logd("side: " + str(order.side))
-#     logd("amount: " + str(order.amount))
-#     logd("price: " + str(order.price))
-#     logd("on_order end")
+fn on_order(trading_context: TradingContext, order: Order) -> None:
+    logd("on_order start")
+    # logd("trading_context: " + str(trading_context))
+    # logd("order: " + str(order))
+    logd("exchange_id: " + str(trading_context.exchange_id))
+    logd("account_id: " + trading_context.account_id)
+    logd("trader_id: " + trading_context.trader_id)
+    logd("=============")
+    logd("id: " + order.id)
+    logd("symbol: " + order.symbol)
+    logd("type: " + order.type)
+    logd("side: " + str(order.side))
+    logd("amount: " + str(order.amount))
+    logd("price: " + str(order.price))
+    logd("on_order end")
 
 
 fn test_binance() raises:
@@ -125,13 +127,13 @@ fn test_binance() raises:
     var binance = Binance(config, trading_context, rt)
     var params = Dict[String, Any]()
 
-    fn on_order(trading_context: TradingContext, order: Order) escaping -> None:
+    fn _on_order(trading_context: TradingContext, order: Order) -> None:
         logd("on_order start")
         logd("trading_context: " + str(trading_context))
         logd("order: " + str(order))
         logd("on_order end")
 
-    binance.set_on_order(on_order)
+    binance.set_on_order(order_decorator(_on_order))
 
     var symbol = "XRPUSDT"
 
@@ -245,8 +247,8 @@ fn test_ws() raises:
     # logd("listen_key: " + listen_key)
 
     var binance_pro = BinancePro(config, trading_context)
-    binance_pro.set_on_ticker(on_ticker)
-    binance_pro.set_on_order(on_order)
+    binance_pro.set_on_ticker(ticker_decorator(on_ticker))
+    binance_pro.set_on_order(order_decorator(on_order))
 
     # Subscribe to order book depth data
     # var params0 = Dict[String, Any]()
@@ -255,9 +257,7 @@ fn test_ws() raises:
 
     # Subscribe to real-time ticker data
     var params1 = Dict[String, Any]()
-    binance_pro.subscribe_ticker(
-        "xrpusdt", params1
-    )
+    binance_pro.subscribe_ticker("xrpusdt", params1)
 
     # Subscribe to order data
     # var params2 = Dict[String, Any]()
