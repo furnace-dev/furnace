@@ -360,7 +360,8 @@ struct Binance(ProExchangeable):
     @always_inline
     fn __on_order(self, json_obj: JsonObject) -> None:
         """
-        {"e":"ORDER_TRADE_UPDATE","T":1737448064726,"E":1737448064726,"o":{"s":"1000PEPEUSDT","c":"XgV42c0IEpacopoGASgVgo","S":"BUY","o":"LIMIT","f":"GTC","q":"1000","p":"0.0050000","ap":"0","sp":"0","x":"CANCELED","X":"CANCELED","i":16534440354,"l":"0","z":"0","L":"0","n":"0","N":"USDT","T":1737448064726,"t":0,"b":"10","a":"0","m":false,"R":false,"wt":"CONTRACT_PRICE","ot":"LIMIT","ps":"LONG","cp":false,"rp":"0","pP":false,"si":0,"ss":0,"V":"NONE","pm":"NONE","gtd":0}}
+        Order update.
+        {"e":"ORDER_TRADE_UPDATE","T":1737448064726,"E":1737448064726,"o":{"s":"1000PEPEUSDT","c":"XgV42c0IEpacopoGASgVgo","S":"BUY","o":"LIMIT","f":"GTC","q":"1000","p":"0.0050000","ap":"0","sp":"0","x":"CANCELED","X":"CANCELED","i":16534440354,"l":"0","z":"0","L":"0","n":"0","N":"USDT","T":1737448064726,"t":0,"b":"10","a":"0","m":false,"R":false,"wt":"CONTRACT_PRICE","ot":"LIMIT","ps":"LONG","cp":false,"rp":"0","pP":false,"si":0,"ss":0,"V":"NONE","pm":"NONE","gtd":0}}.
 
         {
             "e":"ORDER_TRADE_UPDATE",			// 事件类型

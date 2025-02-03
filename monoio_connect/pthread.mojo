@@ -1,4 +1,4 @@
-from memory import UnsafePointer, memset_zero
+from memory import UnsafePointer, memset_zero, memcpy
 from utils import StaticTuple
 from sys.ffi import external_call
 
