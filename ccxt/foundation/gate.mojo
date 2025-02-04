@@ -81,6 +81,7 @@ from ._common_utils import (
     async_trading_channel_ptr,
 )
 from ._base import empty_on_order
+from toolbox import decimal_places
 
 
 struct Gate(Exchangeable):
@@ -567,6 +568,9 @@ struct Gate(Exchangeable):
         var is_linear = quote == settle
         var taker = Fixed(taker_percent) / onehundred
         var maker = Fixed(maker_percent) / onehundred
+        var precision = decimal_places(
+            float(market.get_str("mark_price_round"))
+        )
         return MarketInterface(
             info=Dict[String, Any](),
             id=id,
@@ -600,7 +604,7 @@ struct Gate(Exchangeable):
             expiryDatetime=self._base.iso8601(expiry),
             strike=_NoneType(),
             optionType=None,
-            precision=0,
+            precision=precision,
             # {
             #     amount= self.parse_number('1'),  # all contracts have self step size
             #     price= self.safe_number(market, 'order_price_round'),
