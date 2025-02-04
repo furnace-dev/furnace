@@ -1088,7 +1088,7 @@ struct MarketInterface(Stringable):
     var percentage: Bool
     var tierBased: Bool
     var feeSide: Str
-    var precision: Any
+    var precision: Int
     var limits: MarketLimits
     var created: Int
 
@@ -1161,7 +1161,7 @@ struct MarketInterface(Stringable):
         percentage: Bool,
         tierBased: Bool,
         feeSide: Str,
-        precision: Any,
+        precision: Int,
         limits: MarketLimits,
         created: Int,
     ):

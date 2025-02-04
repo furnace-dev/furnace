@@ -534,21 +534,22 @@ struct Gate(Exchangeable):
         var settle = self._base.safe_currency_code(settleId)
         # var expiry = self._base.safe_timestamp(market, 'expire_time')
         var expiry = int(market.get_i64("expire_time", 0))
-        var symbol = String()
+        var symbol = market.get_str("name")
         var market_type = "swap"
         if date != "":
-            symbol = (
-                base
-                + "/"
-                + quote
-                + ":"
-                + settle
-                + "-"
-                + self._base.yymmdd(expiry, "")
-            )
+            # symbol = (
+            #     base
+            #     + "/"
+            #     + quote
+            #     + ":"
+            #     + settle
+            #     + "-"
+            #     + self._base.yymmdd(expiry, "")
+            # )
             market_type = "future"
         else:
-            symbol = base + "/" + quote + ":" + settle
+            # symbol = base + "/" + quote + ":" + settle
+            pass
         var price_deviate = market.get_str("order_price_deviate")
         var mark_price = market.get_str("mark_price")
         var mark_price_p = Fixed(mark_price)

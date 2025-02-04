@@ -417,7 +417,8 @@ struct Gate(ProExchangeable):
         logd("__on_close")
 
     fn __on_timer(self, count: UInt64) -> None:
-        logd("__on_timer")
+        if self._verbose:
+            logd("__on_timer")
         try:
             var request = JsonObject()
             request.insert_i64("time", int(now_ms() / 1000))
@@ -526,7 +527,8 @@ struct Gate(ProExchangeable):
 
     @always_inline
     fn __on_pong(self, json_obj: JsonObject) -> None:
-        logd("__on_pong")
+        if self._verbose:
+            logd("__on_pong")
 
     @always_inline
     fn __on_header(mut self, json_obj: JsonObject) -> None:
