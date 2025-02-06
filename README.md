@@ -20,7 +20,7 @@ sudo apt-get install zlib1g-dev libtinfo-dev
 
 1. Install Magic using the official installer:
 ```bash
-curl -ssL https://magic.modular.com/ | bash
+curl -ssL https://magic.modular.com/deb1e28c-0019-44c0-b2f9-743dee6ddb70 | bash
 ```
 
 2. Run the `source` command that's printed in your terminal after installation.
