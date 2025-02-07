@@ -13,7 +13,11 @@ Before using furnace, you need to:
 
 3. Install system dependencies:
 ```bash
+# for linux
 sudo apt-get install zlib1g-dev libtinfo-dev
+
+# for macos
+brew install zlib ncurses
 ```
 
 ## Install Magic
