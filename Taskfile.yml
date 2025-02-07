@@ -1,0 +1,165 @@
+version: "3"
+
+#
+# sub namespace: https://taskfile.dev/#/usage?id=including-other-taskfiles
+#
+includes:
+  ffi:
+    aliases: [ 'ffi', ]
+    taskfile: packages/mojo-ffi
+    dir: packages/mojo-ffi
+    optional: true
+
+
+#
+# global vars: https://taskfile.dev/#/usage?id=variables
+#
+vars:
+  VAR1: "some-var"
+
+# global env:
+env:
+  ENV1: testing
+
+# env file:
+dotenv:
+  - .env
+
+################################################################################################
+
+tasks:
+  default:
+    cmds:
+      - echo "hello world"
+
+  init:
+    cmds:
+      - cp .env.local .env
+      - task: install
+      - task: install:pkg
+
+  setup:
+    cmds:
+      - echo "setup"
+      - task: install
+
+  install:
+    aliases: [ 'i' ]
+    cmds:
+      - task: install:magic
+      - task: install:packages
+
+  install:magic:
+    aliases: [ 'ipm', 'ipkg' ]
+    cmds:
+      - curl -ssL https://magic.modular.com/70e02269-abfd-4ed6-aac8-fc2b7d61b954 | bash
+
+  install:packages:
+    aliases: [ 'ip' ]
+    cmds:
+      - magic i
+      - magic --version
+      - magic run mojo -v
+
+  pkg:
+    cmds:
+      - magic --version
+      - magic {{.CLI_ARGS}}
+
+  fmt:
+    cmds:
+      - magic run mojo format -l 120
+
+  get:sonic:
+    cmds:
+      - mkdir -p tmp/
+      - rm -rf tmp/sonic-mojo
+      - git clone https://github.com/furnace-dev/sonic-mojo.git tmp/sonic-mojo
+      - cd tmp/sonic-mojo; rm -rf .git; cd ..
+    ignore_error: true
+
+  get:furnace-connect:
+    cmds:
+      - mkdir -p tmp/
+      - cp -r ../furnace-connect tmp/
+    ignore_error: true
+
+  get:requirements:
+    cmds:
+      - task: get:furnace-connect
+      - task: get:sonic
+
+  build:sonic:
+    aliases: [ 'b:s' ]
+    cmds:
+      - cargo build --release
+      - cp target/release/libsonic.dylib ../../bin/
+    dir: tmp/sonic-mojo
+
+  build:furnace-connect:
+    aliases: [ 'b:fc' ]
+    cmds:
+      - cargo test generate_headers
+      - cargo build --release # macos need llvm (brew install llvm)
+    dir: tmp/furnace-connect
+
+  build:requirements:
+    aliases: [ 'b:r' ]
+    cmds:
+      - mkdir -p bin/
+      - task: build:sonic
+      - task: build:furnace-connect
+    ignore_error: true
+
+  run:demo:
+    aliases: [ 'r:d' ]
+    cmds:
+      - echo $BINANCE_API_KEY
+      - echo $BINANCE_TESTNET
+      - RUST_BACKTRACE=1 magic run mojo run binance-main.mojo
+      - echo $LD_LIBRARY_PATH
+    ignore_error: true
+
+  ################################################################################
+
+  new:
+    aliases: [ 'n' ]
+    cmds:
+      - magic init {{.CLI_ARGS}} --format mojoproject
+    dir: 'packages/try'
+
+  ################################################################################
+
+  count:
+    cmds:
+      - tokei # 代码统计: https://github.com/XAMPPRocky/tokei
+
+  ##################################################################################################
+
+  quick:
+    aliases: [ 'q' ]
+    cmds:
+      - task: cc
+      - task: push
+
+  cc:
+    cmds:
+      - task: commit
+      - task: commit
+
+  commit:
+    aliases: [ 'c' ]
+    cmds:
+      - git add .
+      - git commit -m "update"
+    ignore_error: true
+
+  pull:
+    cmds:
+      - git config pull.rebase false
+      - git pull origin main
+
+  push:
+    cmds:
+      - git push origin main --tags
+      - repo_url=`git remote -v | grep push | awk -F ":" '{print $2}' | awk -F ".git" '{print "https://github.com/"$1}'`; open $repo_url
