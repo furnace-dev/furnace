@@ -70,6 +70,55 @@ tasks:
     cmds:
       - magic run mojo format -l 120
 
+  get:sonic:
+    cmds:
+      - mkdir -p tmp/
+      - rm -rf tmp/sonic-mojo
+      - git clone https://github.com/furnace-dev/sonic-mojo.git tmp/sonic-mojo
+      - cd tmp/sonic-mojo; rm -rf .git; cd ..
+    ignore_error: true
+
+  get:furnace-connect:
+    cmds:
+      - mkdir -p tmp/
+      - cp -r ../furnace-connect tmp/
+    ignore_error: true
+
+  get:requirements:
+    cmds:
+      - task: get:furnace-connect
+      - task: get:sonic
+
+  build:sonic:
+    aliases: [ 'b:s' ]
+    cmds:
+      - cargo build --release
+      - cp target/release/libsonic.dylib ../../bin/
+    dir: tmp/sonic-mojo
+
+  build:furnace-connect:
+    aliases: [ 'b:fc' ]
+    cmds:
+      - cargo test generate_headers
+      - cargo build --release # macos need llvm (brew install llvm)
+    dir: tmp/furnace-connect
+
+  build:requirements:
+    aliases: [ 'b:r' ]
+    cmds:
+      - mkdir -p bin/
+      - task: build:sonic
+      - task: build:furnace-connect
+    ignore_error: true
+
+  run:demo:
+    aliases: [ 'r:d' ]
+    cmds:
+      - echo $BINANCE_API_KEY
+      - echo $BINANCE_TESTNET
+      - RUST_BACKTRACE=1 magic run mojo run binance-main.mojo
+      - echo $LD_LIBRARY_PATH
+    ignore_error: true
 
   ################################################################################
 

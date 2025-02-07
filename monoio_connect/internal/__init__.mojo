@@ -1,6 +1,7 @@
 from sys.ffi import DLHandle, c_char, c_size_t
 from memory import UnsafePointer
 from sys.param_env import is_defined
+from sys import os_is_macos
 from .monoio import (
     StrBoxed,
     bind_to_cpu_set,
@@ -22,7 +23,16 @@ alias c_uint16 = UInt16
 alias c_char_ptr = UnsafePointer[c_char]
 alias c_void_ptr = UnsafePointer[c_void]
 
-alias LIBNAME = "libfurnace_connect.so"
+
+# os platform:
+fn get_libname() -> StringLiteral:
+    @parameter
+    if os_is_macos():
+        return "bin/libfurnace_connect.dylib"
+    else:
+        return "bin/libfurnace_connect.so"
+
+alias LIBNAME = get_libname()
 
 
 @always_inline("nodebug")

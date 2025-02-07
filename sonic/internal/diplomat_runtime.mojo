@@ -29,9 +29,9 @@ alias c_nullptr = c_void_ptr()
 fn get_libname() -> StringLiteral:
     @parameter
     if os_is_macos():
-        return "libsonic.dylib"
+        return "bin/libsonic.dylib"
     else:
-        return "libsonic.so"
+        return "bin/libsonic.so"
 
 alias LIBNAME = get_libname()
 
