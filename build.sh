@@ -33,7 +33,7 @@ if [ -z "$output" ]; then
 fi
 
 # Construct mojoc command
-cmd="./scripts/mojoc $d_params $input -lfurnace_connect -lsonic -L . -o $output"
+cmd="./scripts/mojoc $d_params $input -lfurnace_connect -lsonic -L ./bin/ -o $output"
 
 # Print the command to be executed
 echo "Executing command: $cmd"
