@@ -1172,12 +1172,29 @@
 </ul>
 <h3 id="mojo">mojo 开发环境</h3>
 <ul>
-<li>✅ 安装 magic</li>
+<li>✅ 安装 <a href="https://docs.modular.com/magic/">magic</a></li>
 </ul>
+<div class="language-ruby highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">curl</span><span class="w"> </span><span class="o">-</span><span class="n">ssL</span><span class="w"> </span><span class="ss">https</span><span class="p">:</span><span class="sr">//m</span><span class="n">agic</span><span class="o">.</span><span class="n">modular</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">deb109a8</span><span class="o">-</span><span class="mi">2663</span><span class="o">-</span><span class="mi">4</span><span class="n">eee</span><span class="o">-</span><span class="mi">8</span><span class="n">cd6</span><span class="o">-</span><span class="mi">74128</span><span class="n">a9a83d1</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">bash</span>
+</span></code></pre></div>
+<ul>
+<li>设置环境变量:</li>
+</ul>
+<div class="language-ruby highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># mojo:</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">export</span><span class="w"> </span><span class="no">PATH</span><span class="o">=</span><span class="s2">&quot;$PATH:$HOME/.modular/bin&quot;</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">export</span><span class="w"> </span><span class="no">MODULAR_HOME</span><span class="o">=</span><span class="s2">&quot;$HOME/.modular&quot;</span>
+</span></code></pre></div>
 <h3 id="rust">rust 开发环境</h3>
 <ul>
-<li>✅ 使用 rustup 安装 rust</li>
+<li>✅ 使用 <a href="https://www.rust-lang.org/tools/install">rustup</a> 安装 rust</li>
 </ul>
+<div class="language-ruby highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">curl</span><span class="w"> </span><span class="o">--</span><span class="n">proto</span><span class="w"> </span><span class="s1">&#39;=https&#39;</span><span class="w"> </span><span class="o">--</span><span class="n">tlsv1</span><span class="o">.</span><span class="mi">2</span><span class="w"> </span><span class="o">-</span><span class="n">sSf</span><span class="w"> </span><span class="ss">https</span><span class="p">:</span><span class="sr">//s</span><span class="n">h</span><span class="o">.</span><span class="n">rustup</span><span class="o">.</span><span class="n">rs</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">sh</span>
+</span></code></pre></div>
+<ul>
+<li>设置环境变量:</li>
+</ul>
+<div class="language-ruby highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># rust:</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">export</span><span class="w"> </span><span class="no">PATH</span><span class="o">=</span><span class="s2">&quot;$HOME/.cargo/bin:$PATH&quot;</span>
+</span></code></pre></div>
 <h2 id="vscode">vscode 配置</h2>
 <h3 id="vscode_1">vscode 插件</h3>
 <ul>
@@ -1198,45 +1215,45 @@
 <p>在 mac 用户根目录 ~/.ssh/config 配置如下 ssh 连接配置</p>
 </li>
 </ul>
-<div class="language-ruby highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># 对应 orb 虚拟机的 ssh 配置</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="no">Host</span><span class="w"> </span><span class="n">orb22</span><span class="w">    </span><span class="c1"># 别名</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="no">HostName</span><span class="w"> </span><span class="n">localhost</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="no">Port</span><span class="w"> </span><span class="mi">32222</span><span class="w">    </span><span class="c1"># 端口，稍后会进行修改</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span><span class="no">User</span><span class="w"> </span><span class="n">dev</span><span class="w">    </span><span class="c1"># 用户名</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span><span class="no">IdentityFile</span><span class="w"> </span><span class="o">~</span><span class="sr">/.orbstack/ss</span><span class="n">h</span><span class="o">/</span><span class="n">id_ed25519</span><span class="w">    </span><span class="c1"># 私钥文件</span>
+<div class="language-ruby highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># 对应 orb 虚拟机的 ssh 配置</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="no">Host</span><span class="w"> </span><span class="n">orb22</span><span class="w">    </span><span class="c1"># 别名</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="no">HostName</span><span class="w"> </span><span class="n">localhost</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span><span class="no">Port</span><span class="w"> </span><span class="mi">32222</span><span class="w">    </span><span class="c1"># 端口，稍后会进行修改</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span><span class="no">User</span><span class="w"> </span><span class="n">dev</span><span class="w">    </span><span class="c1"># 用户名</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">    </span><span class="no">IdentityFile</span><span class="w"> </span><span class="o">~</span><span class="sr">/.orbstack/ss</span><span class="n">h</span><span class="o">/</span><span class="n">id_ed25519</span><span class="w">    </span><span class="c1"># 私钥文件</span>
 </span></code></pre></div>
 <h2 id="_3">编译框架</h2>
 <ul>
 <li>✅ <a href="">Taskfile.yml</a> 文件的构建脚本, 同时支持 <code>macOS</code> 和 <code>Linux</code>.</li>
 </ul>
-<div class="language-ruby highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># 同时编译依赖库和框架</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">task</span><span class="w"> </span><span class="n">build</span>
+<div class="language-ruby highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># 同时编译依赖库和框架</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">task</span><span class="w"> </span><span class="n">build</span>
 </span></code></pre></div>
 <h3 id="_4">编译框架依赖库</h3>
 <ul>
 <li>✅ 框架底层依赖为 rust 库, 编译 rust ffi 底层依赖库</li>
 </ul>
-<div class="language-ruby highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># 下载依赖到 tmp/ </span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">task</span><span class="w"> </span><span class="ss">get</span><span class="p">:</span><span class="n">requirements</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># 编译 tmp/ 下的依赖库, 并把编译结果, 自动 copy 到 ./bin/ 目录 </span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="n">task</span><span class="w"> </span><span class="ss">build</span><span class="p">:</span><span class="n">requirements</span><span class="w">    </span>
+<div class="language-ruby highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># 下载依赖到 tmp/ </span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">task</span><span class="w"> </span><span class="ss">get</span><span class="p">:</span><span class="n">requirements</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="c1"># 编译 tmp/ 下的依赖库, 并把编译结果, 自动 copy 到 ./bin/ 目录 </span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="n">task</span><span class="w"> </span><span class="ss">build</span><span class="p">:</span><span class="n">requirements</span><span class="w">    </span>
 </span></code></pre></div>
 <h3 id="_5">编译框架包</h3>
 <ul>
 <li>✅ 把 mojo 量化框架编译为 <code>.mojopkg</code> 格式的二进制包.</li>
 <li>✅ 写策略的工程,需要同时 copy <code>.mojopkg</code> 包 和 <code>./bin/</code> 里的 rust 二进制库依赖.</li>
 </ul>
-<div class="language-ruby highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># 编译 mojo 包, 并 copy 到 ./bin/ 目录</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">task</span><span class="w"> </span><span class="ss">build</span><span class="p">:</span><span class="n">pkg</span>
+<div class="language-ruby highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># 编译 mojo 包, 并 copy 到 ./bin/ 目录</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">task</span><span class="w"> </span><span class="ss">build</span><span class="p">:</span><span class="n">pkg</span>
 </span></code></pre></div>
 <h2 id="_6">运行示例</h2>
 <ul>
 <li>✅ 根据 <code>.env.example</code> 文件, 创建 <code>.env</code> 文件</li>
 <li>✅ 添加环境变量到 <code>.env</code> 文件中, 包含交易所的 API-KEY</li>
 </ul>
-<div class="language-ruby highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># 运行示例 </span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">task</span><span class="w"> </span><span class="ss">run</span><span class="p">:</span><span class="n">demo</span>
+<div class="language-ruby highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># 运行示例 </span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="n">task</span><span class="w"> </span><span class="ss">run</span><span class="p">:</span><span class="n">demo</span>
 </span></code></pre></div>
 <h2 id="_7">策略编写</h2>
 <ul>
