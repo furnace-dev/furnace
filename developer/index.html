@@ -527,6 +527,39 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#vscode" class="md-nav__link">
+    <span class="md-ellipsis">
+      vscode 配置
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="vscode 配置">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#vscode_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      vscode 插件
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#macos-orbstack-ubuntu" class="md-nav__link">
+    <span class="md-ellipsis">
+      macos + orbstack + ubuntu 虚拟机
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
       编译框架
@@ -1031,6 +1064,39 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#vscode" class="md-nav__link">
+    <span class="md-ellipsis">
+      vscode 配置
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="vscode 配置">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#vscode_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      vscode 插件
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#macos-orbstack-ubuntu" class="md-nav__link">
+    <span class="md-ellipsis">
+      macos + orbstack + ubuntu 虚拟机
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
       编译框架
@@ -1112,38 +1178,65 @@
 <ul>
 <li>✅ 使用 rustup 安装 rust</li>
 </ul>
+<h2 id="vscode">vscode 配置</h2>
+<h3 id="vscode_1">vscode 插件</h3>
+<ul>
+<li>注意: 要安装 <code>mojo(nightly)</code> 的插件, 才能正常补全!!!</li>
+<li><a href="https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-ssh">Remote - SSH</a><ul>
+<li>ssh 连接 虚拟机 or 容器, 需要此插件</li>
+</ul>
+</li>
+</ul>
+<h3 id="macos-orbstack-ubuntu">macos + orbstack + ubuntu 虚拟机</h3>
+<ul>
+<li>vscode </li>
+<li>m1 mac 是支持 mojo 的, 不过部分库在 rust ffi 编译 + 链接, 目前有问题.</li>
+<li>
+<p>统一使用 ubuntu 虚拟机环境.</p>
+</li>
+<li>
+<p>在 mac 用户根目录 ~/.ssh/config 配置如下 ssh 连接配置</p>
+</li>
+</ul>
+<div class="language-ruby highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># 对应 orb 虚拟机的 ssh 配置</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="no">Host</span><span class="w"> </span><span class="n">orb22</span><span class="w">    </span><span class="c1"># 别名</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="no">HostName</span><span class="w"> </span><span class="n">localhost</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="no">Port</span><span class="w"> </span><span class="mi">32222</span><span class="w">    </span><span class="c1"># 端口，稍后会进行修改</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span><span class="no">User</span><span class="w"> </span><span class="n">dev</span><span class="w">    </span><span class="c1"># 用户名</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span><span class="no">IdentityFile</span><span class="w"> </span><span class="o">~</span><span class="sr">/.orbstack/ss</span><span class="n">h</span><span class="o">/</span><span class="n">id_ed25519</span><span class="w">    </span><span class="c1"># 私钥文件</span>
+</span></code></pre></div>
 <h2 id="_3">编译框架</h2>
 <ul>
 <li>✅ <a href="">Taskfile.yml</a> 文件的构建脚本, 同时支持 <code>macOS</code> 和 <code>Linux</code>.</li>
 </ul>
-<div class="language-ruby highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># 同时编译依赖库和框架</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">task</span><span class="w"> </span><span class="n">build</span>
+<div class="language-ruby highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># 同时编译依赖库和框架</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">task</span><span class="w"> </span><span class="n">build</span>
 </span></code></pre></div>
 <h3 id="_4">编译框架依赖库</h3>
 <ul>
 <li>✅ 框架底层依赖为 rust 库, 编译 rust ffi 底层依赖库</li>
 </ul>
-<div class="language-ruby highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># 下载依赖到 tmp/ </span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">task</span><span class="w"> </span><span class="ss">get</span><span class="p">:</span><span class="n">requirements</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># 编译 tmp/ 下的依赖库, 并把编译结果, 自动 copy 到 ./bin/ 目录 </span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="n">task</span><span class="w"> </span><span class="ss">build</span><span class="p">:</span><span class="n">requirements</span><span class="w">    </span>
+<div class="language-ruby highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># 下载依赖到 tmp/ </span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">task</span><span class="w"> </span><span class="ss">get</span><span class="p">:</span><span class="n">requirements</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># 编译 tmp/ 下的依赖库, 并把编译结果, 自动 copy 到 ./bin/ 目录 </span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="n">task</span><span class="w"> </span><span class="ss">build</span><span class="p">:</span><span class="n">requirements</span><span class="w">    </span>
 </span></code></pre></div>
 <h3 id="_5">编译框架包</h3>
 <ul>
 <li>✅ 把 mojo 量化框架编译为 <code>.mojopkg</code> 格式的二进制包.</li>
 <li>✅ 写策略的工程,需要同时 copy <code>.mojopkg</code> 包 和 <code>./bin/</code> 里的 rust 二进制库依赖.</li>
 </ul>
-<div class="language-ruby highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># 编译 mojo 包, 并 copy 到 ./bin/ 目录</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">task</span><span class="w"> </span><span class="ss">build</span><span class="p">:</span><span class="n">pkg</span>
+<div class="language-ruby highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># 编译 mojo 包, 并 copy 到 ./bin/ 目录</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">task</span><span class="w"> </span><span class="ss">build</span><span class="p">:</span><span class="n">pkg</span>
 </span></code></pre></div>
 <h2 id="_6">运行示例</h2>
 <ul>
 <li>✅ 根据 <code>.env.example</code> 文件, 创建 <code>.env</code> 文件</li>
 <li>✅ 添加环境变量到 <code>.env</code> 文件中, 包含交易所的 API-KEY</li>
 </ul>
-<div class="language-ruby highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># 运行示例 </span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">task</span><span class="w"> </span><span class="ss">run</span><span class="p">:</span><span class="n">demo</span>
+<div class="language-ruby highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># 运行示例 </span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">task</span><span class="w"> </span><span class="ss">run</span><span class="p">:</span><span class="n">demo</span>
 </span></code></pre></div>
 <h2 id="_7">策略编写</h2>
 <ul>
